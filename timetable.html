@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DevOps & AWS 7-Day Study Timetable</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --devops-primary: #f97316;
+      --devops-secondary: #fb923c;
+      --devops-glow: rgba(249,115,22,0.3);
+      --aws-primary: #f59e0b;
+      --aws-secondary: #fbbf24;
+      --aws-glow: rgba(245,158,11,0.3);
+      --bg-dark: #0a0a0f;
+      --bg-card: #111118;
+      --bg-card2: #16161f;
+      --border: rgba(255,255,255,0.07);
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --accent-blue: #6366f1;
+      --accent-green: #10b981;
+      --accent-red: #ef4444;
+      --accent-purple: #8b5cf6;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── BACKGROUND ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 50% at 20% 10%, rgba(99,102,241,0.08) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 80% 80%, rgba(249,115,22,0.06) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .wrapper { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+    /* ── HEADER ── */
+    header { text-align: center; padding: 3rem 0 2.5rem; }
+    .badge {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: rgba(99,102,241,0.15); border: 1px solid rgba(99,102,241,0.3);
+      border-radius: 50px; padding: 0.35rem 1rem; font-size: 0.78rem;
+      color: #a5b4fc; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase;
+      margin-bottom: 1.25rem;
+    }
+    .badge::before { content: '🎓'; font-size: 0.9rem; }
+    header h1 {
+      font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 800; line-height: 1.15;
+      background: linear-gradient(135deg, #f1f5f9 0%, #94a3b8 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; margin-bottom: 0.75rem;
+    }
+    header p { color: var(--text-secondary); font-size: 1rem; max-width: 520px; margin: 0 auto; }
+
+    /* ── TABS ── */
+    .tabs { display: flex; justify-content: center; gap: 1rem; margin: 2.5rem 0; flex-wrap: wrap; }
+    .tab-btn {
+      display: flex; align-items: center; gap: 0.6rem;
+      padding: 0.75rem 2rem; border-radius: 12px; border: 1.5px solid var(--border);
+      background: var(--bg-card); color: var(--text-secondary);
+      font-family: 'Inter', sans-serif; font-size: 0.95rem; font-weight: 600;
+      cursor: pointer; transition: all 0.3s ease; letter-spacing: 0.02em;
+    }
+    .tab-btn:hover { border-color: rgba(255,255,255,0.2); color: var(--text-primary); transform: translateY(-2px); }
+    .tab-btn.active-devops {
+      background: linear-gradient(135deg, rgba(249,115,22,0.2), rgba(251,146,60,0.1));
+      border-color: var(--devops-primary); color: var(--devops-secondary);
+      box-shadow: 0 0 20px var(--devops-glow);
+    }
+    .tab-btn.active-aws {
+      background: linear-gradient(135deg, rgba(245,158,11,0.2), rgba(251,191,36,0.1));
+      border-color: var(--aws-primary); color: var(--aws-secondary);
+      box-shadow: 0 0 20px var(--aws-glow);
+    }
+    .tab-icon { font-size: 1.2rem; }
+
+    /* ── PANEL ── */
+    .panel { display: none; animation: fadeIn 0.4s ease; }
+    .panel.active { display: block; }
+    @keyframes fadeIn { from { opacity:0; transform: translateY(12px); } to { opacity:1; transform: translateY(0); } }
+
+    /* ── SECTION TITLE ── */
+    .section-title {
+      display: flex; align-items: center; gap: 1rem;
+      margin-bottom: 2rem; padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .section-title .icon { font-size: 2rem; }
+    .section-title h2 { font-size: 1.6rem; font-weight: 700; }
+    .section-title p { color: var(--text-secondary); font-size: 0.88rem; margin-top: 0.2rem; }
+    .devops-accent { color: var(--devops-primary); }
+    .aws-accent { color: var(--aws-primary); }
+
+    /* ── DAYS GRID ── */
+    .days-grid { display: grid; gap: 1.5rem; }
+
+    /* ── DAY CARD ── */
+    .day-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 16px; overflow: hidden;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .day-card:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(0,0,0,0.4); }
+
+    .day-header {
+      display: flex; align-items: center; gap: 1rem;
+      padding: 1.1rem 1.5rem; cursor: pointer;
+      position: relative; overflow: hidden;
+    }
+    .day-header::before {
+      content: ''; position: absolute; inset: 0;
+      opacity: 0.08; transition: opacity 0.3s;
+    }
+    .devops-card .day-header::before { background: linear-gradient(90deg, var(--devops-primary), transparent); }
+    .aws-card .day-header::before { background: linear-gradient(90deg, var(--aws-primary), transparent); }
+    .day-card:hover .day-header::before { opacity: 0.15; }
+
+    .day-badge {
+      min-width: 48px; height: 48px; border-radius: 12px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 0.7rem; line-height: 1.1;
+      text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .devops-card .day-badge { background: linear-gradient(135deg, var(--devops-primary), #ea580c); color: #fff; }
+    .aws-card .day-badge { background: linear-gradient(135deg, var(--aws-primary), #d97706); color: #fff; }
+    .day-badge span { font-size: 1.1rem; font-weight: 800; line-height: 1; }
+
+    .day-info { flex: 1; }
+    .day-info h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.2rem; }
+    .day-info p { font-size: 0.82rem; color: var(--text-muted); }
+
+    .day-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-left: auto; }
+    .tag {
+      padding: 0.25rem 0.65rem; border-radius: 6px;
+      font-size: 0.72rem; font-weight: 600; white-space: nowrap;
+    }
+    .tag-blue   { background: rgba(99,102,241,0.15); color: #a5b4fc; }
+    .tag-green  { background: rgba(16,185,129,0.15); color: #6ee7b7; }
+    .tag-orange { background: rgba(249,115,22,0.15); color: #fdba74; }
+    .tag-yellow { background: rgba(234,179,8,0.15);  color: #fde047; }
+    .tag-purple { background: rgba(139,92,246,0.15); color: #c4b5fd; }
+    .tag-red    { background: rgba(239,68,68,0.15);  color: #fca5a5; }
+    .tag-cyan   { background: rgba(6,182,212,0.15);  color: #67e8f9; }
+
+    .chevron { font-size: 1rem; color: var(--text-muted); transition: transform 0.3s; margin-left: 0.5rem; }
+
+    /* ── SCHEDULE TABLE ── */
+    .schedule { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
+    .schedule.open { max-height: 2000px; }
+
+    table { width: 100%; border-collapse: collapse; }
+    thead tr { background: rgba(255,255,255,0.03); }
+    thead th {
+      padding: 0.65rem 1.2rem; text-align: left;
+      font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--text-muted); font-weight: 600; border-bottom: 1px solid var(--border);
+    }
+    tbody tr { border-bottom: 1px solid rgba(255,255,255,0.04); transition: background 0.15s; }
+    tbody tr:hover { background: rgba(255,255,255,0.03); }
+    tbody tr:last-child { border-bottom: none; }
+    td { padding: 0.75rem 1.2rem; font-size: 0.88rem; vertical-align: top; }
+    td:first-child {
+      font-family: 'JetBrains Mono', monospace; font-size: 0.78rem;
+      color: var(--text-muted); white-space: nowrap; width: 140px;
+    }
+    td:nth-child(2) { font-weight: 500; color: var(--text-primary); }
+    td:nth-child(3) { color: var(--text-secondary); font-size: 0.83rem; }
+
+    .break-row td { color: var(--text-muted) !important; font-style: italic; background: rgba(255,255,255,0.01); }
+
+    /* ── TOPICS FOOTER ── */
+    .topics-footer {
+      display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;
+      padding: 0.85rem 1.2rem; background: rgba(255,255,255,0.02);
+      border-top: 1px solid var(--border);
+    }
+    .topics-footer .label { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; margin-right: 0.25rem; }
+
+    /* ── SUMMARY TABLE ── */
+    .summary-section { margin-top: 3rem; }
+    .summary-section h3 { font-size: 1.2rem; font-weight: 700; margin-bottom: 1.25rem; }
+    .summary-table { width: 100%; border-collapse: collapse; background: var(--bg-card); border-radius: 14px; overflow: hidden; border: 1px solid var(--border); }
+    .summary-table thead tr { background: rgba(255,255,255,0.04); }
+    .summary-table th { padding: 0.85rem 1.25rem; text-align: left; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted); font-weight: 600; }
+    .summary-table td { padding: 0.85rem 1.25rem; font-size: 0.9rem; border-top: 1px solid var(--border); }
+    .summary-table tr:hover td { background: rgba(255,255,255,0.025); }
+    .day-num { font-weight: 700; }
+    .devops-card-mini .day-num { color: var(--devops-primary); }
+    .aws-card-mini .day-num { color: var(--aws-primary); }
+
+    /* ── PROGRESS BAR ── */
+    .progress-section { margin: 2.5rem 0 0; }
+    .progress-section h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 1.2rem; }
+    .progress-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; }
+    .progress-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 1rem 1.2rem; }
+    .progress-label { display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.6rem; }
+    .progress-label span:first-child { font-weight: 600; }
+    .progress-label span:last-child { color: var(--text-muted); }
+    .progress-bar { height: 6px; background: rgba(255,255,255,0.08); border-radius: 999px; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 999px; transition: width 1.2s ease; }
+    .devops-fill { background: linear-gradient(90deg, var(--devops-primary), #fb923c); }
+    .aws-fill { background: linear-gradient(90deg, var(--aws-primary), #fbbf24); }
+
+    /* ── FOOTER ── */
+    .page-footer { text-align: center; margin-top: 4rem; padding-top: 2rem; border-top: 1px solid var(--border); }
+    .page-footer p { color: var(--text-muted); font-size: 0.85rem; }
+    .page-footer strong { color: var(--accent-green); }
+
+    @media (max-width: 640px) {
+      .day-tags { display: none; }
+      td:first-child { width: 100px; }
+      .tab-btn { padding: 0.65rem 1.25rem; font-size: 0.88rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrapper">
+
+  <!-- HEADER -->
+  <header>
+    <div class="badge">Study Timetable 2026</div>
+    <h1>7-Day Study Plans</h1>
+    <p>Structured daily schedules for DevOps & AWS — Theory, Hands-on Labs, and Revision.</p>
+  </header>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab-btn active-devops" id="tab-devops" onclick="switchTab('devops')">
+      <span class="tab-icon">🛠️</span> DevOps Timetable
+    </button>
+    <button class="tab-btn" id="tab-aws" onclick="switchTab('aws')">
+      <span class="tab-icon">☁️</span> AWS Timetable
+    </button>
+  </div>
+
+  <!-- ═══════════════════════════════════════════ DEVOPS PANEL ═══ -->
+  <div class="panel active" id="panel-devops">
+    <div class="section-title">
+      <span class="icon">🛠️</span>
+      <div>
+        <h2><span class="devops-accent">DevOps</span> — 7-Day Plan</h2>
+        <p>Linux · Git · CI/CD · Docker · Kubernetes · Terraform · Ansible · Monitoring</p>
+      </div>
+    </div>
+
+    <div class="days-grid">
+
+      <!-- DAY 1 -->
+      <div class="day-card devops-card">
+        <div class="day-header" onclick="toggleDay(this)">
+          <div class="day-badge"><span>1</span>Day</div>
+          <div class="day-info">
+            <h3>DevOps Fundamentals & Linux</h3>
+            <p>DevOps culture, SDLC, Linux CLI, Shell scripting, SSH</p>
+          </div>
+          <div class="day-tags">
+            <span class="tag tag-orange">DevOps</span>
+            <span class="tag tag-blue">Linux</span>
+            <span class="tag tag-green">Shell</span>
+          </div>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="schedule">
+          <table>
+            <thead><tr><th>Time</th><th>Topic</th><th>Activity</th></tr></thead>
+            <tbody>
+              <tr><td>9:00 – 10:30</td><td>What is DevOps? SDLC, Agile vs DevOps</td><td>📖 Read + Notes</td></tr>
+              <tr><td>10:30 – 12:00</td><td>DevOps lifecycle stages & tools overview</td><td>🧠 Mind Map</td></tr>
+              <tr class="break-row"><td>12:00 – 13:00</td><td>🍽️ Lunch Break</td><td>—</td></tr>
+              <tr><td>13:00 – 15:00</td><td>Linux Commands (filesystem, permissions, processes)</td><td>💻 Terminal practice</td></tr>
+              <tr><td>15:00 – 16:30</td><td>Shell scripting basics (variables, loops, conditionals)</td><td>✍️ Write 5 scripts</td></tr>
+              <tr><td>16:30 – 17:30</td><td>SSH, SCP, cron jobs</td><td>🔬 Hands-on</td></tr>
+              <tr><td>17:30 – 18:00</td><td>Revision + Notes</td><td>📝 Summarize</td></tr>
+            </tbody>
+          </table>
+          <div class="topics-footer">
+            <span class="label">📌 Covered:</span>
+            <span class="tag tag-orange">DevOps Culture</span>
+            <span class="tag tag-blue">Linux CLI</span>
+            <span class="tag tag-green">Shell Scripting</span>
+            <span class="tag tag-purple">SSH</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- DAY 2 -->
+      <div class="day-card devops-card">
+        <div class="day-header" onclick="toggleDay(this)">
+          <div class="day-badge"><span>2</span>Day</div>
+          <div class="day-info">
+            <h3>Version Control with Git & GitHub</h3>
+            <p>Git fundamentals, branching, GitHub workflows, PRs</p>
+          </div>
+          <div class="day-tags">
+            <span class="tag tag-red">Git</span>
+            <span class="tag tag-blue">GitHub</span>
+            <span class="tag tag-green">Workflows</span>
+          </div>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="schedule">
+          <table>
+            <thead><tr><th>Time</th><th>Topic</th><th>Activity</th></tr></thead>
+            <tbody>
+              <tr><td>9:00 – 10:30</td><td>Git fundamentals (init, add, commit, push, pull)</td><td>💻 Practice</td></tr>
+              <tr><td>10:30 – 12:00</td><td>Branching, merging, rebasing, conflict resolution</td><td>🔬 Hands-on</td></tr>
+              <tr class="break-row"><td>12:00 – 13:00</td><td>🍽️ Lunch Break</td><td>—</td></tr>
+              <tr><td>13:00 – 14:30</td><td>GitHub: PRs, issues, forks, GitHub Actions intro</td><td>🌐 Explore GitHub</td></tr>
+              <tr><td>14:30 – 16:00</td><td>Git workflows (GitFlow, trunk-based)</td><td>📖 Study + Diagram</td></tr>
+              <tr><td>16:00 – 17:30</td><td>.gitignore, tagging, stashing, cherry-pick</td><td>💻 Practice</td></tr>
+              <tr><td>17:30 – 18:00</td><td>Revision + Notes</td><td>📝 Summarize</td></tr>
+            </tbody>
+          </table>
+          <div class="topics-footer">
+            <span class="label">📌 Covered:</span>
+            <span class="tag tag-red">Git</span>
+            <span class="tag tag-blue">GitHub</span>
+            <span class="tag tag-green">Branching</span>
+            <span class="tag tag-purple">GitFlow</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- DAY 3 -->
+      <div class="day-card devops-card">
+        <div class="day-header" onclick="toggleDay(this)">
+          <div class="day-badge"><span>3</span>Day</div>
+          <div class="day-info">
+            <h3>CI/CD Pipelines — Jenkins & GitHub Actions</h3>
+            <p>Pipeline stages, Jenkins, GitHub Actions, YAML, full CI pipeline</p>
+          </div>
+          <div class="day-tags">
+            <span class="tag tag-orange">Jenkins</span>
+            <span class="tag tag-blue">CI/CD</span>
+            <span class="tag tag-green">YAML</span>
+          </div>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="schedule">
+          <table>
+            <thead><tr><th>Time</th><th>Topic</th><th>Activity</th></tr></thead>
+            <tbody>
+              <tr><td>9:00 – 10:30</td><td>CI/CD concepts, pipeline stages</td><td>📖 Study</td></tr>
+              <tr><td>10:30 – 12:00</td><td>Jenkins installation & configuration</td><td>⚙️ Setup Lab</td></tr>
+              <tr class="break-row"><td>12:00 – 13:00</td><td>🍽️ Lunch Break</td><td>—</td></tr>
+              <tr><td>13:00 – 14:30</td><td>Jenkins Pipelines (Declarative & Scripted)</td><td>🔧 Create Pipeline</td></tr>
+              <tr><td>14:30 – 16:00</td><td>GitHub Actions: workflows, triggers, runners</td><td>✍️ Write YAML</td></tr>
+              <tr><td>16:00 – 17:30</td><td>Build a full CI pipeline: test → build → deploy</td><td>🚀 Mini Project</td></tr>
+              <tr><td>17:30 – 18:00</td><td>Revision + Notes</td><td>📝 Summarize</td></tr>
+            </tbody>
+          </table>
+          <div class="topics-footer">
+            <span class="label">📌 Covered:</span>
+            <span class="tag tag-orange">CI/CD</span>
+            <span class="tag tag-blue">Jenkins</span>
+            <span class="tag tag-green">GitHub Actions</span>
+            <span class="tag tag-yellow">YAML</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- DAY 4 -->
+      <div class="day-card devops-card">
+        <div class="day-header" onclick="toggleDay(this)">
+          <div class="day-badge"><span>4</span>Day</div>
+          <div class="day-info">
+            <h3>Docker & Containerization</h3>
+            <p>Docker CLI, Dockerfile, Docker Compose, networking, volumes</p>
+          </div>
+          <div class="day-tags">
+            <span class="tag tag-cyan">Docker</span>
+            <span class="tag tag-blue">Containers</span>
+            <span class="tag tag-green">Compose</span>
+          </div>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="schedule">
+          <table>
+            <thead><tr><th>Time</th><th>Topic</th><th>Activity</th></tr></thead>
+            <tbody>
+              <tr><td>9:00 – 10:30</td><td>Containers vs VMs, Docker architecture</td><td>📖 Study</td></tr>
+              <tr><td>10:30 – 12:00</td><td>Docker CLI: pull, run, build, push, ps, logs</td><td>💻 Hands-on</td></tr>
+              <tr class="break-row"><td>12:00 – 13:00</td><td>🍽️ Lunch Break</td><td>—</td></tr>
+              <tr><td>13:00 – 14:30</td><td>Dockerfile: best practices, multi-stage builds</td><td>✍️ Write Dockerfiles</td></tr>
+              <tr><td>14:30 – 16:00</td><td>Docker Compose: multi-container apps</td><td>📄 Create compose.yml</td></tr>
+              <tr><td>16:00 – 17:30</td><td>Docker networking & volumes</td><td>🔬 Lab</td></tr>
+              <tr><td>17:30 – 18:00</td><td>Revision + Notes</td><td>📝 Summarize</td></tr>
+            </tbody>
+          </table>
+          <div class="topics-footer">
+            <span class="label">📌 Covered:</span>
+            <span class="tag tag-cyan">Docker</span>
+            <span class="tag tag-blue">Containerization</span>
+            <span class="tag tag-green">Dockerfile</span>
+            <span class="tag tag-purple">Docker Compose</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- DAY 5 -->
+      <div class="day-card devops-card">
+        <div class="day-header" onclick="toggleDay(this)">
+          <div class="day-badge"><span>5</span>Day</div>
+          <div class="day-info">
+            <h3>Kubernetes (K8s) Fundamentals</h3>
+            <p>Architecture, kubectl, Deployments, Services, Helm Charts</p>
+          </div>
+          <div class="day-tags">
+            <span class="tag tag-blue">Kubernetes</span>
+            <span class="tag tag-purple">kubectl</span>
+            <span class="tag tag-orange">Helm</span>
+          </div>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="schedule">
+          <table>
+            <thead><tr><th>Time</th><th>Topic</th><th>Activity</th></tr></thead>
+            <tbody>
+              <tr><td>9:00 – 10:30</td><td>K8s architecture (Master, Nodes, Pods)</td><td>📖 Study + Diagrams</td></tr>
+              <tr><td>10:30 – 12:00</td><td>kubectl commands, namespaces, contexts</td><td>💻 Practice (minikube)</td></tr>
+              <tr class="break-row"><td>12:00 – 13:00</td><td>🍽️ Lunch Break</td><td>—</td></tr>
+              <tr><td>13:00 – 14:30</td><td>Deployments, Services, ConfigMaps, Secrets</td><td>📄 Create YAML manifests</td></tr>
+              <tr><td>14:30 – 16:00</td><td>Ingress, HPA (Horizontal Pod Autoscaler)</td><td>🔬 Lab</td></tr>
+              <tr><td>16:00 – 17:30</td><td>Helm Charts basics</td><td>📦 Install a chart</td></tr>
+              <tr><td>17:30 – 18:00</td><td>Revision + Notes</td><td>📝 Summarize</td></tr>
+            </tbody>
+          </table>
+          <div class="topics-footer">
+            <span class="label">📌 Covered:</span>
+            <span class="tag tag-blue">Kubernetes</span>
+            <span class="tag tag-purple">kubectl</span>
+            <span class="tag tag-green">Deployments</span>
+            <span class="tag tag-orange">Helm</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- DAY 6 -->
+      <div class="day-card devops-card">
+        <div class="day-header" onclick="toggleDay(this)">
+          <div class="day-badge"><span>6</span>Day</div>
+          <div class="day-info">
+            <h3>Terraform (IaC) & Monitoring</h3>
+            <p>Terraform, Prometheus, Grafana, ELK Stack, logging</p>
+          </div>
+          <div class="day-tags">
+            <span class="tag tag-purple">Terraform</span>
+            <span class="tag tag-orange">Prometheus</span>
+            <span class="tag tag-yellow">Grafana</span>
+          </div>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="schedule">
+          <table>
+            <thead><tr><th>Time</th><th>Topic</th><th>Activity</th></tr></thead>
+            <tbody>
+              <tr><td>9:00 – 10:30</td><td>IaC concepts, Terraform architecture</td><td>📖 Study</td></tr>
+              <tr><td>10:30 – 12:00</td><td>Terraform: providers, resources, variables, outputs</td><td>✍️ Write .tf files</td></tr>
+              <tr class="break-row"><td>12:00 – 13:00</td><td>🍽️ Lunch Break</td><td>—</td></tr>
+              <tr><td>13:00 – 14:30</td><td>Terraform state, modules, workspaces</td><td>🔬 Hands-on</td></tr>
+              <tr><td>14:30 – 16:00</td><td>Monitoring: Prometheus + Grafana setup</td><td>⚙️ Lab</td></tr>
+              <tr><td>16:00 – 17:30</td><td>ELK Stack / Loki for log management</td><td>📖 Study + Setup</td></tr>
+              <tr><td>17:30 – 18:00</td><td>Revision + Notes</td><td>📝 Summarize</td></tr>
+            </tbody>
+          </table>
+          <div class="topics-footer">
+            <span class="label">📌 Covered:</span>
+            <span class="tag tag-purple">Terraform</span>
+            <span class="tag tag-orange">IaC</span>
+            <span class="tag tag-yellow">Prometheus</span>
+            <span class="tag tag-green">Grafana</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- DAY 7 -->
+      <div class="day-card devops-card">
+        <div class="day-header" onclick="toggleDay(this)">
+          <div class="day-badge"><span>7</span>Day</div>
+          <div class="day-info">
+            <h3>Ansible, DevSecOps & Full Revision</h3>
+            <p>Ansible playbooks, DevSecOps, end-to-end project, mock Q&A</p>
+          </div>
+          <div class="day-tags">
+            <span class="tag tag-red">Ansible</span>
+            <span class="tag tag-orange">DevSecOps</span>
+            <span class="tag tag-green">Revision</span>
+          </div>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="schedule">
+          <table>
+            <thead><tr><th>Time</th><th>Topic</th><th>Activity</th></tr></thead>
+            <tbody>
+              <tr><td>9:00 – 10:30</td><td>Configuration Management: Ansible basics</td><td>📖 Study</td></tr>
+              <tr><td>10:30 – 12:00</td><td>Ansible: playbooks, roles, inventory</td><td>✍️ Write playbooks</td></tr>
+              <tr class="break-row"><td>12:00 – 13:00</td><td>🍽️ Lunch Break</td><td>—</td></tr>
+              <tr><td>13:00 – 14:00</td><td>DevSecOps: secrets management, SAST/DAST</td><td>📖 Study</td></tr>
+              <tr><td>14:00 – 15:30</td><td>End-to-End Project (CI → Docker → K8s)</td><td>🚀 Mini Project</td></tr>
+              <tr><td>15:30 – 17:00</td><td>Full Week Revision: concepts + tools + commands</td><td>🃏 Flashcards</td></tr>
+              <tr><td>17:00 – 18:00</td><td>Mock Questions & Interview Prep</td><td>❓ Q&A</td></tr>
+            </tbody>
+          </table>
+          <div class="topics-footer">
+            <span class="label">📌 Covered:</span>
+            <span class="tag tag-red">Ansible</span>
+            <span class="tag tag-orange">DevSecOps</span>
+            <span class="tag tag-green">Full Project</span>
+            <span class="tag tag-blue">Interview Prep</span>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /days-grid -->
+
+    <!-- PROGRESS -->
+    <div class="progress-section">
+      <h3>🎯 DevOps Skill Progression</h3>
+      <div class="progress-grid">
+        <div class="progress-item">
+          <div class="progress-label"><span>Linux & Shell</span><span>Day 1</span></div>
+          <div class="progress-bar"><div class="progress-fill devops-fill" style="width:100%"></div></div>
+        </div>
+        <div class="progress-item">
+          <div class="progress-label"><span>Git & GitHub</span><span>Day 2</span></div>
+          <div class="progress-bar"><div class="progress-fill devops-fill" style="width:85%"></div></div>
+        </div>
+        <div class="progress-item">
+          <div class="progress-label"><span>CI/CD Pipelines</span><span>Day 3</span></div>
+          <div class="progress-bar"><div class="progress-fill devops-fill" style="width:80%"></div></div>
+        </div>
+        <div class="progress-item">
+          <div class="progress-label"><span>Docker</span><span>Day 4</span></div>
+          <div class="progress-bar"><div class="progress-fill devops-fill" style="width:90%"></div></div>
+        </div>
+        <div class="progress-item">
+          <div class="progress-label"><span>Kubernetes</span><span>Day 5</span></div>
+          <div class="progress-bar"><div class="progress-fill devops-fill" style="width:75%"></div></div>
+        </div>
+        <div class="progress-item">
+          <div class="progress-label"><span>Terraform</span><span>Day 6</span></div>
+          <div class="progress-bar"><div class="progress-fill devops-fill" style="width:70%"></div></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /panel-devops -->
+
+  <!-- ═══════════════════════════════════════════ AWS PANEL ═══ -->
+  <div class="panel" id="panel-aws">
+    <div class="section-title">
+      <span class="icon">☁️</span>
+      <div>
+        <h2><span class="aws-accent">AWS</span> — 7-Day Plan</h2>
+        <p>IAM · EC2 · S3 · VPC · RDS · DynamoDB · CloudFormation · ECS · Monitoring</p>
+      </div>
+    </div>
+
+    <div class="days-grid">
+
+      <!-- AWS DAY 1 -->
+      <div class="day-card aws-card">
+        <div class="day-header" onclick="toggleDay(this)">
+          <div class="day-badge"><span>1</span>Day</div>
+          <div class="day-info">
+            <h3>AWS Fundamentals & IAM</h3>
+            <p>Cloud concepts, AWS Console, IAM, CLI setup</p>
+          </div>
+          <div class="day-tags">
+            <span class="tag tag-yellow">IAM</span>
+            <span class="tag tag-orange">Cloud</span>
+            <span class="tag tag-green">CLI</span>
+          </div>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="schedule">
+          <table>
+            <thead><tr><th>Time</th><th>Topic</th><th>Activity</th></tr></thead>
+            <tbody>
+              <tr><td>9:00 – 10:30</td><td>Cloud computing concepts, AWS global infrastructure</td><td>📖 Study</td></tr>
+              <tr><td>10:30 – 12:00</td><td>AWS Free Tier setup, Console tour, Regions & AZs</td><td>💻 Hands-on</td></tr>
+              <tr class="break-row"><td>12:00 – 13:00</td><td>🍽️ Lunch Break</td><td>—</td></tr>
+              <tr><td>13:00 – 14:30</td><td>IAM: Users, Groups, Roles, Policies</td><td>🔧 Create & attach policies</td></tr>
+              <tr><td>14:30 – 16:00</td><td>IAM best practices: MFA, least privilege</td><td>🔬 Lab</td></tr>
+              <tr><td>16:00 – 17:30</td><td>AWS CLI setup & configuration</td><td>⚙️ aws configure</td></tr>
+              <tr><td>17:30 – 18:00</td><td>Revision + Notes</td><td>📝 Summarize</td></tr>
+            </tbody>
+          </table>
+          <div class="topics-footer">
+            <span class="label">📌 Covered:</span>
+            <span class="tag tag-yellow">Cloud Basics</span>
+            <span class="tag tag-orange">AWS Console</span>
+            <span class="tag tag-green">IAM</span>
+            <span class="tag tag-blue">CLI</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- AWS DAY 2 -->
+      <div class="day-card aws-card">
+        <div class="day-header" onclick="toggleDay(this)">
+          <div class="day-badge"><span>2</span>Day</div>
+          <div class="day-info">
+            <h3>Compute Services — EC2 & Lambda</h3>
+            <p>EC2, AMIs, Security Groups, Auto Scaling, Load Balancer, Lambda</p>
+          </div>
+          <div class="day-tags">
+            <span class="tag tag-orange">EC2</span>
+            <span class="tag tag-yellow">Lambda</span>
+            <span class="tag tag-green">ASG</span>
+          </div>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="schedule">
+          <table>
+            <thead><tr><th>Time</th><th>Topic</th><th>Activity</th></tr></thead>
+            <tbody>
+              <tr><td>9:00 – 10:30</td><td>EC2: instance types, AMIs, key pairs, security groups</td><td>📖 Study</td></tr>
+              <tr><td>10:30 – 12:00</td><td>Launch EC2, SSH in, install NGINX</td><td>🔬 Hands-on</td></tr>
+              <tr class="break-row"><td>12:00 – 13:00</td><td>🍽️ Lunch Break</td><td>—</td></tr>
+              <tr><td>13:00 – 14:30</td><td>EC2: EBS volumes, snapshots, Elastic IPs</td><td>⚙️ Lab</td></tr>
+              <tr><td>14:30 – 16:00</td><td>Auto Scaling Groups + Load Balancer (ALB)</td><td>🔧 Configure ASG</td></tr>
+              <tr><td>16:00 – 17:30</td><td>AWS Lambda: functions, triggers, event sources</td><td>🚀 Deploy function</td></tr>
+              <tr><td>17:30 – 18:00</td><td>Revision + Notes</td><td>📝 Summarize</td></tr>
+            </tbody>
+          </table>
+          <div class="topics-footer">
+            <span class="label">📌 Covered:</span>
+            <span class="tag tag-orange">EC2</span>
+            <span class="tag tag-yellow">AMI</span>
+            <span class="tag tag-green">Auto Scaling</span>
+            <span class="tag tag-blue">Lambda</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- AWS DAY 3 -->
+      <div class="day-card aws-card">
+        <div class="day-header" onclick="toggleDay(this)">
+          <div class="day-badge"><span>3</span>Day</div>
+          <div class="day-info">
+            <h3>Storage Services — S3, EBS, EFS, Glacier</h3>
+            <p>S3 buckets, versioning, lifecycle, static hosting, security</p>
+          </div>
+          <div class="day-tags">
+            <span class="tag tag-yellow">S3</span>
+            <span class="tag tag-orange">EBS</span>
+            <span class="tag tag-green">EFS</span>
+          </div>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="schedule">
+          <table>
+            <thead><tr><th>Time</th><th>Topic</th><th>Activity</th></tr></thead>
+            <tbody>
+              <tr><td>9:00 – 10:30</td><td>S3: buckets, objects, storage classes</td><td>📖 Study</td></tr>
+              <tr><td>10:30 – 12:00</td><td>S3: versioning, lifecycle policies, replication</td><td>🔬 Hands-on</td></tr>
+              <tr class="break-row"><td>12:00 – 13:00</td><td>🍽️ Lunch Break</td><td>—</td></tr>
+              <tr><td>13:00 – 14:30</td><td>S3: static website hosting, pre-signed URLs</td><td>🌐 Lab</td></tr>
+              <tr><td>14:30 – 16:00</td><td>S3 security: bucket policies, ACLs, encryption</td><td>🔒 Configure</td></tr>
+              <tr><td>16:00 – 17:30</td><td>EBS vs EFS vs Glacier — comparison & use cases</td><td>📝 Study + Notes</td></tr>
+              <tr><td>17:30 – 18:00</td><td>Revision + Notes</td><td>📝 Summarize</td></tr>
+            </tbody>
+          </table>
+          <div class="topics-footer">
+            <span class="label">📌 Covered:</span>
+            <span class="tag tag-yellow">S3</span>
+            <span class="tag tag-orange">EBS</span>
+            <span class="tag tag-green">EFS</span>
+            <span class="tag tag-blue">Glacier</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- AWS DAY 4 -->
+      <div class="day-card aws-card">
+        <div class="day-header" onclick="toggleDay(this)">
+          <div class="day-badge"><span>4</span>Day</div>
+          <div class="day-info">
+            <h3>Networking — VPC, Route 53, CloudFront</h3>
+            <p>VPC, subnets, NAT Gateway, Route 53, CloudFront CDN</p>
+          </div>
+          <div class="day-tags">
+            <span class="tag tag-cyan">VPC</span>
+            <span class="tag tag-yellow">Route 53</span>
+            <span class="tag tag-orange">CloudFront</span>
+          </div>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="schedule">
+          <table>
+            <thead><tr><th>Time</th><th>Topic</th><th>Activity</th></tr></thead>
+            <tbody>
+              <tr><td>9:00 – 10:30</td><td>VPC: subnets, route tables, internet gateway</td><td>📖 Study + Diagram</td></tr>
+              <tr><td>10:30 – 12:00</td><td>Create custom VPC with public & private subnets</td><td>🔬 Hands-on</td></tr>
+              <tr class="break-row"><td>12:00 – 13:00</td><td>🍽️ Lunch Break</td><td>—</td></tr>
+              <tr><td>13:00 – 14:30</td><td>NAT Gateway, Security Groups vs NACLs</td><td>⚙️ Lab</td></tr>
+              <tr><td>14:30 – 16:00</td><td>VPC Peering, VPN, Direct Connect concepts</td><td>📖 Study</td></tr>
+              <tr><td>16:00 – 17:00</td><td>Route 53: DNS, routing policies</td><td>🔧 Configure</td></tr>
+              <tr><td>17:00 – 17:30</td><td>CloudFront CDN setup with S3 origin</td><td>🌐 Lab</td></tr>
+              <tr><td>17:30 – 18:00</td><td>Revision + Notes</td><td>📝 Summarize</td></tr>
+            </tbody>
+          </table>
+          <div class="topics-footer">
+            <span class="label">📌 Covered:</span>
+            <span class="tag tag-cyan">VPC</span>
+            <span class="tag tag-yellow">NAT Gateway</span>
+            <span class="tag tag-orange">Route 53</span>
+            <span class="tag tag-purple">CloudFront</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- AWS DAY 5 -->
+      <div class="day-card aws-card">
+        <div class="day-header" onclick="toggleDay(this)">
+          <div class="day-badge"><span>5</span>Day</div>
+          <div class="day-info">
+            <h3>Databases — RDS, DynamoDB, ElastiCache</h3>
+            <p>RDS, Multi-AZ, DynamoDB, GSI, DAX, ElastiCache</p>
+          </div>
+          <div class="day-tags">
+            <span class="tag tag-blue">RDS</span>
+            <span class="tag tag-yellow">DynamoDB</span>
+            <span class="tag tag-red">ElastiCache</span>
+          </div>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="schedule">
+          <table>
+            <thead><tr><th>Time</th><th>Topic</th><th>Activity</th></tr></thead>
+            <tbody>
+              <tr><td>9:00 – 10:30</td><td>RDS: MySQL/PostgreSQL, Multi-AZ, Read Replicas</td><td>📖 Study</td></tr>
+              <tr><td>10:30 – 12:00</td><td>Launch RDS, connect from EC2</td><td>🔬 Hands-on</td></tr>
+              <tr class="break-row"><td>12:00 – 13:00</td><td>🍽️ Lunch Break</td><td>—</td></tr>
+              <tr><td>13:00 – 14:30</td><td>DynamoDB: tables, items, partition keys, GSI</td><td>⚙️ Lab</td></tr>
+              <tr><td>14:30 – 16:00</td><td>DynamoDB streams, DAX, on-demand vs provisioned</td><td>📖 Study + Practice</td></tr>
+              <tr><td>16:00 – 17:30</td><td>ElastiCache (Redis/Memcached) overview & setup</td><td>🔍 Explore</td></tr>
+              <tr><td>17:30 – 18:00</td><td>Revision + Notes</td><td>📝 Summarize</td></tr>
+            </tbody>
+          </table>
+          <div class="topics-footer">
+            <span class="label">📌 Covered:</span>
+            <span class="tag tag-blue">RDS</span>
+            <span class="tag tag-yellow">DynamoDB</span>
+            <span class="tag tag-red">ElastiCache</span>
+            <span class="tag tag-purple">DAX</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- AWS DAY 6 -->
+      <div class="day-card aws-card">
+        <div class="day-header" onclick="toggleDay(this)">
+          <div class="day-badge"><span>6</span>Day</div>
+          <div class="day-info">
+            <h3>DevOps Tools — CloudFormation, CodePipeline, ECS/EKS</h3>
+            <p>CloudFormation, CodePipeline, ECS, EKS, ECR</p>
+          </div>
+          <div class="day-tags">
+            <span class="tag tag-orange">CloudFormation</span>
+            <span class="tag tag-cyan">ECS</span>
+            <span class="tag tag-blue">EKS</span>
+          </div>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="schedule">
+          <table>
+            <thead><tr><th>Time</th><th>Topic</th><th>Activity</th></tr></thead>
+            <tbody>
+              <tr><td>9:00 – 10:30</td><td>CloudFormation: templates, stacks, change sets</td><td>📖 Study</td></tr>
+              <tr><td>10:30 – 12:00</td><td>Deploy infrastructure using CFN template</td><td>🔬 Hands-on</td></tr>
+              <tr class="break-row"><td>12:00 – 13:00</td><td>🍽️ Lunch Break</td><td>—</td></tr>
+              <tr><td>13:00 – 14:30</td><td>CodePipeline: CodeCommit → CodeBuild → CodeDeploy</td><td>🔧 Build pipeline</td></tr>
+              <tr><td>14:30 – 16:00</td><td>ECS: clusters, task definitions, services</td><td>🚀 Deploy containerized app</td></tr>
+              <tr><td>16:00 – 17:30</td><td>EKS overview, ECR for container registry</td><td>📖 Study + Push image</td></tr>
+              <tr><td>17:30 – 18:00</td><td>Revision + Notes</td><td>📝 Summarize</td></tr>
+            </tbody>
+          </table>
+          <div class="topics-footer">
+            <span class="label">📌 Covered:</span>
+            <span class="tag tag-orange">CloudFormation</span>
+            <span class="tag tag-blue">CodePipeline</span>
+            <span class="tag tag-cyan">ECS</span>
+            <span class="tag tag-green">ECR</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- AWS DAY 7 -->
+      <div class="day-card aws-card">
+        <div class="day-header" onclick="toggleDay(this)">
+          <div class="day-badge"><span>7</span>Day</div>
+          <div class="day-info">
+            <h3>Monitoring, Security, Cost & Full Revision</h3>
+            <p>CloudWatch, GuardDuty, KMS, Cost Explorer, Well-Architected</p>
+          </div>
+          <div class="day-tags">
+            <span class="tag tag-green">CloudWatch</span>
+            <span class="tag tag-red">Security</span>
+            <span class="tag tag-yellow">Revision</span>
+          </div>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="schedule">
+          <table>
+            <thead><tr><th>Time</th><th>Topic</th><th>Activity</th></tr></thead>
+            <tbody>
+              <tr><td>9:00 – 10:30</td><td>CloudWatch: metrics, alarms, logs, dashboards</td><td>⚙️ Setup alarm</td></tr>
+              <tr><td>10:30 – 12:00</td><td>CloudTrail, AWS Config, GuardDuty, Shield</td><td>📖 Study + Enable</td></tr>
+              <tr class="break-row"><td>12:00 – 13:00</td><td>🍽️ Lunch Break</td><td>—</td></tr>
+              <tr><td>13:00 – 14:00</td><td>KMS, Secrets Manager, Certificate Manager</td><td>🔬 Lab</td></tr>
+              <tr><td>14:00 – 15:00</td><td>AWS Pricing, Cost Explorer, Trusted Advisor</td><td>🌐 Explore</td></tr>
+              <tr><td>15:00 – 16:30</td><td>Well-Architected Framework review</td><td>📖 Study</td></tr>
+              <tr><td>16:30 – 17:30</td><td>Full Week Revision + Flashcards</td><td>🃏 Revise all topics</td></tr>
+              <tr><td>17:30 – 18:00</td><td>Mock Exam Questions (SAA-C03 style)</td><td>❓ Q&A</td></tr>
+            </tbody>
+          </table>
+          <div class="topics-footer">
+            <span class="label">📌 Covered:</span>
+            <span class="tag tag-green">CloudWatch</span>
+            <span class="tag tag-red">Security</span>
+            <span class="tag tag-yellow">Cost Mgmt</span>
+            <span class="tag tag-blue">Well-Architected</span>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /days-grid -->
+
+    <!-- PROGRESS -->
+    <div class="progress-section">
+      <h3>🎯 AWS Skill Progression</h3>
+      <div class="progress-grid">
+        <div class="progress-item">
+          <div class="progress-label"><span>IAM & Console</span><span>Day 1</span></div>
+          <div class="progress-bar"><div class="progress-fill aws-fill" style="width:100%"></div></div>
+        </div>
+        <div class="progress-item">
+          <div class="progress-label"><span>EC2 & Lambda</span><span>Day 2</span></div>
+          <div class="progress-bar"><div class="progress-fill aws-fill" style="width:90%"></div></div>
+        </div>
+        <div class="progress-item">
+          <div class="progress-label"><span>S3 & Storage</span><span>Day 3</span></div>
+          <div class="progress-bar"><div class="progress-fill aws-fill" style="width:85%"></div></div>
+        </div>
+        <div class="progress-item">
+          <div class="progress-label"><span>VPC & Networking</span><span>Day 4</span></div>
+          <div class="progress-bar"><div class="progress-fill aws-fill" style="width:80%"></div></div>
+        </div>
+        <div class="progress-item">
+          <div class="progress-label"><span>Databases</span><span>Day 5</span></div>
+          <div class="progress-bar"><div class="progress-fill aws-fill" style="width:78%"></div></div>
+        </div>
+        <div class="progress-item">
+          <div class="progress-label"><span>ECS/EKS/CFN</span><span>Day 6</span></div>
+          <div class="progress-bar"><div class="progress-fill aws-fill" style="width:72%"></div></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /panel-aws -->
+
+  <!-- FOOTER -->
+  <div class="page-footer">
+    <p>💡 <strong>Capstone Project:</strong> Deploy a containerized app on AWS EKS using a Jenkins CI/CD pipeline with Terraform IaC and CloudWatch monitoring.</p>
+    <p style="margin-top:0.6rem; color:#475569; font-size:0.8rem;">~6–8 hours/day &nbsp;·&nbsp; Theory → Hands-on Lab → Revision &nbsp;·&nbsp; 2026</p>
+  </div>
+
+</div><!-- /wrapper -->
+
+<script>
+  function switchTab(tab) {
+    // hide all panels
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    // deactivate all tabs
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active-devops','active-aws'));
+    // activate selected
+    document.getElementById('panel-' + tab).classList.add('active');
+    document.getElementById('tab-' + tab).classList.add('active-' + tab);
+  }
+
+  function toggleDay(header) {
+    const schedule = header.nextElementSibling;
+    const chevron = header.querySelector('.chevron');
+    const isOpen = schedule.classList.contains('open');
+    schedule.classList.toggle('open', !isOpen);
+    chevron.style.transform = isOpen ? '' : 'rotate(180deg)';
+  }
+
+  // Animate progress bars on tab switch
+  function animateBars() {
+    document.querySelectorAll('.progress-fill').forEach(bar => {
+      const w = bar.style.width;
+      bar.style.width = '0%';
+      setTimeout(() => { bar.style.width = w; }, 100);
+    });
+  }
+
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => setTimeout(animateBars, 150));
+  });
+
+  // Open first day on load
+  document.addEventListener('DOMContentLoaded', () => {
+    animateBars();
+    const firstHeaders = document.querySelectorAll('.day-header');
+    if (firstHeaders[0]) toggleDay(firstHeaders[0]);
+  });
+</script>
+</body>
+</html>
