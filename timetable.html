@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DevOps & AWS 7-Day Study Timetable</title>
+  <title>DevOps, AWS &amp; Networking 7-Day Study Timetable</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
   <style>
     :root {
@@ -13,21 +13,18 @@
       --aws-primary: #f59e0b;
       --aws-secondary: #fbbf24;
       --aws-glow: rgba(245,158,11,0.3);
+      --net-primary: #06b6d4;
+      --net-secondary: #22d3ee;
+      --net-glow: rgba(6,182,212,0.3);
       --bg-dark: #0a0a0f;
       --bg-card: #111118;
-      --bg-card2: #16161f;
       --border: rgba(255,255,255,0.07);
       --text-primary: #f1f5f9;
       --text-secondary: #94a3b8;
       --text-muted: #64748b;
-      --accent-blue: #6366f1;
       --accent-green: #10b981;
-      --accent-red: #ef4444;
-      --accent-purple: #8b5cf6;
     }
-
     * { margin: 0; padding: 0; box-sizing: border-box; }
-
     body {
       font-family: 'Inter', sans-serif;
       background: var(--bg-dark);
@@ -35,22 +32,17 @@
       min-height: 100vh;
       overflow-x: hidden;
     }
-
-    /* ── BACKGROUND ── */
     body::before {
       content: '';
-      position: fixed;
-      inset: 0;
+      position: fixed; inset: 0;
       background:
         radial-gradient(ellipse 80% 50% at 20% 10%, rgba(99,102,241,0.08) 0%, transparent 60%),
         radial-gradient(ellipse 60% 40% at 80% 80%, rgba(249,115,22,0.06) 0%, transparent 60%);
-      pointer-events: none;
-      z-index: 0;
+      pointer-events: none; z-index: 0;
     }
-
     .wrapper { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
 
-    /* ── HEADER ── */
+    /* HEADER */
     header { text-align: center; padding: 3rem 0 2.5rem; }
     .badge {
       display: inline-flex; align-items: center; gap: 0.5rem;
@@ -66,9 +58,9 @@
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
       background-clip: text; margin-bottom: 0.75rem;
     }
-    header p { color: var(--text-secondary); font-size: 1rem; max-width: 520px; margin: 0 auto; }
+    header p { color: var(--text-secondary); font-size: 1rem; max-width: 620px; margin: 0 auto; }
 
-    /* ── TABS ── */
+    /* TABS */
     .tabs { display: flex; justify-content: center; gap: 1rem; margin: 2.5rem 0; flex-wrap: wrap; }
     .tab-btn {
       display: flex; align-items: center; gap: 0.6rem;
@@ -88,17 +80,22 @@
       border-color: var(--aws-primary); color: var(--aws-secondary);
       box-shadow: 0 0 20px var(--aws-glow);
     }
+    .tab-btn.active-net {
+      background: linear-gradient(135deg, rgba(6,182,212,0.2), rgba(34,211,238,0.1));
+      border-color: var(--net-primary); color: var(--net-secondary);
+      box-shadow: 0 0 20px var(--net-glow);
+    }
     .tab-icon { font-size: 1.2rem; }
 
-    /* ── PANEL ── */
+    /* PANEL */
     .panel { display: none; animation: fadeIn 0.4s ease; }
     .panel.active { display: block; }
     @keyframes fadeIn { from { opacity:0; transform: translateY(12px); } to { opacity:1; transform: translateY(0); } }
 
-    /* ── SECTION TITLE ── */
+    /* SECTION TITLE */
     .section-title {
       display: flex; align-items: center; gap: 1rem;
-      margin-bottom: 2rem; padding-bottom: 1rem;
+      margin-bottom: 1.5rem; padding-bottom: 1rem;
       border-bottom: 1px solid var(--border);
     }
     .section-title .icon { font-size: 2rem; }
@@ -106,18 +103,55 @@
     .section-title p { color: var(--text-secondary); font-size: 0.88rem; margin-top: 0.2rem; }
     .devops-accent { color: var(--devops-primary); }
     .aws-accent { color: var(--aws-primary); }
+    .net-accent { color: var(--net-primary); }
 
-    /* ── DAYS GRID ── */
+    /* PANEL PROGRESS BAR */
+    .panel-progress {
+      display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 14px; padding: 1rem 1.4rem; margin-bottom: 1.75rem;
+    }
+    .pp-label { font-size: 0.88rem; font-weight: 700; flex: 1; }
+    .pp-count { font-size: 0.82rem; color: var(--text-muted); }
+    .pp-bar-wrap { width: 100%; height: 8px; background: rgba(255,255,255,0.07); border-radius: 999px; overflow: hidden; }
+    .pp-bar-fill { height: 100%; border-radius: 999px; transition: width 0.5s ease; width: 0%; }
+    .devops-pp .pp-bar-fill { background: linear-gradient(90deg, var(--devops-primary), #fb923c); }
+    .aws-pp    .pp-bar-fill { background: linear-gradient(90deg, var(--aws-primary), #fbbf24); }
+    .net-pp    .pp-bar-fill { background: linear-gradient(90deg, var(--net-primary), #22d3ee); }
+
+    /* DAY CARD */
     .days-grid { display: grid; gap: 1.5rem; }
-
-    /* ── DAY CARD ── */
     .day-card {
       background: var(--bg-card); border: 1px solid var(--border);
       border-radius: 16px; overflow: hidden;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.3s ease;
+      position: relative;
     }
     .day-card:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(0,0,0,0.4); }
 
+    /* COMPLETED STATE */
+    .day-card.completed { border-color: rgba(16,185,129,0.35); box-shadow: 0 0 0 1px rgba(16,185,129,0.15); }
+    .day-card.completed .day-badge { background: linear-gradient(135deg,#10b981,#059669) !important; }
+    .day-card.completed .day-info h3 {
+      text-decoration: line-through;
+      text-decoration-color: rgba(16,185,129,0.5);
+      color: var(--text-muted);
+    }
+    .day-card.completed .day-info p { color: #475569; }
+    .day-card.completed .day-header::before { opacity: 0.03 !important; }
+
+    /* DONE RIBBON */
+    .done-ribbon {
+      display: none; position: absolute; top: 0; right: 0;
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #fff; font-size: 0.63rem; font-weight: 700;
+      padding: 0.22rem 0.7rem 0.22rem 1.1rem;
+      border-bottom-left-radius: 8px; letter-spacing: 0.07em;
+      text-transform: uppercase; z-index: 3;
+    }
+    .day-card.completed .done-ribbon { display: block; }
+
+    /* DAY HEADER */
     .day-header {
       display: flex; align-items: center; gap: 1rem;
       padding: 1.1rem 1.5rem; cursor: pointer;
@@ -128,7 +162,8 @@
       opacity: 0.08; transition: opacity 0.3s;
     }
     .devops-card .day-header::before { background: linear-gradient(90deg, var(--devops-primary), transparent); }
-    .aws-card .day-header::before { background: linear-gradient(90deg, var(--aws-primary), transparent); }
+    .aws-card    .day-header::before { background: linear-gradient(90deg, var(--aws-primary), transparent); }
+    .net-card    .day-header::before { background: linear-gradient(90deg, var(--net-primary), transparent); }
     .day-card:hover .day-header::before { opacity: 0.15; }
 
     .day-badge {
@@ -136,20 +171,19 @@
       display: flex; flex-direction: column; align-items: center; justify-content: center;
       font-weight: 800; font-size: 0.7rem; line-height: 1.1;
       text-transform: uppercase; letter-spacing: 0.05em;
+      transition: background 0.3s ease;
     }
     .devops-card .day-badge { background: linear-gradient(135deg, var(--devops-primary), #ea580c); color: #fff; }
-    .aws-card .day-badge { background: linear-gradient(135deg, var(--aws-primary), #d97706); color: #fff; }
+    .aws-card    .day-badge { background: linear-gradient(135deg, var(--aws-primary), #d97706);  color: #fff; }
+    .net-card    .day-badge { background: linear-gradient(135deg, var(--net-primary), #0891b2);  color: #fff; }
     .day-badge span { font-size: 1.1rem; font-weight: 800; line-height: 1; }
 
-    .day-info { flex: 1; }
-    .day-info h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.2rem; }
-    .day-info p { font-size: 0.82rem; color: var(--text-muted); }
+    .day-info { flex: 1; min-width: 0; }
+    .day-info h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.2rem; transition: all 0.25s; }
+    .day-info p  { font-size: 0.82rem; color: var(--text-muted); transition: color 0.25s; }
 
-    .day-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-left: auto; }
-    .tag {
-      padding: 0.25rem 0.65rem; border-radius: 6px;
-      font-size: 0.72rem; font-weight: 600; white-space: nowrap;
-    }
+    .day-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+    .tag { padding: 0.25rem 0.65rem; border-radius: 6px; font-size: 0.72rem; font-weight: 600; white-space: nowrap; }
     .tag-blue   { background: rgba(99,102,241,0.15); color: #a5b4fc; }
     .tag-green  { background: rgba(16,185,129,0.15); color: #6ee7b7; }
     .tag-orange { background: rgba(249,115,22,0.15); color: #fdba74; }
@@ -158,11 +192,34 @@
     .tag-red    { background: rgba(239,68,68,0.15);  color: #fca5a5; }
     .tag-cyan   { background: rgba(6,182,212,0.15);  color: #67e8f9; }
 
-    .chevron { font-size: 1rem; color: var(--text-muted); transition: transform 0.3s; margin-left: 0.5rem; }
+    /* COMPLETE BUTTON */
+    .complete-btn {
+      display: flex; align-items: center; gap: 0.45rem;
+      padding: 0.45rem 1rem; border-radius: 8px;
+      border: 1.5px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.05);
+      color: var(--text-muted);
+      font-family: 'Inter', sans-serif; font-size: 0.76rem; font-weight: 600;
+      cursor: pointer; transition: all 0.25s ease; white-space: nowrap;
+      position: relative; z-index: 2; flex-shrink: 0;
+    }
+    .complete-btn:hover {
+      border-color: rgba(16,185,129,0.5);
+      color: #6ee7b7; background: rgba(16,185,129,0.1);
+      transform: scale(1.03);
+    }
+    .complete-btn.done {
+      background: rgba(16,185,129,0.18);
+      border-color: rgba(16,185,129,0.55);
+      color: #6ee7b7;
+    }
+    .complete-btn .bi { font-size: 0.9rem; }
 
-    /* ── SCHEDULE TABLE ── */
-    .schedule { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
-    .schedule.open { max-height: 2000px; }
+    .chevron { font-size: 1rem; color: var(--text-muted); transition: transform 0.3s; margin-left: 0.25rem; flex-shrink: 0; }
+
+    /* SCHEDULE */
+    .schedule { max-height: 0; overflow: hidden; transition: max-height 0.5s ease; }
+    .schedule.open { max-height: 6000px; }
 
     table { width: 100%; border-collapse: collapse; }
     thead tr { background: rgba(255,255,255,0.03); }
@@ -181,10 +238,9 @@
     }
     td:nth-child(2) { font-weight: 500; color: var(--text-primary); }
     td:nth-child(3) { color: var(--text-secondary); font-size: 0.83rem; }
-
     .break-row td { color: var(--text-muted) !important; font-style: italic; background: rgba(255,255,255,0.01); }
 
-    /* ── TOPICS FOOTER ── */
+    /* TOPICS FOOTER */
     .topics-footer {
       display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;
       padding: 0.85rem 1.2rem; background: rgba(255,255,255,0.02);
@@ -192,32 +248,124 @@
     }
     .topics-footer .label { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; margin-right: 0.25rem; }
 
-    /* ── SUMMARY TABLE ── */
-    .summary-section { margin-top: 3rem; }
-    .summary-section h3 { font-size: 1.2rem; font-weight: 700; margin-bottom: 1.25rem; }
-    .summary-table { width: 100%; border-collapse: collapse; background: var(--bg-card); border-radius: 14px; overflow: hidden; border: 1px solid var(--border); }
-    .summary-table thead tr { background: rgba(255,255,255,0.04); }
-    .summary-table th { padding: 0.85rem 1.25rem; text-align: left; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted); font-weight: 600; }
-    .summary-table td { padding: 0.85rem 1.25rem; font-size: 0.9rem; border-top: 1px solid var(--border); }
-    .summary-table tr:hover td { background: rgba(255,255,255,0.025); }
-    .day-num { font-weight: 700; }
-    .devops-card-mini .day-num { color: var(--devops-primary); }
-    .aws-card-mini .day-num { color: var(--aws-primary); }
+    /* ── Q&A SECTION ── */
+    .qa-section {
+      border-top: 1px solid var(--border);
+      background: rgba(255,255,255,0.01);
+    }
+    .qa-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.85rem 1.2rem; cursor: pointer;
+      transition: background 0.2s;
+    }
+    .qa-header:hover { background: rgba(255,255,255,0.03); }
+    .qa-header-left {
+      display: flex; align-items: center; gap: 0.6rem;
+    }
+    .qa-icon { font-size: 1rem; }
+    .qa-title {
+      font-size: 0.82rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.07em;
+      color: var(--text-secondary);
+    }
+    .qa-count {
+      font-size: 0.72rem; color: var(--text-muted);
+      background: rgba(255,255,255,0.07); border-radius: 20px;
+      padding: 0.15rem 0.55rem; font-weight: 600;
+    }
+    .qa-chevron {
+      font-size: 0.8rem; color: var(--text-muted);
+      transition: transform 0.3s; flex-shrink: 0;
+    }
+    .qa-body {
+      max-height: 0; overflow: hidden;
+      transition: max-height 0.45s ease;
+    }
+    .qa-body.open { max-height: 4000px; }
+    .qa-list { padding: 0 1.2rem 1rem; }
 
-    /* ── PROGRESS BAR ── */
+    .qa-item {
+      border: 1px solid var(--border);
+      border-radius: 10px; margin-bottom: 0.75rem;
+      overflow: hidden; transition: border-color 0.2s;
+    }
+    .qa-item:last-child { margin-bottom: 0; }
+    .qa-item:hover { border-color: rgba(255,255,255,0.14); }
+
+    .qa-question {
+      display: flex; align-items: flex-start; gap: 0.75rem;
+      padding: 0.8rem 1rem; cursor: pointer;
+      transition: background 0.2s;
+    }
+    .qa-question:hover { background: rgba(255,255,255,0.03); }
+    .qa-q-num {
+      min-width: 24px; height: 24px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.65rem; font-weight: 800; flex-shrink: 0; margin-top: 0.05rem;
+    }
+    .devops-card .qa-q-num { background: rgba(249,115,22,0.25); color: var(--devops-secondary); }
+    .aws-card    .qa-q-num { background: rgba(245,158,11,0.25); color: var(--aws-secondary); }
+    .net-card    .qa-q-num { background: rgba(6,182,212,0.25);  color: var(--net-secondary); }
+
+    .qa-q-text { flex: 1; font-size: 0.86rem; font-weight: 600; color: var(--text-primary); line-height: 1.5; }
+    .ans-toggle-btn {
+      display: flex; align-items: center; gap: 0.35rem;
+      padding: 0.3rem 0.75rem; border-radius: 6px; border: 1.5px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.04); color: var(--text-muted);
+      font-family: 'Inter', sans-serif; font-size: 0.7rem; font-weight: 700;
+      cursor: pointer; transition: all 0.2s ease; white-space: nowrap; flex-shrink: 0;
+      text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .ans-toggle-btn:hover {
+      border-color: rgba(99,102,241,0.5); color: #a5b4fc;
+      background: rgba(99,102,241,0.1);
+    }
+    .ans-toggle-btn.revealed {
+      background: rgba(16,185,129,0.12);
+      border-color: rgba(16,185,129,0.45);
+      color: #6ee7b7;
+    }
+    .ans-toggle-btn .btn-arrow { font-size: 0.65rem; transition: transform 0.25s; display: inline-block; }
+    .ans-toggle-btn.revealed .btn-arrow { transform: rotate(180deg); }
+
+    .qa-answer {
+      max-height: 0; overflow: hidden;
+      transition: max-height 0.35s ease, padding 0.3s;
+    }
+    .qa-answer.open { max-height: 600px; }
+    .qa-answer-inner {
+      margin: 0 1rem 0.85rem;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      border-left: 3px solid;
+      font-size: 0.84rem; line-height: 1.65; color: var(--text-secondary);
+      background: rgba(255,255,255,0.03);
+    }
+    .devops-card .qa-answer-inner { border-left-color: var(--devops-primary); }
+    .aws-card    .qa-answer-inner { border-left-color: var(--aws-primary); }
+    .net-card    .qa-answer-inner { border-left-color: var(--net-primary); }
+    .qa-answer-inner strong { color: var(--text-primary); }
+    .qa-answer-inner code {
+      background: rgba(255,255,255,0.08); padding: 0.1rem 0.35rem;
+      border-radius: 4px; font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem; color: #fdba74;
+    }
+
+    /* SKILL PROGRESS */
     .progress-section { margin: 2.5rem 0 0; }
     .progress-section h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 1.2rem; }
     .progress-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; }
     .progress-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 1rem 1.2rem; }
     .progress-label { display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.6rem; }
     .progress-label span:first-child { font-weight: 600; }
-    .progress-label span:last-child { color: var(--text-muted); }
-    .progress-bar { height: 6px; background: rgba(255,255,255,0.08); border-radius: 999px; overflow: hidden; }
+    .progress-label span:last-child  { color: var(--text-muted); }
+    .progress-bar  { height: 6px; background: rgba(255,255,255,0.08); border-radius: 999px; overflow: hidden; }
     .progress-fill { height: 100%; border-radius: 999px; transition: width 1.2s ease; }
     .devops-fill { background: linear-gradient(90deg, var(--devops-primary), #fb923c); }
-    .aws-fill { background: linear-gradient(90deg, var(--aws-primary), #fbbf24); }
+    .aws-fill    { background: linear-gradient(90deg, var(--aws-primary), #fbbf24); }
+    .net-fill    { background: linear-gradient(90deg, var(--net-primary), #22d3ee); }
 
-    /* ── FOOTER ── */
+    /* PAGE FOOTER */
     .page-footer { text-align: center; margin-top: 4rem; padding-top: 2rem; border-top: 1px solid var(--border); }
     .page-footer p { color: var(--text-muted); font-size: 0.85rem; }
     .page-footer strong { color: var(--accent-green); }
@@ -226,20 +374,20 @@
       .day-tags { display: none; }
       td:first-child { width: 100px; }
       .tab-btn { padding: 0.65rem 1.25rem; font-size: 0.88rem; }
+      .complete-btn span.label-text { display: none; }
+      .qa-q-text { font-size: 0.82rem; }
     }
   </style>
 </head>
 <body>
 <div class="wrapper">
 
-  <!-- HEADER -->
   <header>
     <div class="badge">Study Timetable 2026</div>
     <h1>7-Day Study Plans</h1>
-    <p>Structured daily schedules for DevOps & AWS — Theory, Hands-on Labs, and Revision.</p>
+    <p>Structured daily schedules for DevOps, AWS &amp; Networking — Theory, Hands-on Labs, and Revision.</p>
   </header>
 
-  <!-- TABS -->
   <div class="tabs">
     <button class="tab-btn active-devops" id="tab-devops" onclick="switchTab('devops')">
       <span class="tab-icon">🛠️</span> DevOps Timetable
@@ -247,9 +395,12 @@
     <button class="tab-btn" id="tab-aws" onclick="switchTab('aws')">
       <span class="tab-icon">☁️</span> AWS Timetable
     </button>
+    <button class="tab-btn" id="tab-net" onclick="switchTab('net')">
+      <span class="tab-icon">🌐</span> Networking Timetable
+    </button>
   </div>
 
-  <!-- ═══════════════════════════════════════════ DEVOPS PANEL ═══ -->
+  <!-- ══════════════════ DEVOPS PANEL ══════════════════ -->
   <div class="panel active" id="panel-devops">
     <div class="section-title">
       <span class="icon">🛠️</span>
@@ -259,14 +410,21 @@
       </div>
     </div>
 
+    <div class="panel-progress devops-pp">
+      <span class="pp-label">📊 Overall Progress</span>
+      <span class="pp-count" id="devops-count">0 / 7 days completed</span>
+      <div class="pp-bar-wrap"><div class="pp-bar-fill" id="devops-bar"></div></div>
+    </div>
+
     <div class="days-grid">
 
-      <!-- DAY 1 -->
-      <div class="day-card devops-card">
+      <!-- DEVOPS DAY 1 -->
+      <div class="day-card devops-card" id="devops-day-1">
+        <span class="done-ribbon">✓ Done</span>
         <div class="day-header" onclick="toggleDay(this)">
           <div class="day-badge"><span>1</span>Day</div>
           <div class="day-info">
-            <h3>DevOps Fundamentals & Linux</h3>
+            <h3>DevOps Fundamentals &amp; Linux</h3>
             <p>DevOps culture, SDLC, Linux CLI, Shell scripting, SSH</p>
           </div>
           <div class="day-tags">
@@ -274,6 +432,9 @@
             <span class="tag tag-blue">Linux</span>
             <span class="tag tag-green">Shell</span>
           </div>
+          <button class="complete-btn" id="btn-devops-day-1" onclick="toggleComplete(event,'devops-day-1','devops')">
+            <span class="bi">○</span><span class="label-text">Mark Done</span>
+          </button>
           <span class="chevron">▼</span>
         </div>
         <div class="schedule">
@@ -281,7 +442,7 @@
             <thead><tr><th>Time</th><th>Topic</th><th>Activity</th></tr></thead>
             <tbody>
               <tr><td>9:00 – 10:30</td><td>What is DevOps? SDLC, Agile vs DevOps</td><td>📖 Read + Notes</td></tr>
-              <tr><td>10:30 – 12:00</td><td>DevOps lifecycle stages & tools overview</td><td>🧠 Mind Map</td></tr>
+              <tr><td>10:30 – 12:00</td><td>DevOps lifecycle stages &amp; tools overview</td><td>🧠 Mind Map</td></tr>
               <tr class="break-row"><td>12:00 – 13:00</td><td>🍽️ Lunch Break</td><td>—</td></tr>
               <tr><td>13:00 – 15:00</td><td>Linux Commands (filesystem, permissions, processes)</td><td>💻 Terminal practice</td></tr>
               <tr><td>15:00 – 16:30</td><td>Shell scripting basics (variables, loops, conditionals)</td><td>✍️ Write 5 scripts</td></tr>
@@ -296,15 +457,87 @@
             <span class="tag tag-green">Shell Scripting</span>
             <span class="tag tag-purple">SSH</span>
           </div>
+          <!-- Q&A Day 1 DevOps -->
+          <div class="qa-section">
+            <div class="qa-header" onclick="toggleQA(this)">
+              <div class="qa-header-left">
+                <span class="qa-icon">❓</span>
+                <span class="qa-title">Practice Questions &amp; Answers</span>
+                <span class="qa-count">5 Questions</span>
+              </div>
+              <span class="qa-chevron">▼</span>
+            </div>
+            <div class="qa-body">
+              <div class="qa-list">
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">1</span>
+                    <span class="qa-q-text">What is the key difference between Agile and DevOps?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner"><strong>Agile</strong> focuses on iterative software development and collaboration between dev teams and customers. <strong>DevOps</strong> extends Agile by bridging the gap between Development and Operations teams, emphasizing automation, continuous delivery, and infrastructure management. DevOps = Agile + CI/CD + Ops culture.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">2</span>
+                    <span class="qa-q-text">What command lists all files including hidden ones in Linux?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner"><code>ls -la</code> — The <code>-l</code> flag shows long format (permissions, owner, size) and <code>-a</code> includes hidden files (those starting with a dot). Example: <code>ls -la /home/user</code></div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">3</span>
+                    <span class="qa-q-text">Explain Linux file permissions: what does <code>chmod 755</code> mean?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner"><strong>755</strong> breaks down as: <strong>Owner (7)</strong> = read(4)+write(2)+execute(1), <strong>Group (5)</strong> = read(4)+execute(1), <strong>Others (5)</strong> = read(4)+execute(1). So the owner has full control, while group and others can only read and execute.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">4</span>
+                    <span class="qa-q-text">How do you set up a cron job to run a script every day at midnight?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner">Use <code>crontab -e</code> to edit the cron table, then add:<br><code>0 0 * * * /path/to/script.sh</code><br>Format: <strong>minute hour day month weekday command</strong>. The <code>0 0 * * *</code> means 0th minute, 0th hour (midnight), every day, every month, every weekday.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">5</span>
+                    <span class="qa-q-text">What are the 8 phases of the DevOps lifecycle?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner">The 8 phases are: <strong>1. Plan</strong> (roadmap, backlog) → <strong>2. Code</strong> (development, version control) → <strong>3. Build</strong> (compilation, packaging) → <strong>4. Test</strong> (automated testing) → <strong>5. Release</strong> (approval, staging) → <strong>6. Deploy</strong> (production release) → <strong>7. Operate</strong> (infrastructure, scaling) → <strong>8. Monitor</strong> (logging, metrics, feedback).</div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- DAY 2 -->
-      <div class="day-card devops-card">
+      <!-- DEVOPS DAY 2 -->
+      <div class="day-card devops-card" id="devops-day-2">
+        <span class="done-ribbon">✓ Done</span>
         <div class="day-header" onclick="toggleDay(this)">
           <div class="day-badge"><span>2</span>Day</div>
           <div class="day-info">
-            <h3>Version Control with Git & GitHub</h3>
+            <h3>Version Control with Git &amp; GitHub</h3>
             <p>Git fundamentals, branching, GitHub workflows, PRs</p>
           </div>
           <div class="day-tags">
@@ -312,6 +545,9 @@
             <span class="tag tag-blue">GitHub</span>
             <span class="tag tag-green">Workflows</span>
           </div>
+          <button class="complete-btn" id="btn-devops-day-2" onclick="toggleComplete(event,'devops-day-2','devops')">
+            <span class="bi">○</span><span class="label-text">Mark Done</span>
+          </button>
           <span class="chevron">▼</span>
         </div>
         <div class="schedule">
@@ -334,15 +570,87 @@
             <span class="tag tag-green">Branching</span>
             <span class="tag tag-purple">GitFlow</span>
           </div>
+          <!-- Q&A Day 2 DevOps -->
+          <div class="qa-section">
+            <div class="qa-header" onclick="toggleQA(this)">
+              <div class="qa-header-left">
+                <span class="qa-icon">❓</span>
+                <span class="qa-title">Practice Questions &amp; Answers</span>
+                <span class="qa-count">5 Questions</span>
+              </div>
+              <span class="qa-chevron">▼</span>
+            </div>
+            <div class="qa-body">
+              <div class="qa-list">
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">1</span>
+                    <span class="qa-q-text">What is the difference between <code>git merge</code> and <code>git rebase</code>?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner"><strong>git merge</strong> combines two branches and creates a new merge commit, preserving full history. <strong>git rebase</strong> moves/replays commits from one branch onto another, creating a linear commit history. Rebase is cleaner but rewrites history — never rebase shared/public branches.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">2</span>
+                    <span class="qa-q-text">What does <code>git stash</code> do and when would you use it?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner"><code>git stash</code> temporarily saves your uncommitted changes and reverts the working directory to the last commit. Use it when you need to switch branches without committing incomplete work. Retrieve with <code>git stash pop</code> (applies and removes) or <code>git stash apply</code> (applies but keeps stash).</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">3</span>
+                    <span class="qa-q-text">Explain GitFlow branching strategy and its main branches.</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner">GitFlow uses: <strong>main</strong> (production-ready code), <strong>develop</strong> (integration branch), <strong>feature/</strong> branches (new features, branched from develop), <strong>release/</strong> branches (release preparation), and <strong>hotfix/</strong> branches (urgent production fixes). Features merge to develop; releases merge to both main and develop.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">4</span>
+                    <span class="qa-q-text">What is a Pull Request (PR) and what is its purpose?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner">A <strong>Pull Request</strong> is a GitHub/GitLab mechanism to propose merging changes from one branch into another. Its purpose: <strong>Code Review</strong> (team reviews changes), <strong>Discussion</strong> (comment on specific lines), <strong>CI Checks</strong> (automated tests run before merge), and <strong>Approval</strong> gates before code reaches main/production.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">5</span>
+                    <span class="qa-q-text">How do you undo the last commit without losing your changes?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner"><code>git reset --soft HEAD~1</code> — This undoes the last commit but keeps your changes staged. Use <code>--mixed</code> to unstage changes (but keep files), or <code>--hard</code> to completely discard changes. For already-pushed commits, use <code>git revert HEAD</code> to create a new commit that undoes the changes without rewriting history.</div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- DAY 3 -->
-      <div class="day-card devops-card">
+      <!-- DEVOPS DAY 3 -->
+      <div class="day-card devops-card" id="devops-day-3">
+        <span class="done-ribbon">✓ Done</span>
         <div class="day-header" onclick="toggleDay(this)">
           <div class="day-badge"><span>3</span>Day</div>
           <div class="day-info">
-            <h3>CI/CD Pipelines — Jenkins & GitHub Actions</h3>
+            <h3>CI/CD Pipelines — Jenkins &amp; GitHub Actions</h3>
             <p>Pipeline stages, Jenkins, GitHub Actions, YAML, full CI pipeline</p>
           </div>
           <div class="day-tags">
@@ -350,6 +658,9 @@
             <span class="tag tag-blue">CI/CD</span>
             <span class="tag tag-green">YAML</span>
           </div>
+          <button class="complete-btn" id="btn-devops-day-3" onclick="toggleComplete(event,'devops-day-3','devops')">
+            <span class="bi">○</span><span class="label-text">Mark Done</span>
+          </button>
           <span class="chevron">▼</span>
         </div>
         <div class="schedule">
@@ -357,9 +668,9 @@
             <thead><tr><th>Time</th><th>Topic</th><th>Activity</th></tr></thead>
             <tbody>
               <tr><td>9:00 – 10:30</td><td>CI/CD concepts, pipeline stages</td><td>📖 Study</td></tr>
-              <tr><td>10:30 – 12:00</td><td>Jenkins installation & configuration</td><td>⚙️ Setup Lab</td></tr>
+              <tr><td>10:30 – 12:00</td><td>Jenkins installation &amp; configuration</td><td>⚙️ Setup Lab</td></tr>
               <tr class="break-row"><td>12:00 – 13:00</td><td>🍽️ Lunch Break</td><td>—</td></tr>
-              <tr><td>13:00 – 14:30</td><td>Jenkins Pipelines (Declarative & Scripted)</td><td>🔧 Create Pipeline</td></tr>
+              <tr><td>13:00 – 14:30</td><td>Jenkins Pipelines (Declarative &amp; Scripted)</td><td>🔧 Create Pipeline</td></tr>
               <tr><td>14:30 – 16:00</td><td>GitHub Actions: workflows, triggers, runners</td><td>✍️ Write YAML</td></tr>
               <tr><td>16:00 – 17:30</td><td>Build a full CI pipeline: test → build → deploy</td><td>🚀 Mini Project</td></tr>
               <tr><td>17:30 – 18:00</td><td>Revision + Notes</td><td>📝 Summarize</td></tr>
@@ -372,15 +683,87 @@
             <span class="tag tag-green">GitHub Actions</span>
             <span class="tag tag-yellow">YAML</span>
           </div>
+          <!-- Q&A Day 3 DevOps -->
+          <div class="qa-section">
+            <div class="qa-header" onclick="toggleQA(this)">
+              <div class="qa-header-left">
+                <span class="qa-icon">❓</span>
+                <span class="qa-title">Practice Questions &amp; Answers</span>
+                <span class="qa-count">5 Questions</span>
+              </div>
+              <span class="qa-chevron">▼</span>
+            </div>
+            <div class="qa-body">
+              <div class="qa-list">
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">1</span>
+                    <span class="qa-q-text">What is the difference between Continuous Integration, Continuous Delivery, and Continuous Deployment?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner"><strong>CI</strong>: Automatically build and test code on every commit. <strong>Continuous Delivery</strong>: Automatically deploy to staging/pre-prod after CI passes — but production release requires manual approval. <strong>Continuous Deployment</strong>: Fully automated — every passing build automatically deploys to production without human intervention.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">2</span>
+                    <span class="qa-q-text">What is a Jenkinsfile and what are its two syntax types?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner">A <strong>Jenkinsfile</strong> is a text file that defines a Jenkins pipeline as code, stored in the root of your repository. Two types: <strong>Declarative Pipeline</strong> — structured, readable, uses <code>pipeline { }</code> block (recommended for most cases). <strong>Scripted Pipeline</strong> — uses Groovy scripting with <code>node { }</code> block, more flexible but complex.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">3</span>
+                    <span class="qa-q-text">What triggers can you use in a GitHub Actions workflow?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner">Common GitHub Actions triggers (under <code>on:</code>): <strong>push</strong> (on code push), <strong>pull_request</strong> (on PR creation/update), <strong>schedule</strong> (cron-based), <strong>workflow_dispatch</strong> (manual trigger), <strong>release</strong> (on release creation), <strong>issues</strong>, <strong>repository_dispatch</strong> (external API trigger). You can filter by branches and paths.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">4</span>
+                    <span class="qa-q-text">What is a Jenkins agent/node and why is it important?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner">A <strong>Jenkins agent</strong> (formerly slave) is a machine that executes Jenkins pipeline jobs. The <strong>master/controller</strong> orchestrates jobs and manages configuration. Agents enable: <strong>Parallel execution</strong> across multiple machines, <strong>Platform-specific builds</strong> (Windows, Linux, Mac), <strong>Load distribution</strong>, and <strong>Isolated environments</strong> per project.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">5</span>
+                    <span class="qa-q-text">What are pipeline stages in CI/CD and name a typical pipeline flow?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner">Pipeline stages are sequential steps in a CI/CD process. A typical flow: <strong>Source</strong> (code checkout from Git) → <strong>Build</strong> (compile, package) → <strong>Unit Test</strong> (run automated tests) → <strong>Static Analysis</strong> (SAST, code quality) → <strong>Integration Test</strong> → <strong>Artifact</strong> (store build artifact) → <strong>Deploy to Staging</strong> → <strong>Acceptance Test</strong> → <strong>Deploy to Production</strong>.</div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- DAY 4 -->
-      <div class="day-card devops-card">
+      <!-- DEVOPS DAY 4 -->
+      <div class="day-card devops-card" id="devops-day-4">
+        <span class="done-ribbon">✓ Done</span>
         <div class="day-header" onclick="toggleDay(this)">
           <div class="day-badge"><span>4</span>Day</div>
           <div class="day-info">
-            <h3>Docker & Containerization</h3>
+            <h3>Docker &amp; Containerization</h3>
             <p>Docker CLI, Dockerfile, Docker Compose, networking, volumes</p>
           </div>
           <div class="day-tags">
@@ -388,6 +771,9 @@
             <span class="tag tag-blue">Containers</span>
             <span class="tag tag-green">Compose</span>
           </div>
+          <button class="complete-btn" id="btn-devops-day-4" onclick="toggleComplete(event,'devops-day-4','devops')">
+            <span class="bi">○</span><span class="label-text">Mark Done</span>
+          </button>
           <span class="chevron">▼</span>
         </div>
         <div class="schedule">
@@ -399,7 +785,7 @@
               <tr class="break-row"><td>12:00 – 13:00</td><td>🍽️ Lunch Break</td><td>—</td></tr>
               <tr><td>13:00 – 14:30</td><td>Dockerfile: best practices, multi-stage builds</td><td>✍️ Write Dockerfiles</td></tr>
               <tr><td>14:30 – 16:00</td><td>Docker Compose: multi-container apps</td><td>📄 Create compose.yml</td></tr>
-              <tr><td>16:00 – 17:30</td><td>Docker networking & volumes</td><td>🔬 Lab</td></tr>
+              <tr><td>16:00 – 17:30</td><td>Docker networking &amp; volumes</td><td>🔬 Lab</td></tr>
               <tr><td>17:30 – 18:00</td><td>Revision + Notes</td><td>📝 Summarize</td></tr>
             </tbody>
           </table>
@@ -410,11 +796,83 @@
             <span class="tag tag-green">Dockerfile</span>
             <span class="tag tag-purple">Docker Compose</span>
           </div>
+          <!-- Q&A Day 4 DevOps -->
+          <div class="qa-section">
+            <div class="qa-header" onclick="toggleQA(this)">
+              <div class="qa-header-left">
+                <span class="qa-icon">❓</span>
+                <span class="qa-title">Practice Questions &amp; Answers</span>
+                <span class="qa-count">5 Questions</span>
+              </div>
+              <span class="qa-chevron">▼</span>
+            </div>
+            <div class="qa-body">
+              <div class="qa-list">
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">1</span>
+                    <span class="qa-q-text">What is the key difference between a Docker container and a VM?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner"><strong>VMs</strong> include a full OS, hypervisor layer, and are heavy (GBs). <strong>Containers</strong> share the host OS kernel, contain only the app + dependencies, are lightweight (MBs), start in seconds, and are more portable. Docker uses Linux namespaces and cgroups for isolation without a separate OS per container.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">2</span>
+                    <span class="qa-q-text">What is the purpose of a multi-stage Docker build?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner">Multi-stage builds use multiple <code>FROM</code> statements. The first stage (builder) compiles/builds the app with all build tools. The final stage copies only the compiled artifact into a minimal base image (e.g., <code>alpine</code>). <strong>Benefits</strong>: Significantly smaller production images, no build tools in the final image, improved security.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">3</span>
+                    <span class="qa-q-text">What is the difference between Docker volumes and bind mounts?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner"><strong>Volumes</strong> are managed by Docker, stored in <code>/var/lib/docker/volumes/</code>, portable, and best for production data persistence. <strong>Bind mounts</strong> map a host directory/file directly into the container — useful for development (live code reload). Volumes are preferred for databases and production; bind mounts for development workflows.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">4</span>
+                    <span class="qa-q-text">What is Docker Compose and what problem does it solve?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner">Docker Compose is a tool for defining and running multi-container applications using a <code>docker-compose.yml</code> file. It solves the problem of managing multiple related containers (e.g., web app + database + cache). With one command (<code>docker compose up</code>) you start all services with correct networking, volumes, and environment variables configured.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">5</span>
+                    <span class="qa-q-text">What Docker network types exist and when would you use a bridge network?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner">Docker network types: <strong>bridge</strong> (default, isolated network for containers on same host), <strong>host</strong> (container shares host network stack), <strong>none</strong> (no networking), <strong>overlay</strong> (multi-host networking for Swarm/K8s), <strong>macvlan</strong> (container gets its own MAC address). Use <strong>bridge</strong> when containers on the same host need to communicate (e.g., web app talking to database container).</div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- DAY 5 -->
-      <div class="day-card devops-card">
+      <!-- DEVOPS DAY 5 -->
+      <div class="day-card devops-card" id="devops-day-5">
+        <span class="done-ribbon">✓ Done</span>
         <div class="day-header" onclick="toggleDay(this)">
           <div class="day-badge"><span>5</span>Day</div>
           <div class="day-info">
@@ -426,6 +884,9 @@
             <span class="tag tag-purple">kubectl</span>
             <span class="tag tag-orange">Helm</span>
           </div>
+          <button class="complete-btn" id="btn-devops-day-5" onclick="toggleComplete(event,'devops-day-5','devops')">
+            <span class="bi">○</span><span class="label-text">Mark Done</span>
+          </button>
           <span class="chevron">▼</span>
         </div>
         <div class="schedule">
@@ -448,15 +909,87 @@
             <span class="tag tag-green">Deployments</span>
             <span class="tag tag-orange">Helm</span>
           </div>
+          <!-- Q&A Day 5 DevOps -->
+          <div class="qa-section">
+            <div class="qa-header" onclick="toggleQA(this)">
+              <div class="qa-header-left">
+                <span class="qa-icon">❓</span>
+                <span class="qa-title">Practice Questions &amp; Answers</span>
+                <span class="qa-count">5 Questions</span>
+              </div>
+              <span class="qa-chevron">▼</span>
+            </div>
+            <div class="qa-body">
+              <div class="qa-list">
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">1</span>
+                    <span class="qa-q-text">What are the main components of the Kubernetes control plane?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner">Control plane components: <strong>kube-apiserver</strong> (API gateway, front-end for K8s control plane), <strong>etcd</strong> (distributed key-value store for cluster state), <strong>kube-scheduler</strong> (assigns Pods to nodes), <strong>kube-controller-manager</strong> (runs controllers for desired state), <strong>cloud-controller-manager</strong> (cloud provider integration). Node components: <strong>kubelet</strong>, <strong>kube-proxy</strong>, <strong>container runtime</strong>.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">2</span>
+                    <span class="qa-q-text">What is the difference between a Deployment and a StatefulSet in Kubernetes?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner"><strong>Deployment</strong>: For stateless apps. Pods are interchangeable, random names, can be scaled/rescheduled freely. <strong>StatefulSet</strong>: For stateful apps (databases). Pods have stable, unique names (pod-0, pod-1), stable network IDs, ordered deployment/scaling, and persistent storage per Pod. Use StatefulSet for MySQL, Kafka, Zookeeper, etc.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">3</span>
+                    <span class="qa-q-text">What are the different types of Kubernetes Services?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner"><strong>ClusterIP</strong> (default): Internal cluster access only. <strong>NodePort</strong>: Exposes service on each node's IP at a static port (30000-32767). <strong>LoadBalancer</strong>: Provisions a cloud load balancer, external access. <strong>ExternalName</strong>: Maps service to an external DNS name. For HTTP routing with path/host rules, use an <strong>Ingress</strong> with an Ingress Controller (NGINX, Traefik).</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">4</span>
+                    <span class="qa-q-text">What is the difference between a ConfigMap and a Secret in Kubernetes?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner"><strong>ConfigMap</strong>: Stores non-sensitive configuration data as key-value pairs (env vars, config files). Data is plaintext. <strong>Secret</strong>: Stores sensitive data (passwords, tokens, keys) — values are base64-encoded (not encrypted by default, but can be encrypted at rest with etcd encryption). Both can be mounted as volumes or injected as environment variables into Pods.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">5</span>
+                    <span class="qa-q-text">What is Helm and what problem does it solve in Kubernetes?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner"><strong>Helm</strong> is the package manager for Kubernetes. It solves: managing complex K8s apps with many YAML manifests, templating (reuse manifests across environments), versioned releases (install, upgrade, rollback), and sharing apps via Helm Charts (pre-packaged K8s apps). Key commands: <code>helm install</code>, <code>helm upgrade</code>, <code>helm rollback</code>, <code>helm list</code>.</div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- DAY 6 -->
-      <div class="day-card devops-card">
+      <!-- DEVOPS DAY 6 -->
+      <div class="day-card devops-card" id="devops-day-6">
+        <span class="done-ribbon">✓ Done</span>
         <div class="day-header" onclick="toggleDay(this)">
           <div class="day-badge"><span>6</span>Day</div>
           <div class="day-info">
-            <h3>Terraform (IaC) & Monitoring</h3>
+            <h3>Terraform (IaC) &amp; Monitoring</h3>
             <p>Terraform, Prometheus, Grafana, ELK Stack, logging</p>
           </div>
           <div class="day-tags">
@@ -464,6 +997,9 @@
             <span class="tag tag-orange">Prometheus</span>
             <span class="tag tag-yellow">Grafana</span>
           </div>
+          <button class="complete-btn" id="btn-devops-day-6" onclick="toggleComplete(event,'devops-day-6','devops')">
+            <span class="bi">○</span><span class="label-text">Mark Done</span>
+          </button>
           <span class="chevron">▼</span>
         </div>
         <div class="schedule">
@@ -486,22 +1022,97 @@
             <span class="tag tag-yellow">Prometheus</span>
             <span class="tag tag-green">Grafana</span>
           </div>
+          <!-- Q&A Day 6 DevOps -->
+          <div class="qa-section">
+            <div class="qa-header" onclick="toggleQA(this)">
+              <div class="qa-header-left">
+                <span class="qa-icon">❓</span>
+                <span class="qa-title">Practice Questions &amp; Answers</span>
+                <span class="qa-count">5 Questions</span>
+              </div>
+              <span class="qa-chevron">▼</span>
+            </div>
+            <div class="qa-body">
+              <div class="qa-list">
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">1</span>
+                    <span class="qa-q-text">What is Infrastructure as Code (IaC) and what are its benefits?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner"><strong>IaC</strong> is managing and provisioning infrastructure through code/configuration files rather than manual processes. Benefits: <strong>Version Control</strong> (track changes), <strong>Repeatability</strong> (identical environments), <strong>Automation</strong> (no manual errors), <strong>Documentation</strong> (code = documentation), <strong>Collaboration</strong> (team can review changes via PRs), <strong>Cost Saving</strong> (easily destroy/recreate environments).</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">2</span>
+                    <span class="qa-q-text">Explain the Terraform workflow: init, plan, apply, destroy.</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner"><code>terraform init</code>: Initializes working directory, downloads providers/modules. <code>terraform plan</code>: Shows execution plan (what will be created/changed/destroyed) without making changes — dry run. <code>terraform apply</code>: Executes the plan and provisions infrastructure. <code>terraform destroy</code>: Destroys all managed infrastructure. Always run plan before apply!</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">3</span>
+                    <span class="qa-q-text">What is Terraform state and why is remote state important?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner">Terraform <strong>state</strong> (<code>terraform.tfstate</code>) is a JSON file that maps your config to real infrastructure. It tracks what Terraform created and enables incremental updates. <strong>Remote state</strong> (S3, Terraform Cloud) is critical for teams: enables <strong>collaboration</strong> (shared state), <strong>state locking</strong> (prevents concurrent modifications), <strong>encryption</strong> (secure sensitive data), and <strong>versioning</strong> (history of state changes).</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">4</span>
+                    <span class="qa-q-text">What is Prometheus and how does it collect metrics?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner">Prometheus is an open-source monitoring system with a time-series database. It uses a <strong>pull model</strong> — scrapes metrics from HTTP endpoints (<code>/metrics</code>) exposed by instrumented applications or exporters (Node Exporter, cAdvisor). Key concepts: <strong>Metrics types</strong> (Counter, Gauge, Histogram, Summary), <strong>PromQL</strong> (query language), <strong>Alertmanager</strong> (alerting), and integration with <strong>Grafana</strong> for visualization.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">5</span>
+                    <span class="qa-q-text">What components make up the ELK Stack and what role does each play?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner"><strong>E — Elasticsearch</strong>: Distributed search and analytics engine, stores and indexes logs. <strong>L — Logstash</strong>: Data processing pipeline — collects, filters, transforms, and ships logs. <strong>K — Kibana</strong>: Web UI for visualizing data in Elasticsearch (dashboards, search). Modern stack often uses <strong>Beats</strong> (Filebeat, Metricbeat) as lightweight data shippers instead of Logstash.</div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- DAY 7 -->
-      <div class="day-card devops-card">
+      <!-- DEVOPS DAY 7 -->
+      <div class="day-card devops-card" id="devops-day-7">
+        <span class="done-ribbon">✓ Done</span>
         <div class="day-header" onclick="toggleDay(this)">
           <div class="day-badge"><span>7</span>Day</div>
           <div class="day-info">
-            <h3>Ansible, DevSecOps & Full Revision</h3>
-            <p>Ansible playbooks, DevSecOps, end-to-end project, mock Q&A</p>
+            <h3>Ansible, DevSecOps &amp; Full Revision</h3>
+            <p>Ansible playbooks, DevSecOps, end-to-end project, mock Q&amp;A</p>
           </div>
           <div class="day-tags">
             <span class="tag tag-red">Ansible</span>
             <span class="tag tag-orange">DevSecOps</span>
             <span class="tag tag-green">Revision</span>
           </div>
+          <button class="complete-btn" id="btn-devops-day-7" onclick="toggleComplete(event,'devops-day-7','devops')">
+            <span class="bi">○</span><span class="label-text">Mark Done</span>
+          </button>
           <span class="chevron">▼</span>
         </div>
         <div class="schedule">
@@ -514,7 +1125,7 @@
               <tr><td>13:00 – 14:00</td><td>DevSecOps: secrets management, SAST/DAST</td><td>📖 Study</td></tr>
               <tr><td>14:00 – 15:30</td><td>End-to-End Project (CI → Docker → K8s)</td><td>🚀 Mini Project</td></tr>
               <tr><td>15:30 – 17:00</td><td>Full Week Revision: concepts + tools + commands</td><td>🃏 Flashcards</td></tr>
-              <tr><td>17:00 – 18:00</td><td>Mock Questions & Interview Prep</td><td>❓ Q&A</td></tr>
+              <tr><td>17:00 – 18:00</td><td>Mock Questions &amp; Interview Prep</td><td>❓ Q&amp;A</td></tr>
             </tbody>
           </table>
           <div class="topics-footer">
@@ -524,45 +1135,97 @@
             <span class="tag tag-green">Full Project</span>
             <span class="tag tag-blue">Interview Prep</span>
           </div>
+          <!-- Q&A Day 7 DevOps -->
+          <div class="qa-section">
+            <div class="qa-header" onclick="toggleQA(this)">
+              <div class="qa-header-left">
+                <span class="qa-icon">❓</span>
+                <span class="qa-title">Practice Questions &amp; Answers</span>
+                <span class="qa-count">5 Questions</span>
+              </div>
+              <span class="qa-chevron">▼</span>
+            </div>
+            <div class="qa-body">
+              <div class="qa-list">
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">1</span>
+                    <span class="qa-q-text">What is Ansible and how is it different from Terraform?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner"><strong>Ansible</strong>: Configuration management tool. Manages software installation, configuration, and app deployment on existing servers. Agentless (uses SSH), uses YAML playbooks. <strong>Terraform</strong>: Infrastructure provisioning. Creates/manages cloud infrastructure (servers, networks, databases). They complement each other: Terraform provisions infra, Ansible configures it.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">2</span>
+                    <span class="qa-q-text">What is an Ansible playbook and what are roles?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner">An Ansible <strong>Playbook</strong> is a YAML file defining a set of plays — each play targets hosts and runs tasks (install packages, copy files, start services). <strong>Roles</strong> are a way to organize playbooks into reusable, structured components with directories for tasks, handlers, variables, templates, and files. Roles enable code reuse across multiple playbooks and projects.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">3</span>
+                    <span class="qa-q-text">What is DevSecOps and what are SAST and DAST?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner"><strong>DevSecOps</strong> integrates security practices into DevOps pipelines — "shift-left" security. <strong>SAST</strong> (Static Application Security Testing): Analyzes source code for vulnerabilities without running the app (tools: SonarQube, Checkmarx, Snyk Code). <strong>DAST</strong> (Dynamic Application Security Testing): Tests running application for vulnerabilities by simulating attacks (tools: OWASP ZAP, Burp Suite). SAST = early, DAST = runtime testing.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">4</span>
+                    <span class="qa-q-text">What are common DevOps interview topics you should revise?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner">Key DevOps interview areas: <strong>Linux</strong> (commands, permissions, processes), <strong>Git</strong> (branching, merge vs rebase, workflows), <strong>CI/CD</strong> (Jenkins pipelines, GitHub Actions), <strong>Docker</strong> (Dockerfile, Compose, networking), <strong>Kubernetes</strong> (architecture, kubectl, resources), <strong>Terraform</strong> (state, plan/apply), <strong>Ansible</strong> (playbooks, idempotency), <strong>Monitoring</strong> (Prometheus, Grafana, ELK), <strong>DevSecOps</strong> (SAST, DAST, secrets).</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">5</span>
+                    <span class="qa-q-text">Describe a full end-to-end DevOps pipeline architecture.</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner">A complete DevOps pipeline: <strong>1. Code</strong> → Developer pushes to GitHub. <strong>2. CI</strong> → Jenkins/GitHub Actions triggers: lint, unit tests, SAST scan. <strong>3. Build</strong> → Docker image built &amp; pushed to registry (ECR/DockerHub). <strong>4. Deploy Staging</strong> → Helm/kubectl deploys to K8s staging. <strong>5. DAST + Integration Tests</strong> → Automated security &amp; smoke tests. <strong>6. Deploy Production</strong> → Blue-green or rolling update via K8s. <strong>7. Monitor</strong> → Prometheus metrics + Grafana dashboards + ELK logs.</div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
     </div><!-- /days-grid -->
 
-    <!-- PROGRESS -->
     <div class="progress-section">
       <h3>🎯 DevOps Skill Progression</h3>
       <div class="progress-grid">
-        <div class="progress-item">
-          <div class="progress-label"><span>Linux & Shell</span><span>Day 1</span></div>
-          <div class="progress-bar"><div class="progress-fill devops-fill" style="width:100%"></div></div>
-        </div>
-        <div class="progress-item">
-          <div class="progress-label"><span>Git & GitHub</span><span>Day 2</span></div>
-          <div class="progress-bar"><div class="progress-fill devops-fill" style="width:85%"></div></div>
-        </div>
-        <div class="progress-item">
-          <div class="progress-label"><span>CI/CD Pipelines</span><span>Day 3</span></div>
-          <div class="progress-bar"><div class="progress-fill devops-fill" style="width:80%"></div></div>
-        </div>
-        <div class="progress-item">
-          <div class="progress-label"><span>Docker</span><span>Day 4</span></div>
-          <div class="progress-bar"><div class="progress-fill devops-fill" style="width:90%"></div></div>
-        </div>
-        <div class="progress-item">
-          <div class="progress-label"><span>Kubernetes</span><span>Day 5</span></div>
-          <div class="progress-bar"><div class="progress-fill devops-fill" style="width:75%"></div></div>
-        </div>
-        <div class="progress-item">
-          <div class="progress-label"><span>Terraform</span><span>Day 6</span></div>
-          <div class="progress-bar"><div class="progress-fill devops-fill" style="width:70%"></div></div>
-        </div>
+        <div class="progress-item"><div class="progress-label"><span>Linux &amp; Shell</span><span>Day 1</span></div><div class="progress-bar"><div class="progress-fill devops-fill" style="width:100%"></div></div></div>
+        <div class="progress-item"><div class="progress-label"><span>Git &amp; GitHub</span><span>Day 2</span></div><div class="progress-bar"><div class="progress-fill devops-fill" style="width:85%"></div></div></div>
+        <div class="progress-item"><div class="progress-label"><span>CI/CD Pipelines</span><span>Day 3</span></div><div class="progress-bar"><div class="progress-fill devops-fill" style="width:80%"></div></div></div>
+        <div class="progress-item"><div class="progress-label"><span>Docker</span><span>Day 4</span></div><div class="progress-bar"><div class="progress-fill devops-fill" style="width:90%"></div></div></div>
+        <div class="progress-item"><div class="progress-label"><span>Kubernetes</span><span>Day 5</span></div><div class="progress-bar"><div class="progress-fill devops-fill" style="width:75%"></div></div></div>
+        <div class="progress-item"><div class="progress-label"><span>Terraform</span><span>Day 6</span></div><div class="progress-bar"><div class="progress-fill devops-fill" style="width:70%"></div></div></div>
       </div>
     </div>
 
   </div><!-- /panel-devops -->
 
-  <!-- ═══════════════════════════════════════════ AWS PANEL ═══ -->
+  <!-- ══════════════════ AWS PANEL ══════════════════ -->
   <div class="panel" id="panel-aws">
     <div class="section-title">
       <span class="icon">☁️</span>
@@ -572,14 +1235,21 @@
       </div>
     </div>
 
+    <div class="panel-progress aws-pp">
+      <span class="pp-label">📊 Overall Progress</span>
+      <span class="pp-count" id="aws-count">0 / 7 days completed</span>
+      <div class="pp-bar-wrap"><div class="pp-bar-fill" id="aws-bar"></div></div>
+    </div>
+
     <div class="days-grid">
 
       <!-- AWS DAY 1 -->
-      <div class="day-card aws-card">
+      <div class="day-card aws-card" id="aws-day-1">
+        <span class="done-ribbon">✓ Done</span>
         <div class="day-header" onclick="toggleDay(this)">
           <div class="day-badge"><span>1</span>Day</div>
           <div class="day-info">
-            <h3>AWS Fundamentals & IAM</h3>
+            <h3>AWS Fundamentals &amp; IAM</h3>
             <p>Cloud concepts, AWS Console, IAM, CLI setup</p>
           </div>
           <div class="day-tags">
@@ -587,6 +1257,9 @@
             <span class="tag tag-orange">Cloud</span>
             <span class="tag tag-green">CLI</span>
           </div>
+          <button class="complete-btn" id="btn-aws-day-1" onclick="toggleComplete(event,'aws-day-1','aws')">
+            <span class="bi">○</span><span class="label-text">Mark Done</span>
+          </button>
           <span class="chevron">▼</span>
         </div>
         <div class="schedule">
@@ -594,11 +1267,11 @@
             <thead><tr><th>Time</th><th>Topic</th><th>Activity</th></tr></thead>
             <tbody>
               <tr><td>9:00 – 10:30</td><td>Cloud computing concepts, AWS global infrastructure</td><td>📖 Study</td></tr>
-              <tr><td>10:30 – 12:00</td><td>AWS Free Tier setup, Console tour, Regions & AZs</td><td>💻 Hands-on</td></tr>
+              <tr><td>10:30 – 12:00</td><td>AWS Free Tier setup, Console tour, Regions &amp; AZs</td><td>💻 Hands-on</td></tr>
               <tr class="break-row"><td>12:00 – 13:00</td><td>🍽️ Lunch Break</td><td>—</td></tr>
-              <tr><td>13:00 – 14:30</td><td>IAM: Users, Groups, Roles, Policies</td><td>🔧 Create & attach policies</td></tr>
+              <tr><td>13:00 – 14:30</td><td>IAM: Users, Groups, Roles, Policies</td><td>🔧 Create &amp; attach policies</td></tr>
               <tr><td>14:30 – 16:00</td><td>IAM best practices: MFA, least privilege</td><td>🔬 Lab</td></tr>
-              <tr><td>16:00 – 17:30</td><td>AWS CLI setup & configuration</td><td>⚙️ aws configure</td></tr>
+              <tr><td>16:00 – 17:30</td><td>AWS CLI setup &amp; configuration</td><td>⚙️ aws configure</td></tr>
               <tr><td>17:30 – 18:00</td><td>Revision + Notes</td><td>📝 Summarize</td></tr>
             </tbody>
           </table>
@@ -609,15 +1282,87 @@
             <span class="tag tag-green">IAM</span>
             <span class="tag tag-blue">CLI</span>
           </div>
+          <!-- Q&A Day 1 AWS -->
+          <div class="qa-section">
+            <div class="qa-header" onclick="toggleQA(this)">
+              <div class="qa-header-left">
+                <span class="qa-icon">❓</span>
+                <span class="qa-title">Practice Questions &amp; Answers</span>
+                <span class="qa-count">5 Questions</span>
+              </div>
+              <span class="qa-chevron">▼</span>
+            </div>
+            <div class="qa-body">
+              <div class="qa-list">
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">1</span>
+                    <span class="qa-q-text">What is the difference between an AWS Region and an Availability Zone?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner">A <strong>Region</strong> is a physical geographic location (e.g., us-east-1) containing multiple isolated data center clusters. An <strong>Availability Zone (AZ)</strong> is one or more discrete data centers within a Region, each with redundant power/networking. Regions have 2-6 AZs. Deploy across multiple AZs for <strong>high availability</strong>; deploy across regions for <strong>disaster recovery</strong>.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">2</span>
+                    <span class="qa-q-text">What is the difference between an IAM User, Group, and Role?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner"><strong>IAM User</strong>: A permanent identity for a person or service with long-term credentials (password/access keys). <strong>IAM Group</strong>: A collection of users — attach policies to the group instead of individual users. <strong>IAM Role</strong>: A temporary identity assumed by AWS services (EC2, Lambda) or external identities — no long-term credentials. Roles use short-term tokens via STS. Best practice: Use roles for services, not users with access keys.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">3</span>
+                    <span class="qa-q-text">What is the principle of least privilege in IAM?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner">The principle of <strong>least privilege</strong> means granting only the minimum permissions required to perform a specific task — nothing more. In practice: Start with no permissions, grant only what's needed, use specific resource ARNs instead of wildcards (<code>*</code>), use conditions to restrict further (e.g., specific IP, time), and regularly audit/remove unused permissions with IAM Access Analyzer.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">4</span>
+                    <span class="qa-q-text">What are the three cloud service models: IaaS, PaaS, SaaS?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner"><strong>IaaS</strong> (Infrastructure as a Service): Raw compute, storage, networking — you manage the OS and above. Example: EC2. <strong>PaaS</strong> (Platform as a Service): Managed platform for app deployment — you manage only the application code. Example: Elastic Beanstalk, RDS. <strong>SaaS</strong> (Software as a Service): Complete application managed by provider — you just use it. Example: Gmail, Salesforce. AWS primarily offers IaaS &amp; PaaS.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">5</span>
+                    <span class="qa-q-text">What is IAM MFA and why is it critical for the root account?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner"><strong>MFA</strong> (Multi-Factor Authentication) adds a second layer of security beyond password — a time-based one-time code from an authenticator app (Google Authenticator, Authy) or hardware key. The <strong>root account</strong> has unrestricted access to all AWS resources and billing — if compromised, an attacker can delete everything. Always enable MFA on root, do not create access keys for root, and use IAM users/roles for daily operations.</div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
       <!-- AWS DAY 2 -->
-      <div class="day-card aws-card">
+      <div class="day-card aws-card" id="aws-day-2">
+        <span class="done-ribbon">✓ Done</span>
         <div class="day-header" onclick="toggleDay(this)">
           <div class="day-badge"><span>2</span>Day</div>
           <div class="day-info">
-            <h3>Compute Services — EC2 & Lambda</h3>
+            <h3>Compute Services — EC2 &amp; Lambda</h3>
             <p>EC2, AMIs, Security Groups, Auto Scaling, Load Balancer, Lambda</p>
           </div>
           <div class="day-tags">
@@ -625,6 +1370,9 @@
             <span class="tag tag-yellow">Lambda</span>
             <span class="tag tag-green">ASG</span>
           </div>
+          <button class="complete-btn" id="btn-aws-day-2" onclick="toggleComplete(event,'aws-day-2','aws')">
+            <span class="bi">○</span><span class="label-text">Mark Done</span>
+          </button>
           <span class="chevron">▼</span>
         </div>
         <div class="schedule">
@@ -647,11 +1395,83 @@
             <span class="tag tag-green">Auto Scaling</span>
             <span class="tag tag-blue">Lambda</span>
           </div>
+          <!-- Q&A Day 2 AWS -->
+          <div class="qa-section">
+            <div class="qa-header" onclick="toggleQA(this)">
+              <div class="qa-header-left">
+                <span class="qa-icon">❓</span>
+                <span class="qa-title">Practice Questions &amp; Answers</span>
+                <span class="qa-count">5 Questions</span>
+              </div>
+              <span class="qa-chevron">▼</span>
+            </div>
+            <div class="qa-body">
+              <div class="qa-list">
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">1</span>
+                    <span class="qa-q-text">What are EC2 instance purchasing options and when would you use each?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner"><strong>On-Demand</strong>: Pay per second, no commitment — for unpredictable workloads. <strong>Reserved</strong>: 1 or 3 year commitment, up to 72% savings — for steady-state workloads. <strong>Spot</strong>: Up to 90% discount, can be interrupted — for fault-tolerant, batch workloads. <strong>Savings Plans</strong>: Flexible commitment on usage. <strong>Dedicated Hosts</strong>: Physical server dedicated to you — for compliance/licensing requirements.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">2</span>
+                    <span class="qa-q-text">What is the difference between a Security Group and a NACL?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner"><strong>Security Group</strong>: Instance-level firewall, <strong>stateful</strong> (return traffic automatically allowed), only allow rules, evaluated as a whole. <strong>NACL</strong> (Network ACL): Subnet-level firewall, <strong>stateless</strong> (must explicitly allow both inbound and outbound), supports allow AND deny rules, rules processed in order (lowest number first). Use both for defense in depth.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">3</span>
+                    <span class="qa-q-text">How does Auto Scaling work and what are scaling policies?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner">Auto Scaling Groups (ASG) automatically add/remove EC2 instances based on demand. <strong>Scaling policies</strong>: <strong>Target Tracking</strong> — maintain a target metric (e.g., CPU at 50%). <strong>Step Scaling</strong> — scale by steps based on alarm thresholds. <strong>Scheduled Scaling</strong> — scale at known times (e.g., business hours). <strong>Predictive Scaling</strong> — ML-based, proactively scales based on patterns. ALB distributes traffic across instances.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">4</span>
+                    <span class="qa-q-text">What is AWS Lambda and what are its key limitations?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner"><strong>Lambda</strong> is AWS's serverless compute — run code without managing servers, pay only for execution time. Key limits: <strong>Timeout</strong>: max 15 minutes. <strong>Memory</strong>: 128MB - 10GB. <strong>Deployment package</strong>: 50MB zipped, 250MB unzipped. <strong>Concurrent executions</strong>: 1000 per region (default). <strong>Cold start</strong>: First invocation has latency (use Provisioned Concurrency to eliminate). Best for event-driven, short-duration tasks.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">5</span>
+                    <span class="qa-q-text">What is the difference between ALB, NLB, and CLB in AWS?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner"><strong>ALB</strong> (Application Load Balancer): Layer 7, HTTP/HTTPS, path/host-based routing, supports WebSockets, WAF integration — for web apps &amp; microservices. <strong>NLB</strong> (Network Load Balancer): Layer 4, TCP/UDP, ultra-low latency, static IP, millions of requests/sec — for gaming, IoT, financial systems. <strong>CLB</strong> (Classic Load Balancer): Legacy, Layer 4 &amp; 7 — avoid for new architectures. Use ALB for web apps, NLB for extreme performance.</div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
       <!-- AWS DAY 3 -->
-      <div class="day-card aws-card">
+      <div class="day-card aws-card" id="aws-day-3">
+        <span class="done-ribbon">✓ Done</span>
         <div class="day-header" onclick="toggleDay(this)">
           <div class="day-badge"><span>3</span>Day</div>
           <div class="day-info">
@@ -663,6 +1483,9 @@
             <span class="tag tag-orange">EBS</span>
             <span class="tag tag-green">EFS</span>
           </div>
+          <button class="complete-btn" id="btn-aws-day-3" onclick="toggleComplete(event,'aws-day-3','aws')">
+            <span class="bi">○</span><span class="label-text">Mark Done</span>
+          </button>
           <span class="chevron">▼</span>
         </div>
         <div class="schedule">
@@ -674,7 +1497,7 @@
               <tr class="break-row"><td>12:00 – 13:00</td><td>🍽️ Lunch Break</td><td>—</td></tr>
               <tr><td>13:00 – 14:30</td><td>S3: static website hosting, pre-signed URLs</td><td>🌐 Lab</td></tr>
               <tr><td>14:30 – 16:00</td><td>S3 security: bucket policies, ACLs, encryption</td><td>🔒 Configure</td></tr>
-              <tr><td>16:00 – 17:30</td><td>EBS vs EFS vs Glacier — comparison & use cases</td><td>📝 Study + Notes</td></tr>
+              <tr><td>16:00 – 17:30</td><td>EBS vs EFS vs Glacier — comparison &amp; use cases</td><td>📝 Study + Notes</td></tr>
               <tr><td>17:30 – 18:00</td><td>Revision + Notes</td><td>📝 Summarize</td></tr>
             </tbody>
           </table>
@@ -685,11 +1508,83 @@
             <span class="tag tag-green">EFS</span>
             <span class="tag tag-blue">Glacier</span>
           </div>
+          <!-- Q&A Day 3 AWS -->
+          <div class="qa-section">
+            <div class="qa-header" onclick="toggleQA(this)">
+              <div class="qa-header-left">
+                <span class="qa-icon">❓</span>
+                <span class="qa-title">Practice Questions &amp; Answers</span>
+                <span class="qa-count">5 Questions</span>
+              </div>
+              <span class="qa-chevron">▼</span>
+            </div>
+            <div class="qa-body">
+              <div class="qa-list">
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">1</span>
+                    <span class="qa-q-text">What are the S3 storage classes and when would you use each?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner"><strong>S3 Standard</strong>: Frequent access, high availability. <strong>S3 Standard-IA</strong>: Infrequent access, cheaper storage but retrieval fee. <strong>S3 One Zone-IA</strong>: Single AZ, lower cost, non-critical data. <strong>S3 Intelligent-Tiering</strong>: Automatically moves objects based on access patterns. <strong>S3 Glacier Instant</strong>: Archive with ms retrieval. <strong>S3 Glacier Flexible</strong>: Archive, minutes-hours retrieval. <strong>S3 Glacier Deep Archive</strong>: Cheapest, 12-hour retrieval — for long-term compliance.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">2</span>
+                    <span class="qa-q-text">What is S3 versioning and why would you enable it?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner">S3 <strong>versioning</strong> keeps multiple variants of an object in the same bucket. Benefits: <strong>Accidental deletion protection</strong> (deleted objects get a delete marker, not permanently removed), <strong>Overwrite protection</strong> (previous versions retained), <strong>Recovery</strong> (restore to any previous version). Once enabled, versioning cannot be disabled — only suspended. Works with MFA Delete for extra protection.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">3</span>
+                    <span class="qa-q-text">Compare EBS, EFS, and S3 — when to use which?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner"><strong>EBS</strong> (Elastic Block Store): Persistent block storage, attached to a single EC2 instance (mostly), like an external hard drive. Use for databases, boot volumes. <strong>EFS</strong> (Elastic File System): Managed NFS, shared across multiple EC2 instances simultaneously, auto-scales. Use for shared file storage, content management. <strong>S3</strong>: Object storage, internet-accessible, unlimited scale, 11 nines durability. Use for static assets, backups, data lakes.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">4</span>
+                    <span class="qa-q-text">What is a pre-signed URL in S3 and when is it used?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner">A <strong>pre-signed URL</strong> is a time-limited URL that grants temporary access to a private S3 object without requiring the requester to have AWS credentials. Use cases: <strong>Secure file sharing</strong> (share private documents with customers for a limited time), <strong>Direct uploads</strong> (allow users to upload directly to S3 without going through your server — reduces server load). Generated by: <code>aws s3 presign s3://bucket/key --expires-in 3600</code></div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">5</span>
+                    <span class="qa-q-text">What are the S3 encryption options available?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner">S3 encryption options: <strong>SSE-S3</strong> (Server-Side Encryption with S3 keys — AWS manages keys, enabled by default). <strong>SSE-KMS</strong> (KMS-managed keys — audit trail via CloudTrail, customer control over keys). <strong>SSE-C</strong> (Customer-provided keys — you manage and send keys, AWS doesn't store them). <strong>Client-Side Encryption</strong> (encrypt data before sending to S3 — maximum control). SSE-KMS is recommended for compliance-sensitive data.</div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
       <!-- AWS DAY 4 -->
-      <div class="day-card aws-card">
+      <div class="day-card aws-card" id="aws-day-4">
+        <span class="done-ribbon">✓ Done</span>
         <div class="day-header" onclick="toggleDay(this)">
           <div class="day-badge"><span>4</span>Day</div>
           <div class="day-info">
@@ -701,6 +1596,9 @@
             <span class="tag tag-yellow">Route 53</span>
             <span class="tag tag-orange">CloudFront</span>
           </div>
+          <button class="complete-btn" id="btn-aws-day-4" onclick="toggleComplete(event,'aws-day-4','aws')">
+            <span class="bi">○</span><span class="label-text">Mark Done</span>
+          </button>
           <span class="chevron">▼</span>
         </div>
         <div class="schedule">
@@ -708,7 +1606,7 @@
             <thead><tr><th>Time</th><th>Topic</th><th>Activity</th></tr></thead>
             <tbody>
               <tr><td>9:00 – 10:30</td><td>VPC: subnets, route tables, internet gateway</td><td>📖 Study + Diagram</td></tr>
-              <tr><td>10:30 – 12:00</td><td>Create custom VPC with public & private subnets</td><td>🔬 Hands-on</td></tr>
+              <tr><td>10:30 – 12:00</td><td>Create custom VPC with public &amp; private subnets</td><td>🔬 Hands-on</td></tr>
               <tr class="break-row"><td>12:00 – 13:00</td><td>🍽️ Lunch Break</td><td>—</td></tr>
               <tr><td>13:00 – 14:30</td><td>NAT Gateway, Security Groups vs NACLs</td><td>⚙️ Lab</td></tr>
               <tr><td>14:30 – 16:00</td><td>VPC Peering, VPN, Direct Connect concepts</td><td>📖 Study</td></tr>
@@ -724,11 +1622,83 @@
             <span class="tag tag-orange">Route 53</span>
             <span class="tag tag-purple">CloudFront</span>
           </div>
+          <!-- Q&A Day 4 AWS -->
+          <div class="qa-section">
+            <div class="qa-header" onclick="toggleQA(this)">
+              <div class="qa-header-left">
+                <span class="qa-icon">❓</span>
+                <span class="qa-title">Practice Questions &amp; Answers</span>
+                <span class="qa-count">5 Questions</span>
+              </div>
+              <span class="qa-chevron">▼</span>
+            </div>
+            <div class="qa-body">
+              <div class="qa-list">
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">1</span>
+                    <span class="qa-q-text">What is a VPC and what are its core components?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner">A <strong>VPC</strong> (Virtual Private Cloud) is a logically isolated virtual network in AWS. Core components: <strong>Subnets</strong> (public/private, tied to AZs), <strong>Route Tables</strong> (control traffic routing), <strong>Internet Gateway</strong> (enables internet access for public subnets), <strong>NAT Gateway</strong> (private subnet resources access internet without exposure), <strong>Security Groups</strong> (instance firewall), <strong>NACLs</strong> (subnet firewall), <strong>VPC Endpoints</strong> (private connection to AWS services).</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">2</span>
+                    <span class="qa-q-text">What is a NAT Gateway and why is it needed for private subnets?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner">A <strong>NAT Gateway</strong> (Network Address Translation) allows instances in a <strong>private subnet</strong> to initiate outbound connections to the internet (e.g., software updates, API calls) while preventing the internet from initiating inbound connections to those instances. It sits in a public subnet and translates private IPs to its public IP. Without NAT Gateway, private subnet instances have no internet access at all.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">3</span>
+                    <span class="qa-q-text">What are Route 53 routing policies and when would you use weighted routing?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner">Route 53 routing policies: <strong>Simple</strong> (single resource), <strong>Weighted</strong> (split traffic by percentage — use for A/B testing or canary deployments), <strong>Latency</strong> (route to lowest latency region), <strong>Failover</strong> (active-passive DR), <strong>Geolocation</strong> (based on user's location), <strong>Geoproximity</strong> (based on geographic distance with bias), <strong>Multi-value</strong> (multiple healthy records, like basic load balancing with health checks).</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">4</span>
+                    <span class="qa-q-text">What is CloudFront and how does it improve performance?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner">AWS <strong>CloudFront</strong> is a Content Delivery Network (CDN) that distributes content globally through 400+ edge locations. It improves performance by: <strong>Caching</strong> static content (images, CSS, JS) at edge locations closest to users, <strong>Reducing latency</strong> (users connect to nearest edge, not origin), <strong>SSL/TLS termination</strong> at edge, <strong>DDoS protection</strong> with AWS Shield, and <strong>Origin support</strong> for S3, ALB, EC2, custom origins.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">5</span>
+                    <span class="qa-q-text">What is VPC Peering and what are its limitations?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner"><strong>VPC Peering</strong> connects two VPCs to route traffic privately using AWS backbone (no internet required). Works across accounts and regions. Limitations: <strong>No transitive peering</strong> — if VPC-A peers with VPC-B and VPC-B peers with VPC-C, VPC-A cannot reach VPC-C through VPC-B. <strong>No overlapping CIDR blocks</strong> allowed. For transitive routing across many VPCs, use <strong>AWS Transit Gateway</strong> instead.</div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
       <!-- AWS DAY 5 -->
-      <div class="day-card aws-card">
+      <div class="day-card aws-card" id="aws-day-5">
+        <span class="done-ribbon">✓ Done</span>
         <div class="day-header" onclick="toggleDay(this)">
           <div class="day-badge"><span>5</span>Day</div>
           <div class="day-info">
@@ -740,6 +1710,9 @@
             <span class="tag tag-yellow">DynamoDB</span>
             <span class="tag tag-red">ElastiCache</span>
           </div>
+          <button class="complete-btn" id="btn-aws-day-5" onclick="toggleComplete(event,'aws-day-5','aws')">
+            <span class="bi">○</span><span class="label-text">Mark Done</span>
+          </button>
           <span class="chevron">▼</span>
         </div>
         <div class="schedule">
@@ -751,7 +1724,7 @@
               <tr class="break-row"><td>12:00 – 13:00</td><td>🍽️ Lunch Break</td><td>—</td></tr>
               <tr><td>13:00 – 14:30</td><td>DynamoDB: tables, items, partition keys, GSI</td><td>⚙️ Lab</td></tr>
               <tr><td>14:30 – 16:00</td><td>DynamoDB streams, DAX, on-demand vs provisioned</td><td>📖 Study + Practice</td></tr>
-              <tr><td>16:00 – 17:30</td><td>ElastiCache (Redis/Memcached) overview & setup</td><td>🔍 Explore</td></tr>
+              <tr><td>16:00 – 17:30</td><td>ElastiCache (Redis/Memcached) overview &amp; setup</td><td>🔍 Explore</td></tr>
               <tr><td>17:30 – 18:00</td><td>Revision + Notes</td><td>📝 Summarize</td></tr>
             </tbody>
           </table>
@@ -762,11 +1735,83 @@
             <span class="tag tag-red">ElastiCache</span>
             <span class="tag tag-purple">DAX</span>
           </div>
+          <!-- Q&A Day 5 AWS -->
+          <div class="qa-section">
+            <div class="qa-header" onclick="toggleQA(this)">
+              <div class="qa-header-left">
+                <span class="qa-icon">❓</span>
+                <span class="qa-title">Practice Questions &amp; Answers</span>
+                <span class="qa-count">5 Questions</span>
+              </div>
+              <span class="qa-chevron">▼</span>
+            </div>
+            <div class="qa-body">
+              <div class="qa-list">
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">1</span>
+                    <span class="qa-q-text">What is the difference between RDS Multi-AZ and Read Replicas?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner"><strong>Multi-AZ</strong>: Synchronous replication to a standby instance in another AZ. Purpose: <strong>High Availability / DR</strong>. Standby is passive (not readable). Automatic failover in case of primary failure (~1-2 min). <strong>Read Replicas</strong>: Asynchronous replication to readable copies (up to 5). Purpose: <strong>Performance / scaling reads</strong>. You query read replicas to offload read traffic from primary. Can be in same AZ, different AZ, or different region. Can be promoted to standalone DB.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">2</span>
+                    <span class="qa-q-text">What is DynamoDB's data model — explain partition keys and sort keys?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner">DynamoDB is a NoSQL key-value &amp; document database. <strong>Partition Key</strong> (Hash Key): Required, uniquely identifies an item (simple primary key), determines physical partition for storage. <strong>Sort Key</strong> (Range Key): Optional, combined with partition key forms composite primary key, allows multiple items with same partition key — sorted and range-queryable. Example: Partition Key = <code>UserID</code>, Sort Key = <code>Timestamp</code> for user activity history.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">3</span>
+                    <span class="qa-q-text">What is a Global Secondary Index (GSI) in DynamoDB?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner">A <strong>GSI</strong> is an index with a different partition key and optional sort key than the base table, allowing you to query on non-primary key attributes. Example: Table has partition key <code>OrderID</code>. GSI on <code>CustomerID</code> lets you fetch all orders for a customer efficiently. GSIs have separate read/write capacity, eventual consistency by default, and up to 20 per table. Compared to <strong>LSI</strong> (Local Secondary Index): LSI uses same partition key, different sort key, must be created at table creation time.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">4</span>
+                    <span class="qa-q-text">What is DAX (DynamoDB Accelerator) and when should you use it?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner"><strong>DAX</strong> is a fully managed, in-memory caching layer for DynamoDB. It reduces read response times from milliseconds to <strong>microseconds</strong> and reduces DynamoDB read capacity unit consumption. Drop-in compatible with DynamoDB API — no application code changes needed. Use when: read-heavy workloads, requiring microsecond latency, hot partition keys, or reducing costs. Not for write-heavy or strongly consistent read requirements.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">5</span>
+                    <span class="qa-q-text">What is the difference between Redis and Memcached in ElastiCache?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner"><strong>Redis</strong>: Rich data structures (strings, hashes, lists, sets, sorted sets), persistence, pub/sub, Multi-AZ with failover, read replicas, backup/restore, clustering. <strong>Memcached</strong>: Simple key-value caching only, no persistence, multi-threaded, simpler architecture, no replication. <strong>Choose Redis</strong> for: complex data, HA, pub/sub, persistence needed. <strong>Choose Memcached</strong> for: simple caching, maximum simplicity, multi-threading for CPU-intensive workloads.</div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
       <!-- AWS DAY 6 -->
-      <div class="day-card aws-card">
+      <div class="day-card aws-card" id="aws-day-6">
+        <span class="done-ribbon">✓ Done</span>
         <div class="day-header" onclick="toggleDay(this)">
           <div class="day-badge"><span>6</span>Day</div>
           <div class="day-info">
@@ -778,6 +1823,9 @@
             <span class="tag tag-cyan">ECS</span>
             <span class="tag tag-blue">EKS</span>
           </div>
+          <button class="complete-btn" id="btn-aws-day-6" onclick="toggleComplete(event,'aws-day-6','aws')">
+            <span class="bi">○</span><span class="label-text">Mark Done</span>
+          </button>
           <span class="chevron">▼</span>
         </div>
         <div class="schedule">
@@ -800,15 +1848,87 @@
             <span class="tag tag-cyan">ECS</span>
             <span class="tag tag-green">ECR</span>
           </div>
+          <!-- Q&A Day 6 AWS -->
+          <div class="qa-section">
+            <div class="qa-header" onclick="toggleQA(this)">
+              <div class="qa-header-left">
+                <span class="qa-icon">❓</span>
+                <span class="qa-title">Practice Questions &amp; Answers</span>
+                <span class="qa-count">5 Questions</span>
+              </div>
+              <span class="qa-chevron">▼</span>
+            </div>
+            <div class="qa-body">
+              <div class="qa-list">
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">1</span>
+                    <span class="qa-q-text">What is AWS CloudFormation and what are stacks and change sets?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner"><strong>CloudFormation</strong> is AWS's native IaC service — define infrastructure in JSON/YAML templates. A <strong>Stack</strong> is a collection of AWS resources created/managed as a single unit from a template. A <strong>Change Set</strong> is a preview of what will change before executing an update — like Terraform plan. Benefits over Terraform: native AWS, no state management needed (CloudFormation manages state). Supports <strong>Nested Stacks</strong> for modular architecture.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">2</span>
+                    <span class="qa-q-text">What is the AWS CI/CD pipeline (CodeCommit, CodeBuild, CodeDeploy, CodePipeline)?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner"><strong>CodeCommit</strong>: AWS-managed Git repository (like GitHub). <strong>CodeBuild</strong>: Fully managed build service — compiles, tests, produces artifacts (like Jenkins). <strong>CodeDeploy</strong>: Automated deployments to EC2, Lambda, ECS — supports rolling, blue/green deployments. <strong>CodePipeline</strong>: Orchestrates the entire CI/CD workflow, connecting CodeCommit → CodeBuild → CodeDeploy with approval stages, custom actions, and event triggers.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">3</span>
+                    <span class="qa-q-text">What is Amazon ECS and what is the difference between EC2 and Fargate launch types?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner"><strong>ECS</strong> (Elastic Container Service) is AWS's container orchestration service for Docker containers. <strong>EC2 launch type</strong>: You manage the underlying EC2 instances (OS patching, capacity planning, scaling). More control, cheaper for sustained workloads. <strong>Fargate launch type</strong>: Serverless containers — AWS manages the infrastructure, you only define CPU/memory requirements. No EC2 management, pay per task, ideal for variable workloads and microservices.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">4</span>
+                    <span class="qa-q-text">What is Amazon ECR and how does it integrate with ECS/EKS?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner"><strong>ECR</strong> (Elastic Container Registry) is a fully managed Docker container image registry (like DockerHub, but private within AWS). Benefits: <strong>Native IAM</strong> integration for access control, <strong>Image scanning</strong> for CVEs, <strong>Encryption</strong> at rest, <strong>Cross-region replication</strong>, and private network access via VPC endpoints. ECS/EKS can pull images from ECR without public internet using IAM roles — no registry credentials needed in task definitions.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">5</span>
+                    <span class="qa-q-text">When would you choose EKS over ECS for container workloads?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner">Choose <strong>EKS</strong> (managed Kubernetes) when: Team has Kubernetes expertise, need portability across clouds (multi-cloud), complex workloads requiring K8s ecosystem (Helm, Istio, custom operators), advanced scheduling/autoscaling, or migrating existing K8s workloads. Choose <strong>ECS</strong> when: AWS-only, simpler container orchestration needed, tight AWS integration, cost-sensitive (ECS is cheaper), or team lacks K8s experience. Both support Fargate for serverless containers.</div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
       <!-- AWS DAY 7 -->
-      <div class="day-card aws-card">
+      <div class="day-card aws-card" id="aws-day-7">
+        <span class="done-ribbon">✓ Done</span>
         <div class="day-header" onclick="toggleDay(this)">
           <div class="day-badge"><span>7</span>Day</div>
           <div class="day-info">
-            <h3>Monitoring, Security, Cost & Full Revision</h3>
+            <h3>Monitoring, Security, Cost &amp; Full Revision</h3>
             <p>CloudWatch, GuardDuty, KMS, Cost Explorer, Well-Architected</p>
           </div>
           <div class="day-tags">
@@ -816,6 +1936,9 @@
             <span class="tag tag-red">Security</span>
             <span class="tag tag-yellow">Revision</span>
           </div>
+          <button class="complete-btn" id="btn-aws-day-7" onclick="toggleComplete(event,'aws-day-7','aws')">
+            <span class="bi">○</span><span class="label-text">Mark Done</span>
+          </button>
           <span class="chevron">▼</span>
         </div>
         <div class="schedule">
@@ -829,7 +1952,7 @@
               <tr><td>14:00 – 15:00</td><td>AWS Pricing, Cost Explorer, Trusted Advisor</td><td>🌐 Explore</td></tr>
               <tr><td>15:00 – 16:30</td><td>Well-Architected Framework review</td><td>📖 Study</td></tr>
               <tr><td>16:30 – 17:30</td><td>Full Week Revision + Flashcards</td><td>🃏 Revise all topics</td></tr>
-              <tr><td>17:30 – 18:00</td><td>Mock Exam Questions (SAA-C03 style)</td><td>❓ Q&A</td></tr>
+              <tr><td>17:30 – 18:00</td><td>Mock Exam Questions (SAA-C03 style)</td><td>❓ Q&amp;A</td></tr>
             </tbody>
           </table>
           <div class="topics-footer">
@@ -839,45 +1962,914 @@
             <span class="tag tag-yellow">Cost Mgmt</span>
             <span class="tag tag-blue">Well-Architected</span>
           </div>
+          <!-- Q&A Day 7 AWS -->
+          <div class="qa-section">
+            <div class="qa-header" onclick="toggleQA(this)">
+              <div class="qa-header-left">
+                <span class="qa-icon">❓</span>
+                <span class="qa-title">Practice Questions &amp; Answers</span>
+                <span class="qa-count">5 Questions</span>
+              </div>
+              <span class="qa-chevron">▼</span>
+            </div>
+            <div class="qa-body">
+              <div class="qa-list">
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">1</span>
+                    <span class="qa-q-text">What is the difference between CloudWatch, CloudTrail, and AWS Config?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner"><strong>CloudWatch</strong>: Performance monitoring — metrics (CPU, memory), logs, alarms, dashboards. Answers "Is my system healthy?" <strong>CloudTrail</strong>: Audit trail — logs all API calls made in your AWS account (who did what, when, from where). Answers "Who changed what?" <strong>AWS Config</strong>: Configuration compliance — records configuration history, evaluates resources against compliance rules. Answers "Is my infrastructure configured correctly?"</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">2</span>
+                    <span class="qa-q-text">What is AWS GuardDuty and how does it detect threats?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner"><strong>GuardDuty</strong> is an intelligent threat detection service that continuously monitors for malicious activity and unauthorized behavior. It analyzes: <strong>VPC Flow Logs</strong> (unusual network patterns), <strong>CloudTrail events</strong> (suspicious API calls, policy violations), <strong>DNS logs</strong> (communication with known malicious domains). Uses ML and threat intelligence feeds. Examples of threats detected: cryptocurrency mining, credential compromise, port scanning, communication with C&amp;C servers.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">3</span>
+                    <span class="qa-q-text">What is AWS KMS and what is the difference between KMS and Secrets Manager?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner"><strong>KMS</strong> (Key Management Service): Manages cryptographic keys used to encrypt/decrypt data across AWS services (S3, EBS, RDS). You control the keys; KMS does the encryption. <strong>Secrets Manager</strong>: Stores, retrieves, and <strong>automatically rotates</strong> secrets (DB passwords, API keys, tokens). Secrets are encrypted using KMS. Use KMS for encryption key management; use Secrets Manager for managing application secrets with automatic rotation. Secrets Manager integrates with RDS for automatic password rotation.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">4</span>
+                    <span class="qa-q-text">What are the 6 pillars of the AWS Well-Architected Framework?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner">The 6 pillars: <strong>1. Operational Excellence</strong> — run/monitor systems, continuously improve processes. <strong>2. Security</strong> — protect information, systems, assets. <strong>3. Reliability</strong> — perform intended functions correctly and consistently. <strong>4. Performance Efficiency</strong> — use computing resources efficiently. <strong>5. Cost Optimization</strong> — avoid unnecessary costs. <strong>6. Sustainability</strong> — minimize environmental impact. Each pillar has design principles, best practices, and questions for self-assessment.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">5</span>
+                    <span class="qa-q-text">How does AWS Trusted Advisor help with cost optimization and security?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner">AWS <strong>Trusted Advisor</strong> provides real-time recommendations across 5 categories: <strong>Cost Optimization</strong> (identify idle EC2 instances, underutilized resources, unassociated Elastic IPs), <strong>Security</strong> (open security groups, MFA not enabled on root, public S3 buckets), <strong>Fault Tolerance</strong> (RDS backups, EC2 availability zones), <strong>Performance</strong> (high EC2 utilization, CloudFront optimization), <strong>Service Limits</strong> (usage approaching limits). Full checks require Business or Enterprise support plan.</div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
     </div><!-- /days-grid -->
 
-    <!-- PROGRESS -->
     <div class="progress-section">
       <h3>🎯 AWS Skill Progression</h3>
       <div class="progress-grid">
-        <div class="progress-item">
-          <div class="progress-label"><span>IAM & Console</span><span>Day 1</span></div>
-          <div class="progress-bar"><div class="progress-fill aws-fill" style="width:100%"></div></div>
-        </div>
-        <div class="progress-item">
-          <div class="progress-label"><span>EC2 & Lambda</span><span>Day 2</span></div>
-          <div class="progress-bar"><div class="progress-fill aws-fill" style="width:90%"></div></div>
-        </div>
-        <div class="progress-item">
-          <div class="progress-label"><span>S3 & Storage</span><span>Day 3</span></div>
-          <div class="progress-bar"><div class="progress-fill aws-fill" style="width:85%"></div></div>
-        </div>
-        <div class="progress-item">
-          <div class="progress-label"><span>VPC & Networking</span><span>Day 4</span></div>
-          <div class="progress-bar"><div class="progress-fill aws-fill" style="width:80%"></div></div>
-        </div>
-        <div class="progress-item">
-          <div class="progress-label"><span>Databases</span><span>Day 5</span></div>
-          <div class="progress-bar"><div class="progress-fill aws-fill" style="width:78%"></div></div>
-        </div>
-        <div class="progress-item">
-          <div class="progress-label"><span>ECS/EKS/CFN</span><span>Day 6</span></div>
-          <div class="progress-bar"><div class="progress-fill aws-fill" style="width:72%"></div></div>
-        </div>
+        <div class="progress-item"><div class="progress-label"><span>IAM &amp; Console</span><span>Day 1</span></div><div class="progress-bar"><div class="progress-fill aws-fill" style="width:100%"></div></div></div>
+        <div class="progress-item"><div class="progress-label"><span>EC2 &amp; Lambda</span><span>Day 2</span></div><div class="progress-bar"><div class="progress-fill aws-fill" style="width:90%"></div></div></div>
+        <div class="progress-item"><div class="progress-label"><span>S3 &amp; Storage</span><span>Day 3</span></div><div class="progress-bar"><div class="progress-fill aws-fill" style="width:85%"></div></div></div>
+        <div class="progress-item"><div class="progress-label"><span>VPC &amp; Networking</span><span>Day 4</span></div><div class="progress-bar"><div class="progress-fill aws-fill" style="width:80%"></div></div></div>
+        <div class="progress-item"><div class="progress-label"><span>Databases</span><span>Day 5</span></div><div class="progress-bar"><div class="progress-fill aws-fill" style="width:78%"></div></div></div>
+        <div class="progress-item"><div class="progress-label"><span>ECS/EKS/CFN</span><span>Day 6</span></div><div class="progress-bar"><div class="progress-fill aws-fill" style="width:72%"></div></div></div>
       </div>
     </div>
 
   </div><!-- /panel-aws -->
 
-  <!-- FOOTER -->
+  <!-- ══════════════════ NETWORKING PANEL ══════════════════ -->
+  <div class="panel" id="panel-net">
+    <div class="section-title">
+      <span class="icon">🌐</span>
+      <div>
+        <h2><span class="net-accent">Networking</span> — 7-Day Plan</h2>
+        <p>OSI Model · TCP/IP · DNS · Routing · Switching · Firewalls · Wireless · VPN · SDN</p>
+      </div>
+    </div>
+
+    <div class="panel-progress net-pp">
+      <span class="pp-label">📊 Overall Progress</span>
+      <span class="pp-count" id="net-count">0 / 7 days completed</span>
+      <div class="pp-bar-wrap"><div class="pp-bar-fill" id="net-bar"></div></div>
+    </div>
+
+    <div class="days-grid">
+
+      <!-- NET DAY 1 -->
+      <div class="day-card net-card" id="net-day-1">
+        <span class="done-ribbon">✓ Done</span>
+        <div class="day-header" onclick="toggleDay(this)">
+          <div class="day-badge"><span>1</span>Day</div>
+          <div class="day-info">
+            <h3>OSI Model &amp; TCP/IP Stack</h3>
+            <p>7-layer OSI model, TCP/IP suite, encapsulation, protocols per layer</p>
+          </div>
+          <div class="day-tags">
+            <span class="tag tag-cyan">OSI</span>
+            <span class="tag tag-blue">TCP/IP</span>
+            <span class="tag tag-green">Protocols</span>
+          </div>
+          <button class="complete-btn" id="btn-net-day-1" onclick="toggleComplete(event,'net-day-1','net')">
+            <span class="bi">○</span><span class="label-text">Mark Done</span>
+          </button>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="schedule">
+          <table>
+            <thead><tr><th>Time</th><th>Topic</th><th>Activity</th></tr></thead>
+            <tbody>
+              <tr><td>9:00 – 10:30</td><td>OSI 7 layers: Physical, Data Link, Network, Transport</td><td>📖 Study + Diagram</td></tr>
+              <tr><td>10:30 – 12:00</td><td>OSI 7 layers: Session, Presentation, Application</td><td>🧠 Notes + Examples</td></tr>
+              <tr class="break-row"><td>12:00 – 13:00</td><td>🍽️ Lunch Break</td><td>—</td></tr>
+              <tr><td>13:00 – 14:30</td><td>TCP/IP 4-layer model vs OSI, protocol mapping</td><td>📖 Study + Compare</td></tr>
+              <tr><td>14:30 – 16:00</td><td>Data encapsulation: frames, packets, segments, bits</td><td>🔬 Trace a packet</td></tr>
+              <tr><td>16:00 – 17:30</td><td>Key protocols: HTTP, FTP, SMTP, DNS, ICMP, ARP</td><td>💻 Wireshark capture</td></tr>
+              <tr><td>17:30 – 18:00</td><td>Revision + Notes</td><td>📝 Summarize</td></tr>
+            </tbody>
+          </table>
+          <div class="topics-footer">
+            <span class="label">📌 Covered:</span>
+            <span class="tag tag-cyan">OSI Model</span>
+            <span class="tag tag-blue">TCP/IP</span>
+            <span class="tag tag-green">Encapsulation</span>
+            <span class="tag tag-purple">Protocols</span>
+          </div>
+          <div class="qa-section">
+            <div class="qa-header" onclick="toggleQA(this)">
+              <div class="qa-header-left">
+                <span class="qa-icon">❓</span>
+                <span class="qa-title">Practice Questions &amp; Answers</span>
+                <span class="qa-count">5 Questions</span>
+              </div>
+              <span class="qa-chevron">▼</span>
+            </div>
+            <div class="qa-body">
+              <div class="qa-list">
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">1</span>
+                    <span class="qa-q-text">Name the 7 OSI layers in order and give an example protocol for each.</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner"><strong>L1 Physical</strong>: Cables, hubs (Ethernet cable). <strong>L2 Data Link</strong>: MAC addressing, switches (Ethernet/802.11). <strong>L3 Network</strong>: Logical addressing, routing (IP, ICMP). <strong>L4 Transport</strong>: End-to-end delivery (TCP, UDP). <strong>L5 Session</strong>: Session management (NetBIOS, RPC). <strong>L6 Presentation</strong>: Encoding/encryption (TLS, JPEG). <strong>L7 Application</strong>: User-facing protocols (HTTP, DNS, FTP, SMTP). Mnemonic: <strong>"Please Do Not Throw Sausage Pizza Away"</strong></div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">2</span>
+                    <span class="qa-q-text">What is the difference between TCP and UDP?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner"><strong>TCP</strong> (Transmission Control Protocol): Connection-oriented, reliable, ordered delivery, error checking, flow control, 3-way handshake (SYN → SYN-ACK → ACK). Use for: web (HTTP/HTTPS), email, file transfer. <strong>UDP</strong> (User Datagram Protocol): Connectionless, unreliable, no ordering guarantees, low overhead, faster. Use for: video streaming, gaming, DNS, VoIP — where speed matters more than guaranteed delivery.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">3</span>
+                    <span class="qa-q-text">What is data encapsulation and what is the PDU at each OSI layer?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner">Encapsulation wraps data with headers (and sometimes trailers) at each OSI layer as it travels down from Application to Physical. PDUs (Protocol Data Units): <strong>L7-L5</strong>: Data. <strong>L4 (Transport)</strong>: Segment (TCP) / Datagram (UDP). <strong>L3 (Network)</strong>: Packet. <strong>L2 (Data Link)</strong>: Frame. <strong>L1 (Physical)</strong>: Bits. De-encapsulation happens in reverse on the receiving end.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">4</span>
+                    <span class="qa-q-text">What is the TCP 3-way handshake process?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner">The TCP 3-way handshake establishes a connection before data transfer: <strong>Step 1 — SYN</strong>: Client sends a SYN (synchronize) packet to server, proposing connection &amp; initial sequence number. <strong>Step 2 — SYN-ACK</strong>: Server responds with SYN-ACK — acknowledges client's SYN, sends its own SYN. <strong>Step 3 — ACK</strong>: Client sends ACK to acknowledge server's SYN. Connection is now established. Connection teardown uses a 4-way FIN handshake.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">5</span>
+                    <span class="qa-q-text">How does ARP work and what problem does it solve?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner"><strong>ARP</strong> (Address Resolution Protocol) maps an IP address (L3) to a MAC address (L2). Problem: Devices communicate locally using MAC addresses, but routing uses IP addresses. Process: Host broadcasts an ARP Request: "Who has IP 192.168.1.1? Tell 192.168.1.5". The device with that IP replies with its MAC address. The requesting host caches this in the ARP table (<code>arp -a</code>). ARP is only for local subnet communication.</div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NET DAY 2 -->
+      <div class="day-card net-card" id="net-day-2">
+        <span class="done-ribbon">✓ Done</span>
+        <div class="day-header" onclick="toggleDay(this)">
+          <div class="day-badge"><span>2</span>Day</div>
+          <div class="day-info">
+            <h3>IP Addressing, Subnetting &amp; CIDR</h3>
+            <p>IPv4/IPv6, subnet masks, CIDR notation, VLSM, subnetting practice</p>
+          </div>
+          <div class="day-tags">
+            <span class="tag tag-cyan">IPv4</span>
+            <span class="tag tag-blue">IPv6</span>
+            <span class="tag tag-green">CIDR</span>
+          </div>
+          <button class="complete-btn" id="btn-net-day-2" onclick="toggleComplete(event,'net-day-2','net')">
+            <span class="bi">○</span><span class="label-text">Mark Done</span>
+          </button>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="schedule">
+          <table>
+            <thead><tr><th>Time</th><th>Topic</th><th>Activity</th></tr></thead>
+            <tbody>
+              <tr><td>9:00 – 10:30</td><td>IPv4 address classes, public vs private ranges</td><td>📖 Study + Notes</td></tr>
+              <tr><td>10:30 – 12:00</td><td>Subnet masks, binary conversion, network/host bits</td><td>✍️ Practice binary</td></tr>
+              <tr class="break-row"><td>12:00 – 13:00</td><td>🍽️ Lunch Break</td><td>—</td></tr>
+              <tr><td>13:00 – 14:30</td><td>CIDR notation, VLSM, subnetting calculations</td><td>🔬 Subnetting exercises</td></tr>
+              <tr><td>14:30 – 16:00</td><td>IPv6: address format, types, advantages over IPv4</td><td>📖 Study + Compare</td></tr>
+              <tr><td>16:00 – 17:30</td><td>NAT, PAT, DHCP concepts</td><td>💻 Configure DHCP lab</td></tr>
+              <tr><td>17:30 – 18:00</td><td>Revision + Notes</td><td>📝 Summarize</td></tr>
+            </tbody>
+          </table>
+          <div class="topics-footer">
+            <span class="label">📌 Covered:</span>
+            <span class="tag tag-cyan">IPv4</span>
+            <span class="tag tag-blue">IPv6</span>
+            <span class="tag tag-green">Subnetting</span>
+            <span class="tag tag-yellow">CIDR</span>
+          </div>
+          <div class="qa-section">
+            <div class="qa-header" onclick="toggleQA(this)">
+              <div class="qa-header-left">
+                <span class="qa-icon">❓</span>
+                <span class="qa-title">Practice Questions &amp; Answers</span>
+                <span class="qa-count">5 Questions</span>
+              </div>
+              <span class="qa-chevron">▼</span>
+            </div>
+            <div class="qa-body">
+              <div class="qa-list">
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">1</span>
+                    <span class="qa-q-text">What are the private IP address ranges defined by RFC 1918?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner">RFC 1918 defines three private ranges not routed on the internet: <strong>Class A</strong>: <code>10.0.0.0 – 10.255.255.255</code> (/8, ~16.7M hosts). <strong>Class B</strong>: <code>172.16.0.0 – 172.31.255.255</code> (/12, ~1M hosts). <strong>Class C</strong>: <code>192.168.0.0 – 192.168.255.255</code> (/16, ~65K hosts). Also note: <code>127.0.0.0/8</code> (loopback), <code>169.254.0.0/16</code> (link-local/APIPA when DHCP fails).</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">2</span>
+                    <span class="qa-q-text">How do you subnet 192.168.1.0/24 into 4 equal subnets?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner">To get 4 subnets, borrow 2 bits (2² = 4). New prefix: /26. Each subnet has 64 addresses (62 usable): <strong>Subnet 1</strong>: 192.168.1.0/26 (hosts: .1 – .62, broadcast: .63). <strong>Subnet 2</strong>: 192.168.1.64/26 (hosts: .65 – .126). <strong>Subnet 3</strong>: 192.168.1.128/26 (hosts: .129 – .190). <strong>Subnet 4</strong>: 192.168.1.192/26 (hosts: .193 – .254). Subnet mask: 255.255.255.192.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">3</span>
+                    <span class="qa-q-text">What is CIDR and how does it improve upon classful addressing?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner"><strong>CIDR</strong> (Classless Inter-Domain Routing) uses variable-length subnet masks (VLSM), written as <code>IP/prefix-length</code> (e.g., 192.168.1.0/26). <strong>Improvements over classful</strong>: Eliminates rigid Class A/B/C boundaries, allows right-sizing of networks (no more wasting thousands of addresses), enables route aggregation (supernetting — combining multiple routes into one, reducing routing table size), and slowed IPv4 address exhaustion.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">4</span>
+                    <span class="qa-q-text">What are the key differences between IPv4 and IPv6?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner"><strong>IPv4</strong>: 32-bit, ~4.3 billion addresses, dotted-decimal notation, requires NAT, optional IPsec. <strong>IPv6</strong>: 128-bit, 340 undecillion addresses, colon-hex notation (e.g., <code>2001:db8::1</code>), no NAT needed, built-in IPsec, auto-configuration (SLAAC), no broadcast (uses multicast), simplified header. IPv6 types: <strong>Unicast</strong>, <strong>Multicast</strong>, <strong>Anycast</strong>. Loopback: <code>::1</code>. Link-local: <code>fe80::/10</code>.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">5</span>
+                    <span class="qa-q-text">What is NAT and what problem does it solve?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner"><strong>NAT</strong> (Network Address Translation) translates private IP addresses to one (or a few) public IP addresses, allowing multiple devices to share a single public IP. <strong>Problem solved</strong>: IPv4 address exhaustion — enables thousands of devices on a private network to share a single public IP. Types: <strong>Static NAT</strong> (1:1 mapping), <strong>Dynamic NAT</strong> (pool of public IPs), <strong>PAT/NAT Overload</strong> (many-to-one using port numbers — most common in home/office routers).</div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NET DAY 3 -->
+      <div class="day-card net-card" id="net-day-3">
+        <span class="done-ribbon">✓ Done</span>
+        <div class="day-header" onclick="toggleDay(this)">
+          <div class="day-badge"><span>3</span>Day</div>
+          <div class="day-info">
+            <h3>DNS, DHCP &amp; Application Layer Protocols</h3>
+            <p>DNS resolution, record types, DHCP, HTTP/S, FTP, SMTP, SSH</p>
+          </div>
+          <div class="day-tags">
+            <span class="tag tag-cyan">DNS</span>
+            <span class="tag tag-blue">DHCP</span>
+            <span class="tag tag-green">HTTP/S</span>
+          </div>
+          <button class="complete-btn" id="btn-net-day-3" onclick="toggleComplete(event,'net-day-3','net')">
+            <span class="bi">○</span><span class="label-text">Mark Done</span>
+          </button>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="schedule">
+          <table>
+            <thead><tr><th>Time</th><th>Topic</th><th>Activity</th></tr></thead>
+            <tbody>
+              <tr><td>9:00 – 10:30</td><td>DNS: resolution process, recursive vs iterative queries</td><td>📖 Study + Diagram</td></tr>
+              <tr><td>10:30 – 12:00</td><td>DNS record types: A, AAAA, CNAME, MX, NS, TXT, PTR</td><td>💻 nslookup/dig practice</td></tr>
+              <tr class="break-row"><td>12:00 – 13:00</td><td>🍽️ Lunch Break</td><td>—</td></tr>
+              <tr><td>13:00 – 14:30</td><td>DHCP: DORA process, leases, options, relay agents</td><td>🔬 Configure DHCP</td></tr>
+              <tr><td>14:30 – 16:00</td><td>HTTP vs HTTPS, TLS handshake, status codes</td><td>📖 Study + curl lab</td></tr>
+              <tr><td>16:00 – 17:30</td><td>FTP/SFTP, SMTP/POP3/IMAP, SSH port forwarding</td><td>📝 Protocol comparison</td></tr>
+              <tr><td>17:30 – 18:00</td><td>Revision + Notes</td><td>📝 Summarize</td></tr>
+            </tbody>
+          </table>
+          <div class="topics-footer">
+            <span class="label">📌 Covered:</span>
+            <span class="tag tag-cyan">DNS</span>
+            <span class="tag tag-blue">DHCP</span>
+            <span class="tag tag-green">HTTP/S</span>
+            <span class="tag tag-purple">SSH</span>
+          </div>
+          <div class="qa-section">
+            <div class="qa-header" onclick="toggleQA(this)">
+              <div class="qa-header-left">
+                <span class="qa-icon">❓</span>
+                <span class="qa-title">Practice Questions &amp; Answers</span>
+                <span class="qa-count">5 Questions</span>
+              </div>
+              <span class="qa-chevron">▼</span>
+            </div>
+            <div class="qa-body">
+              <div class="qa-list">
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">1</span>
+                    <span class="qa-q-text">Describe the full DNS resolution process when you type www.google.com in a browser.</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner">1. Browser checks <strong>local cache</strong>. 2. OS checks <strong>hosts file</strong>. 3. Query sent to <strong>Recursive Resolver</strong> (ISP/configured DNS). 4. Resolver checks its cache; if miss, queries <strong>Root Nameserver</strong> → returns TLD (.com) nameserver. 5. Resolver queries <strong>TLD Nameserver</strong> → returns Google's Authoritative Nameserver. 6. Resolver queries <strong>Authoritative Nameserver</strong> → returns A record (IP). 7. Resolver caches result and returns IP to browser. 8. Browser connects to IP.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">2</span>
+                    <span class="qa-q-text">What are the common DNS record types and their purposes?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner"><strong>A</strong>: Maps hostname → IPv4 address. <strong>AAAA</strong>: Maps hostname → IPv6 address. <strong>CNAME</strong>: Canonical Name — alias pointing to another hostname. <strong>MX</strong>: Mail Exchange — specifies mail servers for a domain (with priority). <strong>NS</strong>: Nameserver — delegates DNS zone to nameservers. <strong>TXT</strong>: Text — SPF, DKIM, domain verification. <strong>PTR</strong>: Pointer — reverse DNS, maps IP → hostname. <strong>SOA</strong>: Start of Authority — zone metadata (serial, TTL, admin contact).</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">3</span>
+                    <span class="qa-q-text">What is the DHCP DORA process?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner">DORA = 4-step DHCP IP assignment process: <strong>D — Discover</strong>: Client broadcasts DHCPDISCOVER ("Anyone have an IP for me?"). <strong>O — Offer</strong>: Server sends DHCPOFFER with available IP, subnet, gateway, DNS. <strong>R — Request</strong>: Client broadcasts DHCPREQUEST accepting the offer (may be seen by multiple servers). <strong>A — Acknowledge</strong>: Server sends DHCPACK confirming the lease. Client now has IP, subnet mask, default gateway, DNS, and lease duration.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">4</span>
+                    <span class="qa-q-text">What is the TLS handshake and how does HTTPS secure communication?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner">TLS handshake (simplified): <strong>1</strong>. Client sends <strong>ClientHello</strong> (TLS version, cipher suites). <strong>2</strong>. Server sends <strong>ServerHello</strong> + certificate (public key). <strong>3</strong>. Client verifies certificate against trusted CAs. <strong>4</strong>. <strong>Key Exchange</strong>: Establish session key (using asymmetric crypto). <strong>5</strong>. Both sides confirm with <strong>Finished</strong> message. <strong>6</strong>. Encrypted symmetric communication begins. HTTPS = HTTP + TLS. Provides <strong>Confidentiality</strong> (encryption), <strong>Integrity</strong> (MAC), <strong>Authentication</strong> (certificates).</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">5</span>
+                    <span class="qa-q-text">What are common HTTP status code categories and key codes?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner"><strong>1xx</strong> Informational: 100 Continue. <strong>2xx</strong> Success: 200 OK, 201 Created, 204 No Content. <strong>3xx</strong> Redirection: 301 Moved Permanently, 302 Found, 304 Not Modified. <strong>4xx</strong> Client Error: 400 Bad Request, 401 Unauthorized, 403 Forbidden, 404 Not Found, 429 Too Many Requests. <strong>5xx</strong> Server Error: 500 Internal Server Error, 502 Bad Gateway, 503 Service Unavailable, 504 Gateway Timeout.</div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NET DAY 4 -->
+      <div class="day-card net-card" id="net-day-4">
+        <span class="done-ribbon">✓ Done</span>
+        <div class="day-header" onclick="toggleDay(this)">
+          <div class="day-badge"><span>4</span>Day</div>
+          <div class="day-info">
+            <h3>Routing Protocols &amp; Layer 3 Concepts</h3>
+            <p>Static routing, RIP, OSPF, BGP, routing tables, default gateway</p>
+          </div>
+          <div class="day-tags">
+            <span class="tag tag-cyan">OSPF</span>
+            <span class="tag tag-blue">BGP</span>
+            <span class="tag tag-orange">Routing</span>
+          </div>
+          <button class="complete-btn" id="btn-net-day-4" onclick="toggleComplete(event,'net-day-4','net')">
+            <span class="bi">○</span><span class="label-text">Mark Done</span>
+          </button>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="schedule">
+          <table>
+            <thead><tr><th>Time</th><th>Topic</th><th>Activity</th></tr></thead>
+            <tbody>
+              <tr><td>9:00 – 10:30</td><td>How routing works: routing tables, longest prefix match</td><td>📖 Study + Diagram</td></tr>
+              <tr><td>10:30 – 12:00</td><td>Static routing vs dynamic routing, administrative distance</td><td>🔬 Configure static routes</td></tr>
+              <tr class="break-row"><td>12:00 – 13:00</td><td>🍽️ Lunch Break</td><td>—</td></tr>
+              <tr><td>13:00 – 14:30</td><td>Distance-vector: RIP (hop count, max 15 hops, timers)</td><td>📖 Study + Notes</td></tr>
+              <tr><td>14:30 – 16:00</td><td>Link-state: OSPF (areas, LSA, Dijkstra, DR/BDR)</td><td>💻 OSPF lab (GNS3/Packet Tracer)</td></tr>
+              <tr><td>16:00 – 17:30</td><td>BGP: path-vector, AS numbers, eBGP vs iBGP, attributes</td><td>📖 Study</td></tr>
+              <tr><td>17:30 – 18:00</td><td>Revision + Notes</td><td>📝 Summarize</td></tr>
+            </tbody>
+          </table>
+          <div class="topics-footer">
+            <span class="label">📌 Covered:</span>
+            <span class="tag tag-orange">Static Routing</span>
+            <span class="tag tag-cyan">OSPF</span>
+            <span class="tag tag-blue">BGP</span>
+            <span class="tag tag-yellow">RIP</span>
+          </div>
+          <div class="qa-section">
+            <div class="qa-header" onclick="toggleQA(this)">
+              <div class="qa-header-left">
+                <span class="qa-icon">❓</span>
+                <span class="qa-title">Practice Questions &amp; Answers</span>
+                <span class="qa-count">5 Questions</span>
+              </div>
+              <span class="qa-chevron">▼</span>
+            </div>
+            <div class="qa-body">
+              <div class="qa-list">
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">1</span>
+                    <span class="qa-q-text">What is the difference between distance-vector and link-state routing protocols?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner"><strong>Distance-Vector</strong> (RIP, EIGRP): Each router knows only its neighbors and distances to destinations. Shares routing table with neighbors periodically. Simple but slow convergence, susceptible to routing loops. Metric: hop count (RIP). <strong>Link-State</strong> (OSPF, IS-IS): Each router knows the full network topology. Floods Link State Advertisements (LSAs) to all routers. Runs Dijkstra's algorithm for shortest path. Fast convergence, scalable, loop-free. Metric: cost (based on bandwidth).</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">2</span>
+                    <span class="qa-q-text">What is Administrative Distance (AD) and what are the AD values for common protocols?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner"><strong>AD</strong> is a measure of the trustworthiness of a routing source — lower is more trusted. When multiple protocols learn the same route, lowest AD wins: <strong>Connected</strong>: 0. <strong>Static</strong>: 1. <strong>eBGP</strong>: 20. <strong>OSPF</strong>: 110. <strong>RIP</strong>: 120. <strong>iBGP</strong>: 200. <strong>Unknown</strong>: 255 (not used). Example: If OSPF and RIP both know a route, OSPF wins (110 &lt; 120).</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">3</span>
+                    <span class="qa-q-text">What is OSPF and what are its key concepts (areas, DR, LSA)?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner"><strong>OSPF</strong> (Open Shortest Path First) is a link-state, classless, open-standard IGP. Key concepts: <strong>Areas</strong>: Hierarchical structure — Area 0 (backbone) connects all other areas, reducing LSA flooding. <strong>DR/BDR</strong>: On multi-access segments, a Designated Router (DR) and Backup DR elected to reduce adjacencies. <strong>LSAs</strong>: Link State Advertisements — routers exchange LSA types (Type 1 Router, Type 2 Network, Type 5 External). <strong>Metric</strong>: Cost = 100Mbps / interface bandwidth. Uses Dijkstra's SPF algorithm.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">4</span>
+                    <span class="qa-q-text">What is BGP and why is it called the "protocol of the internet"?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner"><strong>BGP</strong> (Border Gateway Protocol) is an Exterior Gateway Protocol (EGP) — routes between Autonomous Systems (AS) on the internet. Called the "protocol of the internet" because it's the glue connecting all ISPs and large networks. Key features: Path-vector protocol (tracks full AS path to prevent loops), policy-based routing (rich attributes: AS-PATH, LOCAL-PREF, MED, NEXT-HOP), highly scalable (handles 900K+ routes). <strong>eBGP</strong>: Between different ASes. <strong>iBGP</strong>: Within same AS.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">5</span>
+                    <span class="qa-q-text">What is the longest prefix match rule in routing?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner">When a router has multiple routes matching a destination IP, it uses the <strong>most specific route</strong> — the one with the longest prefix (highest subnet mask). Example: For destination <code>192.168.1.5</code>: Route 1 = 192.168.0.0/16 (matches), Route 2 = 192.168.1.0/24 (matches), Route 3 = 192.168.1.0/28 (matches). Router picks Route 3 (/28) — longest match = most specific = best route. Default route (0.0.0.0/0) is always the shortest prefix — last resort.</div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NET DAY 5 -->
+      <div class="day-card net-card" id="net-day-5">
+        <span class="done-ribbon">✓ Done</span>
+        <div class="day-header" onclick="toggleDay(this)">
+          <div class="day-badge"><span>5</span>Day</div>
+          <div class="day-info">
+            <h3>Switching, VLANs &amp; Spanning Tree</h3>
+            <p>Ethernet, MAC tables, VLANs, 802.1Q trunking, STP, EtherChannel</p>
+          </div>
+          <div class="day-tags">
+            <span class="tag tag-cyan">VLANs</span>
+            <span class="tag tag-blue">STP</span>
+            <span class="tag tag-green">Trunking</span>
+          </div>
+          <button class="complete-btn" id="btn-net-day-5" onclick="toggleComplete(event,'net-day-5','net')">
+            <span class="bi">○</span><span class="label-text">Mark Done</span>
+          </button>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="schedule">
+          <table>
+            <thead><tr><th>Time</th><th>Topic</th><th>Activity</th></tr></thead>
+            <tbody>
+              <tr><td>9:00 – 10:30</td><td>Ethernet switching: MAC address table, flooding, forwarding</td><td>📖 Study + Diagram</td></tr>
+              <tr><td>10:30 – 12:00</td><td>VLANs: segmentation, access ports, inter-VLAN routing</td><td>💻 Configure VLANs</td></tr>
+              <tr class="break-row"><td>12:00 – 13:00</td><td>🍽️ Lunch Break</td><td>—</td></tr>
+              <tr><td>13:00 – 14:30</td><td>802.1Q trunk ports, native VLAN, DTP</td><td>🔬 Trunk lab</td></tr>
+              <tr><td>14:30 – 16:00</td><td>Spanning Tree Protocol (STP): root bridge, port states, RSTP</td><td>📖 Study + Observe STP</td></tr>
+              <tr><td>16:00 – 17:30</td><td>EtherChannel (LACP/PAgP), port-channels</td><td>⚙️ Configure EtherChannel</td></tr>
+              <tr><td>17:30 – 18:00</td><td>Revision + Notes</td><td>📝 Summarize</td></tr>
+            </tbody>
+          </table>
+          <div class="topics-footer">
+            <span class="label">📌 Covered:</span>
+            <span class="tag tag-cyan">VLANs</span>
+            <span class="tag tag-blue">STP/RSTP</span>
+            <span class="tag tag-green">802.1Q</span>
+            <span class="tag tag-yellow">EtherChannel</span>
+          </div>
+          <div class="qa-section">
+            <div class="qa-header" onclick="toggleQA(this)">
+              <div class="qa-header-left">
+                <span class="qa-icon">❓</span>
+                <span class="qa-title">Practice Questions &amp; Answers</span>
+                <span class="qa-count">5 Questions</span>
+              </div>
+              <span class="qa-chevron">▼</span>
+            </div>
+            <div class="qa-body">
+              <div class="qa-list">
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">1</span>
+                    <span class="qa-q-text">How does a switch learn and build its MAC address table?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner">A switch builds its MAC table (CAM table) through <strong>source address learning</strong>: When a frame arrives, the switch records the <strong>source MAC + incoming port</strong> in the table. For forwarding: if destination MAC is in the table → <strong>unicast forward</strong> to that port only. If unknown → <strong>flood</strong> to all ports except source (unknown unicast flooding). Entries age out after the aging timer (default 300s). This is different from a hub which always floods all frames.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">2</span>
+                    <span class="qa-q-text">What are VLANs and what problem do they solve?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner"><strong>VLANs</strong> (Virtual LANs) logically segment a physical network into separate broadcast domains without needing separate physical switches. Problems solved: <strong>Broadcast control</strong> (limit broadcasts to VLAN members), <strong>Security</strong> (HR and Finance on same switch but isolated), <strong>Flexibility</strong> (group users by function not location), <strong>Cost</strong> (fewer physical switches needed). VLANs require a Layer 3 device (router or L3 switch) for inter-VLAN routing.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">3</span>
+                    <span class="qa-q-text">What is 802.1Q trunking and what is the native VLAN?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner"><strong>802.1Q</strong> is the IEEE standard for VLAN tagging on trunk links. A trunk port carries multiple VLANs between switches/routers. Each frame gets a 4-byte 802.1Q tag inserted (contains VLAN ID). <strong>Native VLAN</strong>: Frames in the native VLAN are sent untagged over the trunk (default VLAN 1). Security best practice: change the native VLAN to an unused VLAN to prevent VLAN hopping attacks. Access ports carry only one VLAN and don't use tags.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">4</span>
+                    <span class="qa-q-text">What is Spanning Tree Protocol (STP) and what problem does it solve?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner"><strong>STP</strong> (IEEE 802.1D) prevents Layer 2 loops in redundant switch topologies. Without STP, loops cause broadcast storms (frames loop forever) crashing networks. How it works: Elects a <strong>Root Bridge</strong> (lowest Bridge ID = priority + MAC). Each non-root switch finds its <strong>Root Port</strong> (best path to root). Per segment, one <strong>Designated Port</strong> is elected. All other redundant ports are <strong>Blocked</strong>. <strong>RSTP</strong> (802.1w): Rapid STP — much faster convergence (seconds vs 30-50s for STP).</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">5</span>
+                    <span class="qa-q-text">What is EtherChannel and what are LACP and PAgP?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner"><strong>EtherChannel</strong> (Link Aggregation) bundles multiple physical links (2-8) between switches into one logical link, increasing bandwidth and providing redundancy. STP sees it as one link, avoiding blocked ports. <strong>LACP</strong> (Link Aggregation Control Protocol, 802.3ad): Open standard, negotiates link aggregation with the partner. <strong>PAgP</strong> (Port Aggregation Protocol): Cisco proprietary. <strong>Static</strong>: No negotiation protocol. All links must match: speed, duplex, VLAN configuration. Load balancing uses src/dst MAC or IP.</div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NET DAY 6 -->
+      <div class="day-card net-card" id="net-day-6">
+        <span class="done-ribbon">✓ Done</span>
+        <div class="day-header" onclick="toggleDay(this)">
+          <div class="day-badge"><span>6</span>Day</div>
+          <div class="day-info">
+            <h3>Firewalls, ACLs, VPNs &amp; Network Security</h3>
+            <p>Stateful firewalls, ACLs, IPsec, SSL VPN, IDS/IPS, Zero Trust</p>
+          </div>
+          <div class="day-tags">
+            <span class="tag tag-red">Firewall</span>
+            <span class="tag tag-orange">VPN</span>
+            <span class="tag tag-purple">ACLs</span>
+          </div>
+          <button class="complete-btn" id="btn-net-day-6" onclick="toggleComplete(event,'net-day-6','net')">
+            <span class="bi">○</span><span class="label-text">Mark Done</span>
+          </button>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="schedule">
+          <table>
+            <thead><tr><th>Time</th><th>Topic</th><th>Activity</th></tr></thead>
+            <tbody>
+              <tr><td>9:00 – 10:30</td><td>Stateful vs stateless firewalls, firewall zones (DMZ)</td><td>📖 Study + Diagram</td></tr>
+              <tr><td>10:30 – 12:00</td><td>ACLs: standard vs extended, numbered vs named</td><td>💻 Configure ACLs</td></tr>
+              <tr class="break-row"><td>12:00 – 13:00</td><td>🍽️ Lunch Break</td><td>—</td></tr>
+              <tr><td>13:00 – 14:30</td><td>VPN types: Site-to-Site IPsec, Remote Access SSL VPN</td><td>📖 Study + Compare</td></tr>
+              <tr><td>14:30 – 16:00</td><td>IDS vs IPS, NGFW features, WAF</td><td>🔬 Study + Lab</td></tr>
+              <tr><td>16:00 – 17:30</td><td>Zero Trust model, network segmentation, microsegmentation</td><td>📖 Study</td></tr>
+              <tr><td>17:30 – 18:00</td><td>Revision + Notes</td><td>📝 Summarize</td></tr>
+            </tbody>
+          </table>
+          <div class="topics-footer">
+            <span class="label">📌 Covered:</span>
+            <span class="tag tag-red">Firewall</span>
+            <span class="tag tag-orange">IPsec VPN</span>
+            <span class="tag tag-purple">ACLs</span>
+            <span class="tag tag-cyan">Zero Trust</span>
+          </div>
+          <div class="qa-section">
+            <div class="qa-header" onclick="toggleQA(this)">
+              <div class="qa-header-left">
+                <span class="qa-icon">❓</span>
+                <span class="qa-title">Practice Questions &amp; Answers</span>
+                <span class="qa-count">5 Questions</span>
+              </div>
+              <span class="qa-chevron">▼</span>
+            </div>
+            <div class="qa-body">
+              <div class="qa-list">
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">1</span>
+                    <span class="qa-q-text">What is the difference between a stateful and stateless firewall?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner"><strong>Stateless firewall</strong>: Inspects each packet independently against static rules (ACLs). Doesn't track connection state. Fast but less secure — must explicitly allow return traffic. <strong>Stateful firewall</strong>: Tracks the state of connections (NEW, ESTABLISHED, RELATED). Automatically allows return traffic for established connections. More secure because it understands context. Most modern firewalls are stateful. <strong>NGFW</strong> (Next-Generation Firewall) adds: deep packet inspection (DPI), application awareness (Layer 7), user identity, IPS integration.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">2</span>
+                    <span class="qa-q-text">What are ACLs in networking and what is the implicit deny rule?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner"><strong>ACLs</strong> (Access Control Lists) are ordered lists of permit/deny rules applied to router interfaces to filter traffic. Types: <strong>Standard ACL</strong>: Filters by source IP only (numbered 1-99). <strong>Extended ACL</strong>: Filters by source/destination IP, protocol, ports (numbered 100-199). Rules are processed top-down — first match wins. <strong>Implicit Deny</strong>: At the end of every ACL is an invisible <code>deny any</code> — any traffic not explicitly permitted is dropped. Always add explicit permit rules for needed traffic.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">3</span>
+                    <span class="qa-q-text">What is IPsec VPN and what are its two modes (Transport vs Tunnel)?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner"><strong>IPsec</strong> is a suite of protocols for secure IP communication (authentication + encryption). Two modes: <strong>Transport Mode</strong>: Encrypts only the payload (data), original IP header preserved — used for end-to-end communication (host to host). <strong>Tunnel Mode</strong>: Encrypts the entire original packet and adds a new IP header — used for site-to-site VPNs (gateway to gateway). IPsec uses: <strong>AH</strong> (Authentication Header — integrity, no encryption) or <strong>ESP</strong> (Encapsulating Security Payload — integrity + encryption). IKE handles key exchange.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">4</span>
+                    <span class="qa-q-text">What is the difference between IDS and IPS?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner"><strong>IDS</strong> (Intrusion Detection System): Passively monitors network traffic, detects threats/anomalies, and <strong>alerts</strong> — but does NOT block traffic. Deployed out-of-band (traffic copy via SPAN port). <strong>IPS</strong> (Intrusion Prevention System): Inline device that actively <strong>blocks</strong> detected threats in real time. Can drop packets, reset connections, block IPs. Detection methods: <strong>Signature-based</strong> (known attack patterns), <strong>Anomaly-based</strong> (deviation from baseline), <strong>Policy-based</strong> (defined rules). False positives are a concern with IPS blocking.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">5</span>
+                    <span class="qa-q-text">What is Zero Trust Network Architecture (ZTNA)?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner"><strong>Zero Trust</strong> is a security model based on "Never trust, always verify" — no implicit trust based on network location (inside/outside perimeter). Core principles: <strong>Verify explicitly</strong>: Always authenticate/authorize using all available data (identity, location, device, service). <strong>Least privilege access</strong>: Limit user/device access with just-in-time and just-enough access. <strong>Assume breach</strong>: Minimize blast radius, segment access, encrypt everything, use analytics. Replaces the outdated castle-and-moat (perimeter) security model.</div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NET DAY 7 -->
+      <div class="day-card net-card" id="net-day-7">
+        <span class="done-ribbon">✓ Done</span>
+        <div class="day-header" onclick="toggleDay(this)">
+          <div class="day-badge"><span>7</span>Day</div>
+          <div class="day-info">
+            <h3>Wireless, Cloud Networking &amp; SDN</h3>
+            <p>Wi-Fi standards, WPA3, SD-WAN, SDN concepts, network automation</p>
+          </div>
+          <div class="day-tags">
+            <span class="tag tag-cyan">Wi-Fi</span>
+            <span class="tag tag-purple">SDN</span>
+            <span class="tag tag-green">Automation</span>
+          </div>
+          <button class="complete-btn" id="btn-net-day-7" onclick="toggleComplete(event,'net-day-7','net')">
+            <span class="bi">○</span><span class="label-text">Mark Done</span>
+          </button>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="schedule">
+          <table>
+            <thead><tr><th>Time</th><th>Topic</th><th>Activity</th></tr></thead>
+            <tbody>
+              <tr><td>9:00 – 10:30</td><td>Wi-Fi standards: 802.11a/b/g/n/ac/ax, bands, channels</td><td>📖 Study + Compare</td></tr>
+              <tr><td>10:30 – 12:00</td><td>WPA2 vs WPA3, wireless security, SSID, hidden networks</td><td>🔬 Wireless security lab</td></tr>
+              <tr class="break-row"><td>12:00 – 13:00</td><td>🍽️ Lunch Break</td><td>—</td></tr>
+              <tr><td>13:00 – 14:30</td><td>SDN: control plane vs data plane, OpenFlow, controllers</td><td>📖 Study + Diagram</td></tr>
+              <tr><td>14:30 – 16:00</td><td>SD-WAN, cloud networking basics (overlay networks)</td><td>📖 Study</td></tr>
+              <tr><td>16:00 – 17:30</td><td>Network automation: Ansible for networking, NETCONF, REST APIs</td><td>💻 Ansible network module</td></tr>
+              <tr><td>17:30 – 18:00</td><td>Full revision + Mock Q&amp;A</td><td>📝 Flashcards</td></tr>
+            </tbody>
+          </table>
+          <div class="topics-footer">
+            <span class="label">📌 Covered:</span>
+            <span class="tag tag-cyan">Wi-Fi 6</span>
+            <span class="tag tag-purple">SDN</span>
+            <span class="tag tag-orange">SD-WAN</span>
+            <span class="tag tag-green">Automation</span>
+          </div>
+          <div class="qa-section">
+            <div class="qa-header" onclick="toggleQA(this)">
+              <div class="qa-header-left">
+                <span class="qa-icon">❓</span>
+                <span class="qa-title">Practice Questions &amp; Answers</span>
+                <span class="qa-count">5 Questions</span>
+              </div>
+              <span class="qa-chevron">▼</span>
+            </div>
+            <div class="qa-body">
+              <div class="qa-list">
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">1</span>
+                    <span class="qa-q-text">What are the Wi-Fi 802.11 standards and their key characteristics?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner"><strong>802.11b</strong>: 2.4GHz, 11Mbps. <strong>802.11a</strong>: 5GHz, 54Mbps. <strong>802.11g</strong>: 2.4GHz, 54Mbps. <strong>802.11n (Wi-Fi 4)</strong>: 2.4/5GHz, 600Mbps, MIMO. <strong>802.11ac (Wi-Fi 5)</strong>: 5GHz, up to 3.5Gbps, MU-MIMO, beamforming. <strong>802.11ax (Wi-Fi 6/6E)</strong>: 2.4/5/6GHz, up to 9.6Gbps, OFDMA, BSS Coloring, better performance in dense environments (stadiums, offices). 2.4GHz = better range, more interference. 5/6GHz = faster, shorter range.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">2</span>
+                    <span class="qa-q-text">What are the differences between WPA2 and WPA3?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner"><strong>WPA2</strong>: Uses AES-CCMP encryption, PSK (Pre-Shared Key) or 802.1X enterprise. Vulnerable to KRACK attack (key reinstallation), offline dictionary attacks on PSK. <strong>WPA3</strong>: Uses SAE (Simultaneous Authentication of Equals) — replaces PSK, protects against offline dictionary attacks. <strong>Forward Secrecy</strong>: Past sessions can't be decrypted even if password is compromised. <strong>WPA3-Enterprise</strong>: 192-bit security. <strong>Easy Connect</strong>: Simplified IoT device onboarding via QR code. WPA3 is the current standard (mandatory since 2020 for Wi-Fi certification).</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">3</span>
+                    <span class="qa-q-text">What is SDN (Software-Defined Networking) and how does it separate control and data planes?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner"><strong>SDN</strong> decouples the network's control logic from the underlying hardware. Traditional networking: control plane (routing decisions) and data plane (packet forwarding) are both on each device. <strong>SDN</strong>: <strong>Control Plane</strong> is centralized in an SDN Controller (OpenDaylight, ONOS). <strong>Data Plane</strong> remains on network devices (switches/routers). Communication via <strong>OpenFlow</strong> protocol (southbound API). Benefits: centralized management, programmability, rapid policy changes, network virtualization (overlays). Used in data centers and cloud networking.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">4</span>
+                    <span class="qa-q-text">What is SD-WAN and how does it differ from traditional WAN?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner"><strong>Traditional WAN</strong>: Uses MPLS circuits (expensive, rigid, long provisioning), traffic must backhaul to data center for internet. <strong>SD-WAN</strong>: Software-defined overlay on any transport (MPLS, broadband, LTE, 5G). Features: <strong>Centralized control</strong> (one dashboard manages all sites), <strong>Application-aware routing</strong> (send video on one link, voice on another), <strong>Dynamic path selection</strong> (automatically use best path), <strong>Direct internet breakout</strong> (cloud traffic goes directly, not through DC), <strong>Zero-touch provisioning</strong>. Cost savings: replace expensive MPLS with cheaper broadband.</div>
+                  </div>
+                </div>
+
+                <div class="qa-item">
+                  <div class="qa-question">
+                    <span class="qa-q-num">5</span>
+                    <span class="qa-q-text">How is Ansible used for network automation and what protocols does it use?</span>
+                    <button class="ans-toggle-btn" onclick="toggleAnswer(this)">Show Answer <span class="btn-arrow">▼</span></button>
+                  </div>
+                  <div class="qa-answer">
+                    <div class="qa-answer-inner">Ansible automates network device configuration using <strong>agentless</strong> connections. Network modules use: <strong>SSH/CLI</strong> (most network devices — Cisco IOS, Juniper), <strong>NETCONF/YANG</strong> (structured data exchange, RFC 6241), <strong>REST APIs</strong> (RESTCONF, modern devices). Key concepts: <strong>Network modules</strong>: <code>cisco.ios.ios_config</code>, <code>juniper.junos</code>, <code>arista.eos</code>. <strong>connection: network_cli</strong> for SSH-based devices. Use cases: bulk config changes, compliance checks, rollback, inventory management. No agents needed — just SSH access.</div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /days-grid -->
+
+    <div class="progress-section">
+      <h3>🎯 Networking Skill Progression</h3>
+      <div class="progress-grid">
+        <div class="progress-item"><div class="progress-label"><span>OSI &amp; TCP/IP</span><span>Day 1</span></div><div class="progress-bar"><div class="progress-fill net-fill" style="width:100%"></div></div></div>
+        <div class="progress-item"><div class="progress-label"><span>IP Addressing</span><span>Day 2</span></div><div class="progress-bar"><div class="progress-fill net-fill" style="width:90%"></div></div></div>
+        <div class="progress-item"><div class="progress-label"><span>DNS &amp; App Protocols</span><span>Day 3</span></div><div class="progress-bar"><div class="progress-fill net-fill" style="width:85%"></div></div></div>
+        <div class="progress-item"><div class="progress-label"><span>Routing Protocols</span><span>Day 4</span></div><div class="progress-bar"><div class="progress-fill net-fill" style="width:80%"></div></div></div>
+        <div class="progress-item"><div class="progress-label"><span>Switching &amp; VLANs</span><span>Day 5</span></div><div class="progress-bar"><div class="progress-fill net-fill" style="width:78%"></div></div></div>
+        <div class="progress-item"><div class="progress-label"><span>Security &amp; VPN</span><span>Day 6</span></div><div class="progress-bar"><div class="progress-fill net-fill" style="width:72%"></div></div></div>
+      </div>
+    </div>
+
+  </div><!-- /panel-net -->
+
   <div class="page-footer">
     <p>💡 <strong>Capstone Project:</strong> Deploy a containerized app on AWS EKS using a Jenkins CI/CD pipeline with Terraform IaC and CloudWatch monitoring.</p>
     <p style="margin-top:0.6rem; color:#475569; font-size:0.8rem;">~6–8 hours/day &nbsp;·&nbsp; Theory → Hands-on Lab → Revision &nbsp;·&nbsp; 2026</p>
@@ -886,42 +2878,109 @@
 </div><!-- /wrapper -->
 
 <script>
+  /* ── TAB SWITCHING ── */
   function switchTab(tab) {
-    // hide all panels
     document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-    // deactivate all tabs
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active-devops','active-aws'));
-    // activate selected
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active-devops','active-aws','active-net'));
     document.getElementById('panel-' + tab).classList.add('active');
     document.getElementById('tab-' + tab).classList.add('active-' + tab);
+    setTimeout(animateBars, 150);
   }
 
+  /* ── ACCORDION (Day schedule) ── */
   function toggleDay(header) {
     const schedule = header.nextElementSibling;
-    const chevron = header.querySelector('.chevron');
-    const isOpen = schedule.classList.contains('open');
+    const chevron  = header.querySelector('.chevron');
+    const isOpen   = schedule.classList.contains('open');
     schedule.classList.toggle('open', !isOpen);
     chevron.style.transform = isOpen ? '' : 'rotate(180deg)';
   }
 
-  // Animate progress bars on tab switch
+  /* ── Q&A SECTION TOGGLE ── */
+  function toggleQA(header) {
+    const body    = header.nextElementSibling;
+    const chevron = header.querySelector('.qa-chevron');
+    const isOpen  = body.classList.contains('open');
+    body.classList.toggle('open', !isOpen);
+    chevron.style.transform = isOpen ? '' : 'rotate(180deg)';
+  }
+
+  /* ── INDIVIDUAL ANSWER TOGGLE ── */
+  function toggleAnswer(btn) {
+    const questionRow = btn.closest('.qa-question');
+    const answerDiv   = questionRow.nextElementSibling;
+    const isOpen      = answerDiv.classList.contains('open');
+
+    answerDiv.classList.toggle('open', !isOpen);
+    btn.classList.toggle('revealed', !isOpen);
+    btn.innerHTML = isOpen
+      ? 'Show Answer <span class="btn-arrow">▼</span>'
+      : 'Hide Answer <span class="btn-arrow">▼</span>';
+  }
+
+  /* ── SKILL PROGRESS BARS ── */
   function animateBars() {
     document.querySelectorAll('.progress-fill').forEach(bar => {
       const w = bar.style.width;
       bar.style.width = '0%';
-      setTimeout(() => { bar.style.width = w; }, 100);
+      setTimeout(() => { bar.style.width = w; }, 80);
     });
   }
 
-  document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.addEventListener('click', () => setTimeout(animateBars, 150));
-  });
+  /* ── COMPLETE / NOT-COMPLETE TOGGLE ── */
+  const DEVOPS_DAYS = ['devops-day-1','devops-day-2','devops-day-3','devops-day-4','devops-day-5','devops-day-6','devops-day-7'];
+  const AWS_DAYS    = ['aws-day-1','aws-day-2','aws-day-3','aws-day-4','aws-day-5','aws-day-6','aws-day-7'];
+  const NET_DAYS    = ['net-day-1','net-day-2','net-day-3','net-day-4','net-day-5','net-day-6','net-day-7'];
 
-  // Open first day on load
+  function setCardUI(id, done) {
+    const card = document.getElementById(id);
+    const btn  = document.getElementById('btn-' + id);
+    if (!card || !btn) return;
+    if (done) {
+      card.classList.add('completed');
+      btn.classList.add('done');
+      btn.innerHTML = '<span class="bi">✓</span><span class="label-text"> Completed</span>';
+    } else {
+      card.classList.remove('completed');
+      btn.classList.remove('done');
+      btn.innerHTML = '<span class="bi">○</span><span class="label-text"> Mark Done</span>';
+    }
+  }
+
+  function updatePanelProgress(panel) {
+    const map  = { devops: DEVOPS_DAYS, aws: AWS_DAYS, net: NET_DAYS };
+    const days = map[panel] || [];
+    const done = days.filter(id => localStorage.getItem('tt_' + id) === '1').length;
+    const pct  = Math.round((done / 7) * 100);
+    const countEl = document.getElementById(panel + '-count');
+    const barEl   = document.getElementById(panel + '-bar');
+    if (countEl) countEl.textContent = done + ' / 7 days completed';
+    if (barEl)   barEl.style.width   = pct + '%';
+  }
+
+  function toggleComplete(event, id, panel) {
+    event.stopPropagation();
+    const isDone = localStorage.getItem('tt_' + id) === '1';
+    localStorage.setItem('tt_' + id, isDone ? '0' : '1');
+    setCardUI(id, !isDone);
+    updatePanelProgress(panel);
+  }
+
+  /* ── INIT ON LOAD ── */
   document.addEventListener('DOMContentLoaded', () => {
     animateBars();
-    const firstHeaders = document.querySelectorAll('.day-header');
-    if (firstHeaders[0]) toggleDay(firstHeaders[0]);
+
+    // Restore saved completion state
+    [...DEVOPS_DAYS, ...AWS_DAYS, ...NET_DAYS].forEach(id => {
+      setCardUI(id, localStorage.getItem('tt_' + id) === '1');
+    });
+    updatePanelProgress('devops');
+    updatePanelProgress('aws');
+    updatePanelProgress('net');
+
+    // Open first card
+    const first = document.querySelector('.day-header');
+    if (first) toggleDay(first);
   });
 </script>
 </body>
