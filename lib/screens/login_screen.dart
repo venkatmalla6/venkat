@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -207,20 +208,24 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   Widget _buildCard() {
-    return Container(
-      padding: const EdgeInsets.all(28),
-      decoration: BoxDecoration(
-        color: const Color(0xFF111118),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0x12FFFFFF)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.4),
-            blurRadius: 40,
-            offset: const Offset(0, 16),
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(24),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: const Color(0x12FFFFFF),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: const Color(0x2AFFFFFF), width: 1.5),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.2),
+                blurRadius: 40,
+                offset: const Offset(0, 16),
+              ),
+            ],
           ),
-        ],
-      ),
       child: Form(
         key: _formKey,
         child: Column(
@@ -228,7 +233,7 @@ class _LoginScreenState extends State<LoginScreen>
           children: [
             // Tab switch
             _buildTabSwitch(),
-            const SizedBox(height: 24),
+            const SizedBox(height: 16),
             // Email field
             _buildField(
               controller: _emailCtrl,
@@ -334,7 +339,7 @@ class _LoginScreenState extends State<LoginScreen>
           ],
         ),
       ),
-    );
+    )));
   }
 
   Widget _buildTabSwitch() {
@@ -361,20 +366,24 @@ class _LoginScreenState extends State<LoginScreen>
           _errorMsg = null;
         }),
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeOutCubic,
           margin: const EdgeInsets.all(4),
           decoration: BoxDecoration(
             gradient: active
                 ? const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
                     colors: [Color(0xFF6366F1), Color(0xFF8B5CF6)],
                   )
                 : null,
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(10),
             boxShadow: active
                 ? [
                     BoxShadow(
-                      color: const Color(0xFF6366F1).withValues(alpha: 0.3),
-                      blurRadius: 8,
+                      color: const Color(0xFF6366F1).withValues(alpha: 0.4),
+                      blurRadius: 12,
+                      offset: const Offset(0, 2),
                     ),
                   ]
                 : null,
@@ -383,12 +392,10 @@ class _LoginScreenState extends State<LoginScreen>
           child: Text(
             label,
             style: TextStyle(
-              color: active
-                  ? Colors.white
-                  : const Color(0xFF64748B),
-              fontWeight:
-                  active ? FontWeight.w700 : FontWeight.w500,
+              color: active ? Colors.white : const Color(0xFF94A3B8),
+              fontWeight: active ? FontWeight.w800 : FontWeight.w600,
               fontSize: 13,
+              letterSpacing: 0.5,
             ),
           ),
         ),
@@ -419,7 +426,7 @@ class _LoginScreenState extends State<LoginScreen>
         filled: true,
         fillColor: const Color(0x0DFFFFFF),
         contentPadding: const EdgeInsets.symmetric(
-            horizontal: 16, vertical: 14),
+            horizontal: 14, vertical: 10),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: Color(0x1AFFFFFF)),
@@ -448,40 +455,44 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   Widget _buildSubmitBtn() {
-    return Container(
-      height: 50,
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      height: 44,
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Color(0xFF6366F1), Color(0xFF8B5CF6)],
+          colors: [Color(0xFF4F46E5), Color(0xFF7C3AED)],
         ),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF6366F1).withValues(alpha: 0.35),
-            blurRadius: 16,
-            offset: const Offset(0, 6),
+            color: const Color(0xFF6366F1).withValues(alpha: 0.5),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
           onTap: _loading ? null : _submit,
+          splashColor: Colors.white.withValues(alpha: 0.2),
+          highlightColor: Colors.white.withValues(alpha: 0.1),
           child: Center(
             child: _loading
                 ? const SizedBox(
-                    width: 20,
-                    height: 20,
+                    width: 24,
+                    height: 24,
                     child: CircularProgressIndicator(
-                        strokeWidth: 2, color: Colors.white),
+                        strokeWidth: 2.5, color: Colors.white),
                   )
                 : Text(
                     _isLogin ? 'Sign In' : 'Create Account',
                     style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 1.0,
                     ),
                   ),
           ),
@@ -525,28 +536,30 @@ class _BgPainter extends CustomPainter {
     // Top-left indigo glow
     paint.shader = RadialGradient(
       colors: [
-        const Color(0xFF6366F1).withValues(alpha: 0.12),
+        const Color(0xFF4F46E5).withValues(alpha: 0.3),
         Colors.transparent,
       ],
+      stops: const [0.2, 1.0],
     ).createShader(Rect.fromCircle(
-      center: Offset(size.width * 0.15, size.height * 0.1),
-      radius: size.width * 0.5,
+      center: Offset(size.width * 0.1, size.height * 0.1),
+      radius: size.width * 0.6,
     ));
     canvas.drawCircle(
-        Offset(size.width * 0.15, size.height * 0.1), size.width * 0.5, paint);
+        Offset(size.width * 0.1, size.height * 0.1), size.width * 0.6, paint);
 
-    // Bottom-right orange glow
+    // Bottom-right purple glow
     paint.shader = RadialGradient(
       colors: [
-        const Color(0xFFF97316).withValues(alpha: 0.08),
+        const Color(0xFF9333EA).withValues(alpha: 0.25),
         Colors.transparent,
       ],
+      stops: const [0.2, 1.0],
     ).createShader(Rect.fromCircle(
-      center: Offset(size.width * 0.85, size.height * 0.9),
-      radius: size.width * 0.45,
+      center: Offset(size.width * 0.9, size.height * 0.9),
+      radius: size.width * 0.6,
     ));
-    canvas.drawCircle(Offset(size.width * 0.85, size.height * 0.9),
-        size.width * 0.45, paint);
+    canvas.drawCircle(Offset(size.width * 0.9, size.height * 0.9),
+        size.width * 0.6, paint);
   }
 
   @override

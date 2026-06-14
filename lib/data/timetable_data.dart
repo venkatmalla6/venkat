@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 // ─── Data Models & Content for all 3 Timetables ───────────────────────────
 
 class ScheduleRow {
@@ -22,6 +24,8 @@ class DayData {
   final List<String> tags;
   final List<ScheduleRow> schedule;
   final List<String> covered;
+  final String? explanation;
+  final String? imageAsset;
   final List<QAItem> qa;
   const DayData({
     required this.dayNumber,
@@ -30,6 +34,8 @@ class DayData {
     required this.tags,
     required this.schedule,
     required this.covered,
+    this.explanation,
+    this.imageAsset,
     required this.qa,
   });
 }
@@ -56,212 +62,279 @@ const devopsData = TimetableData(
   id: 'devops',
   label: 'DevOps',
   emoji: '🛠️',
-  subtitle: 'Linux · Git · CI/CD · Docker · Kubernetes · Terraform · Ansible',
+  subtitle: 'Linux · Git · CI/CD · Docker · Kubernetes · Terraform',
   days: [
     DayData(
       dayNumber: 1,
       title: 'DevOps Fundamentals & Linux',
-      subtitle: 'DevOps culture, SDLC, Linux CLI, Shell scripting, SSH',
+      subtitle: 'DevOps culture, Linux CLI, Shell scripting',
       tags: ['DevOps', 'Linux', 'Shell'],
+      explanation: '''
+# DevOps Fundamentals & Linux
+
+## 1. What is DevOps?
+DevOps is a culture and methodology that bridges the gap between software development (Dev) and IT operations (Ops). By prioritizing communication, automation, and continuous delivery, DevOps teams deploy software faster and more reliably.
+
+## 2. Linux Commands
+Most servers and containers run on Linux. Mastering the command line interface (CLI) with tools like `ls`, `cd`, `grep`, and `chmod` is critical for navigating file systems and managing user permissions without a graphical interface.
+
+## 3. Shell Scripting Basics
+Shell scripting allows you to write a sequence of Linux commands into a single file (like `script.sh`). This automates repetitive tasks, turning a 50-step manual setup into a single command execution.
+
+## 4. SSH & Cron Jobs
+**SSH (Secure Shell)** is a protocol used to securely connect to remote servers over the internet. **Cron jobs** are time-based schedulers in Linux used to run your shell scripts automatically at specific intervals (e.g., every day at midnight).
+
+## Real-World Example
+A system administrator uses **SSH** to log into a remote **Linux** server. Instead of manually backing up the database every night, they write a **Shell Script** to do it, and schedule it using a **Cron Job** to execute automatically at 2 AM. This embodies the **DevOps** culture of automation.
+''',
+      imageAsset: 'assets/images/devops_concept.png',
       schedule: [
-        ScheduleRow('9:00 – 10:30', 'What is DevOps? SDLC, Agile vs DevOps', '📖 Read + Notes'),
-        ScheduleRow('10:30 – 12:00', 'DevOps lifecycle stages & tools overview', '🧠 Mind Map'),
+        ScheduleRow('9:00 – 10:30', 'What is DevOps?', '📖 Read'),
+        ScheduleRow('10:30 – 12:00', 'Linux Commands', '💻 Practice'),
         ScheduleRow('12:00 – 13:00', '🍽️ Lunch Break', '—', isBreak: true),
-        ScheduleRow('13:00 – 15:00', 'Linux Commands (filesystem, permissions, processes)', '💻 Terminal practice'),
-        ScheduleRow('15:00 – 16:30', 'Shell scripting basics (variables, loops, conditionals)', '✍️ Write 5 scripts'),
-        ScheduleRow('16:30 – 17:30', 'SSH, SCP, cron jobs', '🔬 Hands-on'),
-        ScheduleRow('17:30 – 18:00', 'Revision + Notes', '📝 Summarize'),
+        ScheduleRow('13:00 – 15:00', 'Shell scripting basics', '✍️ Write scripts'),
+        ScheduleRow('15:00 – 17:00', 'SSH & cron jobs', '🔬 Hands-on'),
+        ScheduleRow('17:00 – 18:00', 'Revision', '📝 Summarize'),
       ],
-      covered: ['DevOps Culture', 'Linux CLI', 'Shell Scripting', 'SSH'],
+      covered: ['Culture', 'Linux CLI', 'Bash', 'Cron'],
       qa: [
-        QAItem(
-          'What is the key difference between Agile and DevOps?',
-          'Agile focuses on iterative software development and collaboration between dev teams and customers. DevOps extends Agile by bridging the gap between Development and Operations teams, emphasizing automation, continuous delivery, and infrastructure management. DevOps = Agile + CI/CD + Ops culture.',
-        ),
-        QAItem(
-          'What command lists all files including hidden ones in Linux?',
-          'ls -la — The -l flag shows long format (permissions, owner, size) and -a includes hidden files (those starting with a dot). Example: ls -la /home/user',
-        ),
-        QAItem(
-          'Explain Linux file permissions: what does chmod 755 mean?',
-          '755 breaks down as: Owner (7) = read(4)+write(2)+execute(1), Group (5) = read(4)+execute(1), Others (5) = read(4)+execute(1). The owner has full control, while group and others can only read and execute.',
-        ),
-        QAItem(
-          'How do you set up a cron job to run a script every day at midnight?',
-          'Use crontab -e to edit the cron table, then add: 0 0 * * * /path/to/script.sh — Format: minute hour day month weekday command. The 0 0 * * * means midnight, every day.',
-        ),
-        QAItem(
-          'What are the 8 phases of the DevOps lifecycle?',
-          'Plan → Code → Build → Test → Release → Deploy → Operate → Monitor. Each phase represents a stage in the continuous software delivery process.',
-        ),
+        QAItem('What is DevOps?', 'A culture combining Development and Operations to automate and speed up software delivery.'),
+        QAItem('How to list hidden files in Linux?', 'Use `ls -a` or `ls -la`.'),
+        QAItem('What does chmod 755 mean?', 'Owner can read/write/execute. Others can only read/execute.'),
+        QAItem('What is a cron job?', 'A time-based job scheduler in Linux used to run scripts automatically.'),
       ],
     ),
     DayData(
       dayNumber: 2,
-      title: 'Version Control with Git & GitHub',
-      subtitle: 'Git fundamentals, branching, GitHub workflows, PRs',
-      tags: ['Git', 'GitHub', 'Workflows'],
+      title: 'Version Control (Git/GitHub)',
+      subtitle: 'Branching, PRs, GitFlow',
+      tags: ['Git', 'GitHub'],
+      explanation: '''
+# Version Control with Git & GitHub
+
+## 1. Git Basics (Commit, Push, Pull)
+Git is a distributed version control system. You save a snapshot of your code locally with a `commit`, send it to a remote server with `push`, and retrieve updates from others using `pull`.
+
+## 2. Branching & Merging
+Instead of editing the main codebase directly, developers create **branches** to build features in isolation. Once completed and tested, the branch is **merged** back into the main code.
+
+## 3. GitHub PRs & Issues
+GitHub is a cloud platform for hosting Git repositories. An **Issue** tracks bugs or tasks. A **Pull Request (PR)** is a formal request to merge your branch into the main repository, allowing team members to review your code first.
+
+## 4. Rebasing & Stashing
+**Rebasing** rewrites commit history to create a clean, linear timeline (unlike merging). **Stashing** lets you temporarily hide uncommitted changes so you can switch branches without losing work.
+
+## Real-World Example
+Developer A is fixing a bug (tracked via a **GitHub Issue**). They create a new **branch**, write the code, **commit**, and **push** it. Before it's added to the live game, they open a **Pull Request**. The team reviews it, requests a small change, and once approved, it is **merged** into the main branch.
+''',
+      imageAsset: 'assets/images/devops_day2.png',
       schedule: [
-        ScheduleRow('9:00 – 10:30', 'Git fundamentals (init, add, commit, push, pull)', '💻 Practice'),
-        ScheduleRow('10:30 – 12:00', 'Branching, merging, rebasing, conflict resolution', '🔬 Hands-on'),
+        ScheduleRow('9:00 – 11:00', 'Git basics (commit, push, pull)', '💻 Practice'),
+        ScheduleRow('11:00 – 12:00', 'Branching & Merging', '🔬 Hands-on'),
         ScheduleRow('12:00 – 13:00', '🍽️ Lunch Break', '—', isBreak: true),
-        ScheduleRow('13:00 – 14:30', 'GitHub: PRs, issues, forks, GitHub Actions intro', '🌐 Explore GitHub'),
-        ScheduleRow('14:30 – 16:00', 'Git workflows (GitFlow, trunk-based)', '📖 Study + Diagram'),
-        ScheduleRow('16:00 – 17:30', '.gitignore, tagging, stashing, cherry-pick', '💻 Practice'),
-        ScheduleRow('17:30 – 18:00', 'Revision + Notes', '📝 Summarize'),
+        ScheduleRow('13:00 – 15:00', 'GitHub PRs & Issues', '🌐 Explore'),
+        ScheduleRow('15:00 – 17:00', 'Rebasing & Stashing', '💻 Practice'),
+        ScheduleRow('17:00 – 18:00', 'Revision', '📝 Summarize'),
       ],
-      covered: ['Git', 'GitHub', 'Branching', 'GitFlow'],
+      covered: ['Git', 'Branching', 'PRs', 'Merge/Rebase'],
       qa: [
-        QAItem('What is the difference between git merge and git rebase?',
-            'git merge combines two branches and creates a new merge commit, preserving full history. git rebase moves/replays commits from one branch onto another, creating a linear commit history. Rebase is cleaner but rewrites history — never rebase shared/public branches.'),
-        QAItem('What does git stash do and when would you use it?',
-            'git stash temporarily saves your uncommitted changes and reverts the working directory to the last commit. Use it when you need to switch branches without committing incomplete work. Retrieve with git stash pop (applies and removes) or git stash apply.'),
-        QAItem('Explain GitFlow branching strategy and its main branches.',
-            'GitFlow uses: main (production-ready), develop (integration branch), feature/ (new features), release/ (release preparation), and hotfix/ (urgent production fixes). Features merge to develop; releases merge to both main and develop.'),
-        QAItem('What is a Pull Request (PR) and what is its purpose?',
-            'A Pull Request is a GitHub/GitLab mechanism to propose merging changes from one branch into another. Its purpose: Code Review (team reviews changes), Discussion (comment on specific lines), CI Checks (automated tests run before merge), and Approval gates before code reaches main/production.'),
-        QAItem('How do you undo the last commit without losing your changes?',
-            'git reset --soft HEAD~1 — This undoes the last commit but keeps your changes staged. Use --mixed to unstage changes (but keep files), or --hard to completely discard changes. For already-pushed commits, use git revert HEAD.'),
+        QAItem('Merge vs Rebase?', 'Merge combines histories. Rebase rewrites history for a clean, linear commit line.'),
+        QAItem('What is git stash?', 'It temporarily saves uncommitted changes so you can switch branches safely.'),
+        QAItem('What is a Pull Request?', 'A request to review and merge code from one branch into another.'),
+        QAItem('How to undo a commit?', 'Use `git reset --soft HEAD~1` to keep changes, or `--hard` to delete them.'),
       ],
     ),
     DayData(
       dayNumber: 3,
-      title: 'CI/CD Pipelines — Jenkins & GitHub Actions',
-      subtitle: 'Pipeline stages, Jenkins, GitHub Actions, YAML, full CI pipeline',
-      tags: ['Jenkins', 'CI/CD', 'YAML'],
+      title: 'CI/CD Pipelines',
+      subtitle: 'Jenkins & GitHub Actions',
+      tags: ['CI/CD', 'Jenkins', 'YAML'],
+      explanation: '''
+# Continuous Integration & Deployment (CI/CD)
+
+## 1. CI/CD Concepts
+**Continuous Integration (CI)** automates building and testing code on every commit. **Continuous Deployment (CD)** automatically releases that verified code to servers. Together, they prevent bugs and speed up releases.
+
+## 2. Jenkins Setup
+Jenkins is a wildly popular open-source automation server. You configure a "Jenkinsfile" to define pipeline steps, allowing Jenkins to fetch your code, run tests, and deploy it automatically.
+
+## 3. GitHub Actions YAML
+GitHub Actions is a modern CI/CD platform built directly into GitHub. It uses **YAML** files to define workflows that trigger automatically on events (like a code push or PR creation).
+
+## 4. Build Full Pipeline
+Building a full pipeline means connecting the Dev phase (writing code) to the Ops phase (running on a server). The pipeline handles everything in between: installing dependencies, running unit tests, and pushing to production.
+
+## Real-World Example
+An engineer at Spotify pushes an update for the mobile app. A **GitHub Action** immediately triggers, reading a **YAML** file. The action compiles the app, runs 500 automated tests (**CI**), and upon passing, automatically deploys the update to millions of users seamlessly (**CD**).
+''',
+      imageAsset: 'assets/images/devops_day3.png',
       schedule: [
-        ScheduleRow('9:00 – 10:30', 'CI/CD concepts, pipeline stages', '📖 Study'),
-        ScheduleRow('10:30 – 12:00', 'Jenkins installation & configuration', '⚙️ Setup Lab'),
+        ScheduleRow('9:00 – 11:00', 'CI/CD Concepts', '📖 Study'),
+        ScheduleRow('11:00 – 12:00', 'Jenkins Setup', '⚙️ Lab'),
         ScheduleRow('12:00 – 13:00', '🍽️ Lunch Break', '—', isBreak: true),
-        ScheduleRow('13:00 – 14:30', 'Jenkins Pipelines (Declarative & Scripted)', '🔧 Create Pipeline'),
-        ScheduleRow('14:30 – 16:00', 'GitHub Actions: workflows, triggers, runners', '✍️ Write YAML'),
-        ScheduleRow('16:00 – 17:30', 'Build a full CI pipeline: test → build → deploy', '🚀 Mini Project'),
-        ScheduleRow('17:30 – 18:00', 'Revision + Notes', '📝 Summarize'),
+        ScheduleRow('13:00 – 15:00', 'GitHub Actions YAML', '✍️ Write'),
+        ScheduleRow('15:00 – 17:00', 'Build full pipeline', '🚀 Project'),
+        ScheduleRow('17:00 – 18:00', 'Revision', '📝 Summarize'),
       ],
-      covered: ['CI/CD', 'Jenkins', 'GitHub Actions', 'YAML'],
+      covered: ['Pipelines', 'Jenkins', 'Actions'],
       qa: [
-        QAItem('What is the difference between CI, Continuous Delivery, and Continuous Deployment?',
-            'CI: Automatically build and test code on every commit. Continuous Delivery: Automatically deploy to staging after CI passes — but production release requires manual approval. Continuous Deployment: Fully automated — every passing build automatically deploys to production.'),
-        QAItem('What is a Jenkinsfile and what are its two syntax types?',
-            'A Jenkinsfile is a text file that defines a Jenkins pipeline as code, stored in the root of your repository. Two types: Declarative Pipeline — structured, readable, uses pipeline { } block. Scripted Pipeline — uses Groovy scripting with node { } block, more flexible but complex.'),
-        QAItem('What triggers can you use in a GitHub Actions workflow?',
-            'Common triggers (under on:): push, pull_request, schedule (cron-based), workflow_dispatch (manual), release, issues, repository_dispatch (external API). You can filter by branches and paths.'),
-        QAItem('What is a Jenkins agent/node and why is it important?',
-            'A Jenkins agent is a machine that executes Jenkins pipeline jobs. Agents enable: Parallel execution across multiple machines, Platform-specific builds, Load distribution, and Isolated environments per project.'),
-        QAItem('What are pipeline stages in CI/CD and name a typical pipeline flow?',
-            'Typical flow: Source (code checkout) → Build (compile, package) → Unit Test → Static Analysis → Integration Test → Artifact (store build) → Deploy to Staging → Acceptance Test → Deploy to Production.'),
+        QAItem('What is CI/CD?', 'Continuous Integration (auto-testing) and Continuous Deployment (auto-releasing).'),
+        QAItem('What is a Jenkinsfile?', 'A text file defining your pipeline steps as code.'),
+        QAItem('How do GitHub Actions trigger?', 'Via events like `push`, `pull_request`, or a `schedule`.'),
+        QAItem('Why use CI/CD?', 'To catch bugs early, automate manual tasks, and deploy faster.'),
       ],
     ),
     DayData(
       dayNumber: 4,
-      title: 'Docker & Containerization',
-      subtitle: 'Docker CLI, Dockerfile, Docker Compose, networking, volumes',
-      tags: ['Docker', 'Containers', 'Compose'],
+      title: 'Docker & Containers',
+      subtitle: 'Images, Dockerfile, Compose',
+      tags: ['Docker', 'Compose'],
+      explanation: '''
+# Containerization with Docker
+
+## 1. Containers vs VMs
+Virtual Machines require an entire guest operating system, making them heavy and slow. Containers share the host OS's kernel, making them lightweight, fast, and portable. 
+
+## 2. Docker CLI Basics
+Docker is the standard platform for containers. The CLI is used to pull images from the internet (`docker pull`), run them (`docker run`), and manage active containers (`docker ps`, `docker stop`).
+
+## 3. Writing Dockerfiles
+A `Dockerfile` is a text document containing all the commands a user could call on the command line to assemble an image. It defines the base OS, dependencies, and how the app starts.
+
+## 4. Docker Compose
+Docker Compose is a tool used to define and run multi-container applications. Using a single `docker-compose.yml` file, you can spin up a web server container and a database container simultaneously, automatically linking them together.
+
+## Real-World Example
+A developer builds an app on a Mac, but the production server runs Linux, causing the "it works on my machine" bug. The developer writes a **Dockerfile** to package the app and its libraries. They use **Docker Compose** to run both the app and a database locally. Because containers are perfectly portable, that exact same container runs flawlessly on the production server.
+''',
       schedule: [
-        ScheduleRow('9:00 – 10:30', 'Containers vs VMs, Docker architecture', '📖 Study'),
-        ScheduleRow('10:30 – 12:00', 'Docker CLI: pull, run, build, push, ps, logs', '💻 Hands-on'),
+        ScheduleRow('9:00 – 11:00', 'Containers vs VMs', '📖 Study'),
+        ScheduleRow('11:00 – 12:00', 'Docker CLI basics', '💻 Practice'),
         ScheduleRow('12:00 – 13:00', '🍽️ Lunch Break', '—', isBreak: true),
-        ScheduleRow('13:00 – 14:30', 'Dockerfile: best practices, multi-stage builds', '✍️ Write Dockerfiles'),
-        ScheduleRow('14:30 – 16:00', 'Docker Compose: multi-container apps', '📄 Create compose.yml'),
-        ScheduleRow('16:00 – 17:30', 'Docker networking & volumes', '🔬 Lab'),
-        ScheduleRow('17:30 – 18:00', 'Revision + Notes', '📝 Summarize'),
+        ScheduleRow('13:00 – 15:00', 'Writing Dockerfiles', '✍️ Write'),
+        ScheduleRow('15:00 – 17:00', 'Docker Compose', '⚙️ Lab'),
+        ScheduleRow('17:00 – 18:00', 'Revision', '📝 Summarize'),
       ],
-      covered: ['Docker', 'Containerization', 'Dockerfile', 'Docker Compose'],
+      covered: ['Containers', 'Images', 'Compose'],
       qa: [
-        QAItem('What is the key difference between a Docker container and a VM?',
-            'VMs include a full OS, hypervisor layer, and are heavy (GBs). Containers share the host OS kernel, contain only the app + dependencies, are lightweight (MBs), start in seconds, and are more portable. Docker uses Linux namespaces and cgroups for isolation.'),
-        QAItem('What is the purpose of a multi-stage Docker build?',
-            'Multi-stage builds use multiple FROM statements. The first stage (builder) compiles/builds the app with all build tools. The final stage copies only the compiled artifact into a minimal base image. Benefits: Significantly smaller production images, no build tools in the final image, improved security.'),
-        QAItem('What is the difference between Docker volumes and bind mounts?',
-            'Volumes are managed by Docker, stored in /var/lib/docker/volumes/, portable, and best for production data persistence. Bind mounts map a host directory/file directly into the container — useful for development (live code reload).'),
-        QAItem('What is Docker Compose and what problem does it solve?',
-            'Docker Compose is a tool for defining and running multi-container applications using a docker-compose.yml file. With one command (docker compose up) you start all services with correct networking, volumes, and environment variables.'),
-        QAItem('What Docker network types exist and when would you use a bridge network?',
-            'Types: bridge (default, isolated network for containers on same host), host (container shares host network stack), none, overlay (multi-host for Swarm/K8s), macvlan. Use bridge when containers on the same host need to communicate (e.g., web app + database container).'),
+        QAItem('Container vs VM?', 'VMs pack a full OS. Containers share the host OS, making them faster and lighter.'),
+        QAItem('What is a Dockerfile?', 'A script of instructions used to build a custom Docker image.'),
+        QAItem('What is Docker Compose?', 'A tool to run multi-container applications using a single YAML file.'),
+        QAItem('What are Docker volumes?', 'They persist data generated by a container, surviving container restarts.'),
       ],
     ),
     DayData(
       dayNumber: 5,
-      title: 'Kubernetes (K8s) Fundamentals',
-      subtitle: 'Architecture, kubectl, Deployments, Services, Helm Charts',
-      tags: ['Kubernetes', 'kubectl', 'Helm'],
+      title: 'Kubernetes (K8s)',
+      subtitle: 'Pods, Services, Deployments',
+      tags: ['K8s', 'kubectl'],
+      explanation: '''
+# Kubernetes Orchestration
+
+## 1. K8s Architecture
+Kubernetes (K8s) is an orchestration engine designed to automate the deployment and scaling of thousands of containers across many servers (nodes). It features a Master Node controlling Worker Nodes.
+
+## 2. kubectl commands
+`kubectl` is the command-line tool used to communicate with the Kubernetes cluster. You use it to inspect the cluster, read logs, and apply YAML configuration files.
+
+## 3. Pods & Deployments
+A **Pod** is the smallest deployable unit in K8s, usually holding one container. A **Deployment** manages these Pods, ensuring the desired number are always running. If a Pod crashes, the Deployment replaces it instantly.
+
+## 4. Services & Ingress
+Because Pods are constantly created and destroyed, their IP addresses change constantly. A **Service** provides a stable IP address and load balancing. An **Ingress** acts as a smart router, directing outside internet traffic to the correct internal Services.
+
+## Real-World Example
+During a flash sale, an e-commerce website experiences a massive surge in traffic. The **Kubernetes Architecture** detects the CPU load increasing on the web **Pods**. A **Deployment** automatically spins up 50 new Pods to handle the traffic. A **Service** spreads the incoming traffic evenly across all 50 Pods so none of them crash.
+''',
       schedule: [
-        ScheduleRow('9:00 – 10:30', 'K8s architecture (Master, Nodes, Pods)', '📖 Study + Diagrams'),
-        ScheduleRow('10:30 – 12:00', 'kubectl commands, namespaces, contexts', '💻 Practice (minikube)'),
+        ScheduleRow('9:00 – 11:00', 'K8s Architecture', '📖 Study'),
+        ScheduleRow('11:00 – 12:00', 'kubectl commands', '💻 Practice'),
         ScheduleRow('12:00 – 13:00', '🍽️ Lunch Break', '—', isBreak: true),
-        ScheduleRow('13:00 – 14:30', 'Deployments, Services, ConfigMaps, Secrets', '📄 Create YAML manifests'),
-        ScheduleRow('14:30 – 16:00', 'Ingress, HPA (Horizontal Pod Autoscaler)', '🔬 Lab'),
-        ScheduleRow('16:00 – 17:30', 'Helm Charts basics', '📦 Install a chart'),
-        ScheduleRow('17:30 – 18:00', 'Revision + Notes', '📝 Summarize'),
+        ScheduleRow('13:00 – 15:00', 'Pods & Deployments', '✍️ YAML'),
+        ScheduleRow('15:00 – 17:00', 'Services & Ingress', '⚙️ Lab'),
+        ScheduleRow('17:00 – 18:00', 'Revision', '📝 Summarize'),
       ],
-      covered: ['Kubernetes', 'kubectl', 'Deployments', 'Helm'],
+      covered: ['Pods', 'Deployments', 'Services'],
       qa: [
-        QAItem('What are the main components of the Kubernetes control plane?',
-            'kube-apiserver (API gateway), etcd (distributed key-value store for cluster state), kube-scheduler (assigns Pods to nodes), kube-controller-manager (runs controllers), cloud-controller-manager (cloud provider integration). Node components: kubelet, kube-proxy, container runtime.'),
-        QAItem('What is the difference between a Deployment and a StatefulSet?',
-            'Deployment: For stateless apps. Pods are interchangeable, random names, can be scaled/rescheduled freely. StatefulSet: For stateful apps (databases). Pods have stable unique names (pod-0, pod-1), stable network IDs, ordered deployment/scaling, and persistent storage per Pod.'),
-        QAItem('What are the different types of Kubernetes Services?',
-            'ClusterIP (default): Internal cluster access only. NodePort: Exposes service on each node\'s IP at a static port. LoadBalancer: Provisions a cloud load balancer, external access. ExternalName: Maps service to an external DNS name. Use Ingress for HTTP routing with path/host rules.'),
-        QAItem('What is the difference between a ConfigMap and a Secret?',
-            'ConfigMap: Stores non-sensitive configuration data as key-value pairs (env vars, config files). Data is plaintext. Secret: Stores sensitive data (passwords, tokens, keys) — values are base64-encoded. Both can be mounted as volumes or injected as environment variables.'),
-        QAItem('What is Helm and what problem does it solve in Kubernetes?',
-            'Helm is the package manager for Kubernetes. It solves: managing complex K8s apps with many YAML manifests, templating (reuse manifests across environments), versioned releases (install, upgrade, rollback), and sharing apps via Helm Charts. Key commands: helm install, helm upgrade, helm rollback.'),
+        QAItem('What is Kubernetes?', 'An orchestration tool to automatically deploy, scale, and manage containers.'),
+        QAItem('What is a Pod?', 'The smallest deployable unit in K8s, containing one or more containers.'),
+        QAItem('Deployment vs StatefulSet?', 'Deployments are for stateless apps. StatefulSets are for stateful apps like databases.'),
+        QAItem('What does a Service do?', 'It provides a stable IP address and load balancing for a set of Pods.'),
       ],
     ),
     DayData(
       dayNumber: 6,
-      title: 'Terraform (IaC) & Monitoring',
-      subtitle: 'Terraform, Prometheus, Grafana, ELK Stack, logging',
-      tags: ['Terraform', 'Prometheus', 'Grafana'],
+      title: 'Terraform & IaC',
+      subtitle: 'Provisioning infrastructure as code',
+      tags: ['Terraform', 'IaC'],
+      explanation: '''
+# Infrastructure as Code (IaC)
+
+## 1. IaC Concepts
+**Infrastructure as Code (IaC)** replaces manual clicks in a cloud console with machine-readable definition files. This ensures your environments are perfectly reproducible, version-controlled, and instantly deployable.
+
+## 2. Terraform Syntax
+Terraform uses HashiCorp Configuration Language (HCL). You declare what you want (e.g., an AWS server), and Terraform figures out how to make it happen across any cloud provider.
+
+## 3. State & Modules
+Terraform maps your code to real-world cloud resources using a **State file**. When you run an update, it checks the state to know exactly what to change. **Modules** act like functions, allowing you to reuse Terraform code across different projects.
+
+## 4. Deploy AWS Resources
+Using commands like `terraform init`, `terraform plan`, and `terraform apply`, you can spin up complex architectures involving networking, servers, and databases simultaneously.
+
+## Real-World Example
+A startup needs to create an identical testing environment that perfectly mimics production. Without **IaC**, an engineer spends days manually configuring AWS. With **Terraform Syntax**, they simply change an environment variable from "prod" to "test", run `terraform apply`, and the entire infrastructure builds automatically in minutes.
+''',
       schedule: [
-        ScheduleRow('9:00 – 10:30', 'IaC concepts, Terraform architecture', '📖 Study'),
-        ScheduleRow('10:30 – 12:00', 'Terraform: providers, resources, variables, outputs', '✍️ Write .tf files'),
+        ScheduleRow('9:00 – 11:00', 'IaC Concepts', '📖 Study'),
+        ScheduleRow('11:00 – 12:00', 'Terraform syntax', '💻 Practice'),
         ScheduleRow('12:00 – 13:00', '🍽️ Lunch Break', '—', isBreak: true),
-        ScheduleRow('13:00 – 14:30', 'Terraform state, modules, workspaces', '🔬 Hands-on'),
-        ScheduleRow('14:30 – 16:00', 'Monitoring: Prometheus + Grafana setup', '⚙️ Lab'),
-        ScheduleRow('16:00 – 17:30', 'ELK Stack / Loki for log management', '📖 Study + Setup'),
-        ScheduleRow('17:30 – 18:00', 'Revision + Notes', '📝 Summarize'),
+        ScheduleRow('13:00 – 15:00', 'State & Modules', '⚙️ Lab'),
+        ScheduleRow('15:00 – 17:00', 'Deploy AWS Resources', '🚀 Project'),
+        ScheduleRow('17:00 – 18:00', 'Revision', '📝 Summarize'),
       ],
-      covered: ['Terraform', 'IaC', 'Prometheus', 'Grafana'],
+      covered: ['IaC', 'State', 'Modules'],
       qa: [
-        QAItem('What is Infrastructure as Code (IaC) and what are its benefits?',
-            'IaC is managing and provisioning infrastructure through code/configuration files rather than manual processes. Benefits: Version Control, Repeatability (identical environments), Automation (no manual errors), Documentation (code = documentation), Collaboration (review changes via PRs).'),
-        QAItem('Explain the Terraform workflow: init, plan, apply, destroy.',
-            'terraform init: Initializes working directory, downloads providers/modules. terraform plan: Shows execution plan without making changes — dry run. terraform apply: Executes the plan and provisions infrastructure. terraform destroy: Destroys all managed infrastructure.'),
-        QAItem('What is Terraform state and why is remote state important?',
-            'Terraform state (terraform.tfstate) is a JSON file that maps your config to real infrastructure. Remote state (S3, Terraform Cloud) enables: collaboration (shared state), state locking (prevents concurrent modifications), encryption, and versioning.'),
-        QAItem('What is Prometheus and how does it collect metrics?',
-            'Prometheus is an open-source monitoring system with a time-series database. It uses a pull model — scrapes metrics from HTTP endpoints (/metrics). Key concepts: Metrics types (Counter, Gauge, Histogram, Summary), PromQL (query language), Alertmanager, Grafana integration.'),
-        QAItem('What components make up the ELK Stack?',
-            'E — Elasticsearch: Distributed search engine, stores and indexes logs. L — Logstash: Data processing pipeline — collects, filters, transforms, and ships logs. K — Kibana: Web UI for visualizing data (dashboards, search). Modern stacks often use Beats (Filebeat, Metricbeat) as lightweight data shippers.'),
+        QAItem('What is IaC?', 'Managing and provisioning infrastructure through code instead of manual clicks.'),
+        QAItem('What are the core Terraform commands?', '`init` (setup), `plan` (preview), `apply` (build), `destroy` (delete).'),
+        QAItem('What is the tfstate file?', 'A file Terraform uses to map real-world resources to your configuration.'),
+        QAItem('Why use remote state?', 'To allow teams to collaborate safely and prevent concurrent modifications.'),
       ],
     ),
     DayData(
       dayNumber: 7,
-      title: 'Ansible, DevSecOps & Full Revision',
-      subtitle: 'Ansible playbooks, DevSecOps, end-to-end project, mock Q&A',
-      tags: ['Ansible', 'DevSecOps', 'Revision'],
+      title: 'Monitoring & Review',
+      subtitle: 'Prometheus, Grafana, Full Review',
+      tags: ['Monitoring', 'Review'],
+      explanation: '''
+# Monitoring and Observability
+
+## 1. Prometheus & Grafana
+Without visibility, you are flying blind. **Prometheus** is a toolkit that collects metrics (CPU, RAM, error rates) from your servers via a pull model. **Grafana** connects to Prometheus to visualize this data through interactive, beautiful dashboards.
+
+## 2. Log Management
+While metrics tell you *if* a system is failing, logs tell you *why*. Centralized log management aggregates text logs from hundreds of servers into one searchable database to aid in rapid troubleshooting.
+
+## 3. End-to-End Pipeline
+Tying it all together: writing code, testing it automatically (CI), building a Docker container, deploying it to Kubernetes with Terraform, and monitoring it with Grafana.
+
+## Real-World Example
+An online banking app monitors database queries. If **Prometheus** detects that queries suddenly take 5 seconds instead of 0.1 seconds, **Grafana** triggers a visual red alert. The monitoring system automatically pages the on-call engineer, who then checks the **Log Management** system to find the exact error message and fixes the issue before customers even notice.
+''',
       schedule: [
-        ScheduleRow('9:00 – 10:30', 'Configuration Management: Ansible basics', '📖 Study'),
-        ScheduleRow('10:30 – 12:00', 'Ansible: playbooks, roles, inventory', '✍️ Write playbooks'),
+        ScheduleRow('9:00 – 11:00', 'Prometheus & Grafana', '📖 Study'),
+        ScheduleRow('11:00 – 12:00', 'Log Management', '⚙️ Lab'),
         ScheduleRow('12:00 – 13:00', '🍽️ Lunch Break', '—', isBreak: true),
-        ScheduleRow('13:00 – 14:00', 'DevSecOps: secrets management, SAST/DAST', '📖 Study'),
-        ScheduleRow('14:00 – 15:30', 'End-to-End Project (CI → Docker → K8s)', '🚀 Mini Project'),
-        ScheduleRow('15:30 – 17:00', 'Full Week Revision: concepts + tools + commands', '🃏 Flashcards'),
-        ScheduleRow('17:00 – 18:00', 'Mock Questions & Interview Prep', '❓ Q&A'),
+        ScheduleRow('13:00 – 15:00', 'End-to-End Pipeline', '🚀 Practice'),
+        ScheduleRow('15:00 – 17:00', 'Mock Interviews', '❓ Q&A'),
+        ScheduleRow('17:00 – 18:00', 'Final Review', '📝 Summarize'),
       ],
-      covered: ['Ansible', 'DevSecOps', 'Full Project', 'Interview Prep'],
+      covered: ['Grafana', 'Metrics', 'Logs'],
       qa: [
-        QAItem('What is Ansible and how is it different from Terraform?',
-            'Ansible: Configuration management tool. Manages software installation, configuration, and app deployment on existing servers. Agentless (uses SSH), uses YAML playbooks. Terraform: Infrastructure provisioning — creates/manages cloud infrastructure. They complement each other: Terraform provisions infra, Ansible configures it.'),
-        QAItem('What is an Ansible playbook and what are roles?',
-            'A Playbook is a YAML file defining a set of plays — each play targets hosts and runs tasks (install packages, copy files, start services). Roles are a way to organize playbooks into reusable, structured components with directories for tasks, handlers, variables, templates, and files.'),
-        QAItem('What is DevSecOps and what are SAST and DAST?',
-            'DevSecOps integrates security practices into DevOps pipelines — "shift-left" security. SAST (Static Application Security Testing): Analyzes source code for vulnerabilities without running the app (SonarQube, Snyk). DAST (Dynamic Application Security Testing): Tests running application by simulating attacks (OWASP ZAP, Burp Suite).'),
-        QAItem('What are common DevOps interview topics to revise?',
-            'Linux (commands, permissions, processes), Git (branching, merge vs rebase), CI/CD (Jenkins pipelines, GitHub Actions), Docker (Dockerfile, Compose, networking), Kubernetes (architecture, kubectl), Terraform (state, plan/apply), Ansible (playbooks, idempotency), Monitoring (Prometheus, Grafana, ELK), DevSecOps.'),
-        QAItem('Describe a full end-to-end DevOps pipeline architecture.',
-            '1. Code → Developer pushes to GitHub. 2. CI → Jenkins/GitHub Actions triggers: lint, unit tests, SAST scan. 3. Build → Docker image built & pushed to registry. 4. Deploy Staging → Helm/kubectl deploys to K8s staging. 5. DAST + Integration Tests. 6. Deploy Production → Blue-green or rolling update. 7. Monitor → Prometheus + Grafana + ELK.'),
+        QAItem('Prometheus vs Grafana?', 'Prometheus collects and stores metrics. Grafana visualizes them in dashboards.'),
+        QAItem('What is DevSecOps?', 'Integrating security checks automatically into every stage of the CI/CD pipeline.'),
+        QAItem('What is Ansible?', 'A configuration management tool used to automate software installation on servers.'),
+        QAItem('Difference between Ansible and Terraform?', 'Terraform builds the servers (infra). Ansible configures the software inside them.'),
       ],
     ),
   ],
@@ -274,204 +347,270 @@ const awsData = TimetableData(
   id: 'aws',
   label: 'AWS',
   emoji: '☁️',
-  subtitle: 'IAM · EC2 · S3 · VPC · RDS · DynamoDB · CloudFormation · ECS',
+  subtitle: 'IAM · EC2 · S3 · VPC · RDS · DynamoDB',
   days: [
     DayData(
       dayNumber: 1,
-      title: 'AWS Fundamentals & IAM',
-      subtitle: 'Cloud concepts, AWS Console, IAM, CLI setup',
-      tags: ['IAM', 'Cloud', 'CLI'],
+      title: 'AWS Basics & IAM',
+      subtitle: 'Console, Regions, Security',
+      tags: ['IAM', 'Security'],
+      explanation: '''
+# AWS Fundamentals & Security
+
+## 1. Cloud Concepts
+Cloud computing replaces upfront capital infrastructure expenses with low variable costs that scale with your business. It provides agility, elasticity, and global reach in minutes.
+
+## 2. AWS Console Tour
+The AWS Management Console is a web interface to access your cloud resources. It allows you to provision servers, configure networks, and monitor billing directly from your browser.
+
+## 3. IAM Users & Roles
+AWS Identity and Access Management (IAM) controls access securely. **Users** represent actual people with passwords. **Roles** are temporary credentials assumed by services (e.g., an EC2 server needing access to a database).
+
+## 4. MFA & Policies
+Policies are JSON documents defining exact permissions. Multi-Factor Authentication (MFA) adds an extra layer of protection, requiring a mobile device code in addition to a password.
+
+## Real-World Example
+A company hires a new Junior Developer. Instead of giving them the root account password, the admin uses **IAM Users & Roles** to create an account. They attach a strict **Policy** granting only "Read-Only" access to EC2. They also mandate **MFA** so even if the developer's password is stolen, hackers cannot log in.
+''',
+      imageAsset: 'assets/images/aws_concept.png',
       schedule: [
-        ScheduleRow('9:00 – 10:30', 'Cloud computing concepts, AWS global infrastructure', '📖 Study'),
-        ScheduleRow('10:30 – 12:00', 'AWS Free Tier setup, Console tour, Regions & AZs', '💻 Hands-on'),
+        ScheduleRow('9:00 – 11:00', 'Cloud Concepts', '📖 Study'),
+        ScheduleRow('11:00 – 12:00', 'AWS Console Tour', '💻 Explore'),
         ScheduleRow('12:00 – 13:00', '🍽️ Lunch Break', '—', isBreak: true),
-        ScheduleRow('13:00 – 14:30', 'IAM: Users, Groups, Roles, Policies', '🔧 Create & attach policies'),
-        ScheduleRow('14:30 – 16:00', 'IAM best practices: MFA, least privilege', '🔬 Lab'),
-        ScheduleRow('16:00 – 17:30', 'AWS CLI setup & configuration', '⚙️ aws configure'),
-        ScheduleRow('17:30 – 18:00', 'Revision + Notes', '📝 Summarize'),
+        ScheduleRow('13:00 – 15:00', 'IAM Users & Roles', '⚙️ Lab'),
+        ScheduleRow('15:00 – 17:00', 'MFA & Policies', '🔒 Security'),
+        ScheduleRow('17:00 – 18:00', 'Revision', '📝 Summarize'),
       ],
-      covered: ['Cloud Basics', 'AWS Console', 'IAM', 'CLI'],
+      covered: ['Regions', 'AZs', 'IAM'],
       qa: [
-        QAItem('What is the difference between an AWS Region and an Availability Zone?',
-            'A Region is a physical geographic location (e.g., us-east-1) containing multiple isolated data center clusters. An Availability Zone (AZ) is one or more discrete data centers within a Region, each with redundant power/networking. Deploy across multiple AZs for high availability; across regions for disaster recovery.'),
-        QAItem('What is the difference between an IAM User, Group, and Role?',
-            'IAM User: A permanent identity for a person or service with long-term credentials (password/access keys). IAM Group: A collection of users — attach policies to the group. IAM Role: A temporary identity assumed by AWS services (EC2, Lambda) — no long-term credentials. Uses short-term tokens via STS.'),
-        QAItem('What is the principle of least privilege in IAM?',
-            'The principle of least privilege means granting only the minimum permissions required to perform a specific task. In practice: Start with no permissions, grant only what\'s needed, use specific resource ARNs instead of wildcards (*), use conditions to restrict further, and regularly audit/remove unused permissions.'),
-        QAItem('What are the three cloud service models: IaaS, PaaS, SaaS?',
-            'IaaS (Infrastructure as a Service): Raw compute, storage, networking — you manage the OS and above. Example: EC2. PaaS (Platform as a Service): Managed platform for app deployment. Example: Elastic Beanstalk, RDS. SaaS (Software as a Service): Complete application managed by provider. Example: Gmail, Salesforce.'),
-        QAItem('What is IAM MFA and why is it critical for the root account?',
-            'MFA (Multi-Factor Authentication) adds a second layer of security beyond password — a time-based one-time code from an authenticator app. The root account has unrestricted access to all AWS resources. Always enable MFA on root, do not create access keys for root, and use IAM users/roles for daily operations.'),
+        QAItem('Region vs Availability Zone (AZ)?', 'A Region is a geographic area. An AZ is a physical data center within that Region.'),
+        QAItem('IAM User vs Role?', 'Users have permanent passwords. Roles provide temporary access tokens for services.'),
+        QAItem('What is the Principle of Least Privilege?', 'Giving users only the bare minimum permissions needed for their job.'),
+        QAItem('Why use MFA on the root account?', 'The root account has unlimited power. MFA prevents hackers from taking over your account.'),
       ],
     ),
     DayData(
       dayNumber: 2,
-      title: 'Compute Services — EC2 & Lambda',
-      subtitle: 'EC2, AMIs, Security Groups, Auto Scaling, Load Balancer, Lambda',
-      tags: ['EC2', 'Lambda', 'ASG'],
+      title: 'Compute (EC2 & Lambda)',
+      subtitle: 'Servers and Serverless',
+      tags: ['EC2', 'Lambda'],
+      explanation: '''
+# Cloud Compute Models
+
+## 1. EC2 Instance Types & Launching
+Amazon EC2 provides virtual servers. Instance types dictate the hardware (e.g., compute-optimized for gaming, memory-optimized for databases). Launching an EC2 means selecting an OS, allocating storage, and booting it up.
+
+## 2. Security Groups & Auto Scaling Groups (ASG)
+**Security Groups** are virtual firewalls controlling inbound and outbound traffic. An **Auto Scaling Group (ASG)** automatically adds or removes EC2 instances based on current traffic demand, ensuring you don't overpay for idle servers.
+
+## 3. Lambda Functions
+AWS Lambda is the ultimate **serverless** compute. You upload your code (Python, Node.js), and AWS automatically provisions the compute power to run it when triggered, charging you purely by the millisecond.
+
+## Real-World Example
+An e-commerce site uses **EC2** servers behind an **Auto Scaling Group**. On Black Friday, the ASG detects heavy CPU usage and automatically launches 10 more EC2 servers. At the same time, users upload profile pictures; an **AWS Lambda Function** is triggered instantly to compress each picture into a thumbnail, running for 200 milliseconds and costing fractions of a cent.
+''',
+      imageAsset: 'assets/images/aws_day2.png',
       schedule: [
-        ScheduleRow('9:00 – 10:30', 'EC2: instance types, AMIs, key pairs, security groups', '📖 Study'),
-        ScheduleRow('10:30 – 12:00', 'Launch EC2, SSH in, install NGINX', '🔬 Hands-on'),
+        ScheduleRow('9:00 – 11:00', 'EC2 Instance Types', '📖 Study'),
+        ScheduleRow('11:00 – 12:00', 'Launch an EC2', '💻 Lab'),
         ScheduleRow('12:00 – 13:00', '🍽️ Lunch Break', '—', isBreak: true),
-        ScheduleRow('13:00 – 14:30', 'EC2: EBS volumes, snapshots, Elastic IPs', '⚙️ Lab'),
-        ScheduleRow('14:30 – 16:00', 'Auto Scaling Groups + Load Balancer (ALB)', '🔧 Configure ASG'),
-        ScheduleRow('16:00 – 17:30', 'AWS Lambda: functions, triggers, event sources', '🚀 Deploy function'),
-        ScheduleRow('17:30 – 18:00', 'Revision + Notes', '📝 Summarize'),
+        ScheduleRow('13:00 – 15:00', 'Security Groups & ASG', '⚙️ Configure'),
+        ScheduleRow('15:00 – 17:00', 'Lambda Functions', '🚀 Code'),
+        ScheduleRow('17:00 – 18:00', 'Revision', '📝 Summarize'),
       ],
-      covered: ['EC2', 'AMI', 'Auto Scaling', 'Lambda'],
+      covered: ['EC2', 'ASG', 'Lambda'],
       qa: [
-        QAItem('What are EC2 instance purchasing options and when would you use each?',
-            'On-Demand: Pay per second, no commitment — for unpredictable workloads. Reserved: 1 or 3 year commitment, up to 72% savings — for steady-state workloads. Spot: Up to 90% discount, can be interrupted — for fault-tolerant, batch workloads. Savings Plans: Flexible commitment. Dedicated Hosts: Physical server for compliance/licensing.'),
-        QAItem('What is the difference between a Security Group and a NACL?',
-            'Security Group: Instance-level firewall, stateful (return traffic automatically allowed), only allow rules. NACL (Network ACL): Subnet-level firewall, stateless (must explicitly allow both inbound and outbound), supports allow AND deny rules, rules processed in order. Use both for defense in depth.'),
-        QAItem('How does Auto Scaling work and what are scaling policies?',
-            'Auto Scaling Groups (ASG) automatically add/remove EC2 instances based on demand. Scaling policies: Target Tracking — maintain a target metric (e.g., CPU at 50%). Step Scaling — scale by steps based on alarm thresholds. Scheduled Scaling — scale at known times. Predictive Scaling — ML-based, proactively scales based on patterns.'),
-        QAItem('What is AWS Lambda and what are its key limitations?',
-            'Lambda is AWS\'s serverless compute — run code without managing servers, pay only for execution time. Key limits: Timeout: max 15 minutes. Memory: 128MB - 10GB. Deployment package: 50MB zipped. Concurrent executions: 1000 per region (default). Cold start: First invocation has latency (use Provisioned Concurrency to eliminate).'),
-        QAItem('What is the difference between ALB, NLB, and CLB in AWS?',
-            'ALB (Application Load Balancer): Layer 7, HTTP/HTTPS, path/host-based routing — for web apps & microservices. NLB (Network Load Balancer): Layer 4, TCP/UDP, ultra-low latency, static IP, millions of requests/sec — for gaming, IoT, financial systems. CLB (Classic): Legacy. Use ALB for web apps, NLB for extreme performance.'),
+        QAItem('What are Security Groups?', 'Virtual firewalls attached to EC2 instances to control inbound and outbound traffic.'),
+        QAItem('What is Auto Scaling?', 'Automatically adding or removing EC2 instances based on traffic demand.'),
+        QAItem('What is AWS Lambda?', 'A serverless compute service that runs code in response to events without managing servers.'),
+        QAItem('ALB vs NLB?', 'Application Load Balancer (ALB) routes HTTP/HTTPS. Network Load Balancer (NLB) routes fast TCP/UDP traffic.'),
       ],
     ),
     DayData(
       dayNumber: 3,
-      title: 'Storage Services — S3, EBS, EFS, Glacier',
-      subtitle: 'S3 buckets, versioning, lifecycle, static hosting, security',
-      tags: ['S3', 'EBS', 'EFS'],
+      title: 'Storage (S3 & EBS)',
+      subtitle: 'Object and Block Storage',
+      tags: ['S3', 'EBS'],
+      explanation: '''
+# AWS Storage Solutions
+
+## 1. S3 Buckets & Classes
+Amazon S3 is **Object Storage** accessed over the internet, perfect for media and backups. It offers storage classes: Standard (fast, expensive), Infrequent Access (cheaper, accessed rarely), and Glacier (cheapest, used for long-term archiving).
+
+## 2. S3 Hosting
+S3 can be configured to host static websites (HTML, CSS, JS) directly from a bucket, eliminating the need to provision an EC2 web server entirely.
+
+## 3. EBS Volumes
+Amazon EBS is **Block Storage**. It provides high-performance hard drives that are directly attached to EC2 instances. Unlike S3, EBS is required to install an operating system and run databases efficiently.
+
+## 4. EFS & Glacier
+Elastic File System (EFS) is a shared network drive that multiple EC2 instances can access simultaneously. Glacier is S3's deep archive class.
+
+## Real-World Example
+Spotify stores its massive library of mp3 audio files and album artwork in **S3 Buckets** because they are static files delivered over the web. However, the EC2 server that runs the Spotify recommendation algorithm has an **EBS Volume** attached to act as its high-speed `C:` drive. Meanwhile, 10-year-old billing records are sent to **Glacier** to save on storage costs.
+''',
+      imageAsset: 'assets/images/aws_day3.png',
       schedule: [
-        ScheduleRow('9:00 – 10:30', 'S3: buckets, objects, storage classes', '📖 Study'),
-        ScheduleRow('10:30 – 12:00', 'S3: versioning, lifecycle policies, replication', '🔬 Hands-on'),
+        ScheduleRow('9:00 – 11:00', 'S3 Buckets & Classes', '📖 Study'),
+        ScheduleRow('11:00 – 12:00', 'S3 Hosting', '💻 Lab'),
         ScheduleRow('12:00 – 13:00', '🍽️ Lunch Break', '—', isBreak: true),
-        ScheduleRow('13:00 – 14:30', 'S3: static website hosting, pre-signed URLs', '🌐 Lab'),
-        ScheduleRow('14:30 – 16:00', 'S3 security: bucket policies, ACLs, encryption', '🔒 Configure'),
-        ScheduleRow('16:00 – 17:30', 'EBS vs EFS vs Glacier — comparison & use cases', '📝 Study + Notes'),
-        ScheduleRow('17:30 – 18:00', 'Revision + Notes', '📝 Summarize'),
+        ScheduleRow('13:00 – 15:00', 'EBS Volumes', '⚙️ Configure'),
+        ScheduleRow('15:00 – 17:00', 'EFS & Glacier', '🚀 Compare'),
+        ScheduleRow('17:00 – 18:00', 'Revision', '📝 Summarize'),
       ],
-      covered: ['S3', 'EBS', 'EFS', 'Glacier'],
+      covered: ['S3', 'EBS', 'EFS'],
       qa: [
-        QAItem('What are the S3 storage classes and when would you use each?',
-            'S3 Standard: Frequent access, high availability. S3 Standard-IA: Infrequent access, cheaper storage but retrieval fee. S3 One Zone-IA: Single AZ, lower cost, non-critical data. S3 Intelligent-Tiering: Automatically moves objects based on access patterns. S3 Glacier: Archive with retrieval times from milliseconds to hours. S3 Glacier Deep Archive: Cheapest, 12-hour retrieval.'),
-        QAItem('What is S3 versioning and why would you enable it?',
-            'S3 versioning keeps multiple variants of an object in the same bucket. Benefits: Accidental deletion protection (deleted objects get a delete marker, not permanently removed), Overwrite protection (previous versions retained), Recovery (restore to any previous version). Once enabled, versioning cannot be disabled — only suspended.'),
-        QAItem('Compare EBS, EFS, and S3 — when to use which?',
-            'EBS (Elastic Block Store): Persistent block storage, attached to a single EC2 instance, like an external hard drive. Use for databases, boot volumes. EFS (Elastic File System): Managed NFS, shared across multiple EC2 instances simultaneously, auto-scales. Use for shared file storage. S3: Object storage, internet-accessible, unlimited scale. Use for static assets, backups, data lakes.'),
-        QAItem('What is a pre-signed URL in S3 and when is it used?',
-            'A pre-signed URL is a time-limited URL that grants temporary access to a private S3 object without requiring the requester to have AWS credentials. Use cases: Secure file sharing (share private documents for a limited time), Direct uploads (allow users to upload directly to S3 without going through your server — reduces server load).'),
-        QAItem('What are the S3 encryption options available?',
-            'SSE-S3: Server-Side Encryption with S3 keys — AWS manages keys, enabled by default. SSE-KMS: KMS-managed keys — audit trail via CloudTrail, customer control over keys. SSE-C: Customer-provided keys — you manage and send keys, AWS doesn\'t store them. Client-Side Encryption: encrypt data before sending to S3 — maximum control. SSE-KMS is recommended for compliance-sensitive data.'),
+        QAItem('S3 vs EBS?', 'S3 is object storage (files, images). EBS is a hard drive attached to an EC2 instance.'),
+        QAItem('What is S3 Glacier?', 'A highly secure, extremely low-cost storage class used for long-term data archiving.'),
+        QAItem('What is EFS?', 'Elastic File System. A shared network drive that multiple EC2 instances can access at once.'),
+        QAItem('Why use S3 Versioning?', 'To easily recover files if they are accidentally deleted or overwritten.'),
       ],
     ),
     DayData(
       dayNumber: 4,
-      title: 'Networking — VPC, Route 53, CloudFront',
-      subtitle: 'VPC, subnets, NAT Gateway, Route 53, CloudFront CDN',
-      tags: ['VPC', 'Route 53', 'CloudFront'],
+      title: 'Networking (VPC)',
+      subtitle: 'Subnets, Routing, CloudFront',
+      tags: ['VPC', 'CDN'],
+      explanation: '''
+# Virtual Private Cloud (VPC)
+
+## 1. VPC Concepts & Building
+A VPC lets you provision a logically isolated section of the AWS Cloud. Building a VPC involves choosing an IP range (CIDR), creating subnets, and setting up routing tables to direct traffic.
+
+## 2. NAT Gateways
+Public subnets connect directly to the internet. Private subnets do not. A **NAT Gateway** placed in a public subnet allows servers in a private subnet to reach out to the internet (e.g., to download software updates) without allowing the internet to initiate a connection back in.
+
+## 3. Route 53 & CloudFront
+**Route 53** is AWS's highly available DNS service that translates domain names into IP addresses. **CloudFront** is a Content Delivery Network (CDN) that caches your website's static files at edge locations globally to reduce latency.
+
+## Real-World Example
+An online store uses **Route 53** to route traffic from `mystore.com` to a web server in a **Public Subnet** within their **VPC**. The web server fetches products from a database hidden safely in a **Private Subnet**. When the database needs a security patch, it accesses the internet securely via a **NAT Gateway**. Heavy product images are cached globally using **CloudFront** so customers in Japan and the US experience fast loading times.
+''',
       schedule: [
-        ScheduleRow('9:00 – 10:30', 'VPC: subnets, route tables, internet gateway', '📖 Study + Diagram'),
-        ScheduleRow('10:30 – 12:00', 'Create custom VPC with public & private subnets', '🔬 Hands-on'),
+        ScheduleRow('9:00 – 11:00', 'VPC Concepts', '📖 Study'),
+        ScheduleRow('11:00 – 12:00', 'Build a VPC', '💻 Lab'),
         ScheduleRow('12:00 – 13:00', '🍽️ Lunch Break', '—', isBreak: true),
-        ScheduleRow('13:00 – 14:30', 'NAT Gateway, Security Groups vs NACLs', '⚙️ Lab'),
-        ScheduleRow('14:30 – 16:00', 'VPC Peering, VPN, Direct Connect concepts', '📖 Study'),
-        ScheduleRow('16:00 – 17:00', 'Route 53: DNS, routing policies', '🔧 Configure'),
-        ScheduleRow('17:00 – 17:30', 'CloudFront CDN setup with S3 origin', '🌐 Lab'),
-        ScheduleRow('17:30 – 18:00', 'Revision + Notes', '📝 Summarize'),
+        ScheduleRow('13:00 – 15:00', 'NAT Gateways', '⚙️ Configure'),
+        ScheduleRow('15:00 – 17:00', 'Route 53 & CloudFront', '🌐 Set up CDN'),
+        ScheduleRow('17:00 – 18:00', 'Revision', '📝 Summarize'),
       ],
-      covered: ['VPC', 'NAT Gateway', 'Route 53', 'CloudFront'],
+      covered: ['Subnets', 'NAT', 'Route 53'],
       qa: [
-        QAItem('What is a VPC and what are its core components?',
-            'A VPC (Virtual Private Cloud) is a logically isolated virtual network in AWS. Core components: Subnets (public/private, tied to AZs), Route Tables (control traffic routing), Internet Gateway (enables internet access for public subnets), NAT Gateway (private subnet internet access without exposure), Security Groups (instance firewall), NACLs (subnet firewall), VPC Endpoints.'),
-        QAItem('What is a NAT Gateway and why is it needed for private subnets?',
-            'A NAT Gateway allows instances in a private subnet to initiate outbound connections to the internet (e.g., software updates) while preventing the internet from initiating inbound connections to those instances. It sits in a public subnet and translates private IPs to its public IP. Without NAT Gateway, private subnet instances have no internet access.'),
-        QAItem('What are Route 53 routing policies and when would you use weighted routing?',
-            'Route 53 routing policies: Simple (single resource), Weighted (split traffic by percentage — for A/B testing or canary deployments), Latency (route to lowest latency region), Failover (active-passive DR), Geolocation (based on user\'s location), Geoproximity, Multi-value (multiple healthy records, like basic load balancing).'),
-        QAItem('What is CloudFront and how does it improve performance?',
-            'AWS CloudFront is a Content Delivery Network (CDN) that distributes content globally through 400+ edge locations. It improves performance by: Caching static content at edge locations closest to users, Reducing latency, SSL/TLS termination at edge, DDoS protection with AWS Shield, and Origin support for S3, ALB, EC2, custom origins.'),
-        QAItem('What is VPC Peering and what are its limitations?',
-            'VPC Peering connects two VPCs to route traffic privately using AWS backbone (no internet required). Works across accounts and regions. Limitations: No transitive peering — if VPC-A peers with VPC-B and VPC-B peers with VPC-C, VPC-A cannot reach VPC-C through VPC-B. No overlapping CIDR blocks allowed. For transitive routing, use AWS Transit Gateway.'),
+        QAItem('What is a VPC?', 'A logically isolated section of the AWS cloud where you launch resources in a virtual network.'),
+        QAItem('Public vs Private Subnet?', 'Public subnets have direct internet access. Private subnets do not.'),
+        QAItem('What is a NAT Gateway?', 'It allows resources in a private subnet to access the internet securely for updates.'),
+        QAItem('What does CloudFront do?', 'It is a Content Delivery Network (CDN) that caches content close to users for faster loading.'),
       ],
     ),
     DayData(
       dayNumber: 5,
-      title: 'Databases — RDS, DynamoDB, ElastiCache',
-      subtitle: 'RDS, Multi-AZ, DynamoDB, GSI, DAX, ElastiCache',
-      tags: ['RDS', 'DynamoDB', 'ElastiCache'],
+      title: 'Databases',
+      subtitle: 'SQL vs NoSQL, RDS, DynamoDB',
+      tags: ['RDS', 'DynamoDB'],
+      explanation: '''
+# AWS Managed Databases
+
+## 1. Relational vs NoSQL
+Relational databases (SQL) organize data into strict tables and rows, perfect for complex transactions. NoSQL databases organize data using flexible key-value pairs or documents, perfect for massive scale and unstructured data.
+
+## 2. RDS Setup
+Amazon Relational Database Service (RDS) manages SQL engines like PostgreSQL and MySQL. Setting it up involves configuring Multi-AZ for failover redundancy and Read Replicas to offload heavy query traffic.
+
+## 3. DynamoDB Basics
+Amazon DynamoDB is a serverless NoSQL database. You simply create tables and start inserting data. It automatically scales to handle millions of requests per second with single-digit millisecond latency.
+
+## 4. ElastiCache
+ElastiCache provides managed Redis or Memcached. It sits in front of a database, caching frequently requested data in RAM to drastically speed up application performance.
+
+## Real-World Example
+A banking app requires strict financial consistency, so they **setup an RDS** PostgreSQL database. To ensure the bank never goes offline, they enable Multi-AZ failover. Conversely, a globally viral mobile game needs to load millions of player high scores instantly; they use **DynamoDB** to handle the unstructured data scale, and **ElastiCache** to instantly retrieve the top 10 leaderboard.
+''',
       schedule: [
-        ScheduleRow('9:00 – 10:30', 'RDS: MySQL/PostgreSQL, Multi-AZ, Read Replicas', '📖 Study'),
-        ScheduleRow('10:30 – 12:00', 'Launch RDS, connect from EC2', '🔬 Hands-on'),
+        ScheduleRow('9:00 – 11:00', 'Relational vs NoSQL', '📖 Study'),
+        ScheduleRow('11:00 – 12:00', 'RDS Setup', '💻 Lab'),
         ScheduleRow('12:00 – 13:00', '🍽️ Lunch Break', '—', isBreak: true),
-        ScheduleRow('13:00 – 14:30', 'DynamoDB: tables, items, partition keys, GSI', '⚙️ Lab'),
-        ScheduleRow('14:30 – 16:00', 'DynamoDB streams, DAX, on-demand vs provisioned', '📖 Study + Practice'),
-        ScheduleRow('16:00 – 17:30', 'ElastiCache (Redis/Memcached) overview & setup', '🔍 Explore'),
-        ScheduleRow('17:30 – 18:00', 'Revision + Notes', '📝 Summarize'),
+        ScheduleRow('13:00 – 15:00', 'DynamoDB basics', '⚙️ Create Tables'),
+        ScheduleRow('15:00 – 17:00', 'ElastiCache', '🚀 Optimize'),
+        ScheduleRow('17:00 – 18:00', 'Revision', '📝 Summarize'),
       ],
-      covered: ['RDS', 'DynamoDB', 'ElastiCache', 'DAX'],
+      covered: ['RDS', 'DynamoDB', 'ElastiCache'],
       qa: [
-        QAItem('What is the difference between RDS Multi-AZ and Read Replicas?',
-            'Multi-AZ: Synchronous replication to a standby instance in another AZ. Purpose: High Availability / DR. Standby is passive (not readable). Automatic failover in case of primary failure (~1-2 min). Read Replicas: Asynchronous replication to readable copies (up to 5). Purpose: Performance / scaling reads. Can be in same AZ, different AZ, or different region. Can be promoted to standalone DB.'),
-        QAItem('What is DynamoDB\'s data model — explain partition keys and sort keys?',
-            'DynamoDB is a NoSQL key-value & document database. Partition Key (Hash Key): Required, uniquely identifies an item, determines physical partition for storage. Sort Key (Range Key): Optional, combined with partition key forms composite primary key, allows multiple items with same partition key — sorted and range-queryable. Example: Partition Key = UserID, Sort Key = Timestamp.'),
-        QAItem('What is a Global Secondary Index (GSI) in DynamoDB?',
-            'A GSI is an index with a different partition key and optional sort key than the base table, allowing you to query on non-primary key attributes. Example: Table has partition key OrderID. GSI on CustomerID lets you fetch all orders for a customer efficiently. GSIs have separate read/write capacity, eventual consistency by default, up to 20 per table.'),
-        QAItem('What is DAX (DynamoDB Accelerator) and when should you use it?',
-            'DAX is a fully managed, in-memory caching layer for DynamoDB. It reduces read response times from milliseconds to microseconds and reduces DynamoDB read capacity unit consumption. Drop-in compatible with DynamoDB API — no application code changes needed. Use when: read-heavy workloads, requiring microsecond latency, hot partition keys, or reducing costs.'),
-        QAItem('What is the difference between Redis and Memcached in ElastiCache?',
-            'Redis: Rich data structures (strings, hashes, lists, sets, sorted sets), persistence, pub/sub, Multi-AZ with failover, read replicas, backup/restore, clustering. Memcached: Simple key-value caching only, no persistence, multi-threaded, simpler architecture, no replication. Choose Redis for: complex data, HA, pub/sub, persistence. Choose Memcached for: simple caching, multi-threading for CPU-intensive workloads.'),
+        QAItem('RDS vs DynamoDB?', 'RDS is for structured relational data (SQL). DynamoDB is a flexible key-value NoSQL database.'),
+        QAItem('What are RDS Read Replicas?', 'Copies of your database used purely for handling heavy read traffic to boost performance.'),
+        QAItem('What is RDS Multi-AZ?', 'An automatic standby database in another zone used for backup if the primary database fails.'),
+        QAItem('What is ElastiCache?', 'An in-memory caching service (Redis/Memcached) used to speed up database queries.'),
       ],
     ),
     DayData(
       dayNumber: 6,
-      title: 'DevOps Tools — CloudFormation, CodePipeline, ECS/EKS',
-      subtitle: 'CloudFormation, CodePipeline, ECS, EKS, ECR',
-      tags: ['CloudFormation', 'ECS', 'EKS'],
+      title: 'Automation & Containers',
+      subtitle: 'CloudFormation, ECS, ECR',
+      tags: ['CloudFormation', 'ECS'],
+      explanation: '''
+# Automation and Container Orchestration
+
+## 1. CloudFormation Basics & Stack Deployment
+AWS CloudFormation allows you to model and provision infrastructure using YAML or JSON templates. A "Stack" is a collection of AWS resources you can manage as a single unit, making infrastructure perfectly reproducible.
+
+## 2. ECS & ECR
+Amazon Elastic Container Registry (ECR) securely stores Docker images. Amazon Elastic Container Service (ECS) takes those images and orchestrates running them seamlessly across a cluster.
+
+## 3. Fargate vs EC2
+When running containers in ECS, you have two choices: EC2 mode (you manage the underlying virtual servers) or Fargate mode (completely serverless compute where AWS manages the servers for you).
+
+## Real-World Example
+A team wants to deploy a microservice architecture. They write a **CloudFormation** template to automate everything. The template creates an **ECS** cluster and pulls the required Docker image from **ECR**. Because the team doesn't want to deal with patching operating systems, they choose to run the containers on **Fargate**.
+''',
       schedule: [
-        ScheduleRow('9:00 – 10:30', 'CloudFormation: templates, stacks, change sets', '📖 Study'),
-        ScheduleRow('10:30 – 12:00', 'Deploy infrastructure using CFN template', '🔬 Hands-on'),
+        ScheduleRow('9:00 – 11:00', 'CloudFormation Basics', '📖 Study'),
+        ScheduleRow('11:00 – 12:00', 'Deploy a Stack', '💻 Lab'),
         ScheduleRow('12:00 – 13:00', '🍽️ Lunch Break', '—', isBreak: true),
-        ScheduleRow('13:00 – 14:30', 'CodePipeline: CodeCommit → CodeBuild → CodeDeploy', '🔧 Build pipeline'),
-        ScheduleRow('14:30 – 16:00', 'ECS: clusters, task definitions, services', '🚀 Deploy containerized app'),
-        ScheduleRow('16:00 – 17:30', 'EKS overview, ECR for container registry', '📖 Study + Push image'),
-        ScheduleRow('17:30 – 18:00', 'Revision + Notes', '📝 Summarize'),
+        ScheduleRow('13:00 – 15:00', 'ECS & ECR', '⚙️ Containers'),
+        ScheduleRow('15:00 – 17:00', 'Fargate vs EC2', '🚀 Deploy'),
+        ScheduleRow('17:00 – 18:00', 'Revision', '📝 Summarize'),
       ],
-      covered: ['CloudFormation', 'CodePipeline', 'ECS', 'ECR'],
+      covered: ['IaC', 'ECS', 'Fargate'],
       qa: [
-        QAItem('What is AWS CloudFormation and what are stacks and change sets?',
-            'CloudFormation is AWS\'s native IaC service — define infrastructure in JSON/YAML templates. A Stack is a collection of AWS resources created/managed as a single unit from a template. A Change Set is a preview of what will change before executing an update — like Terraform plan. Supports Nested Stacks for modular architecture.'),
-        QAItem('What is the AWS CI/CD pipeline (CodeCommit, CodeBuild, CodeDeploy, CodePipeline)?',
-            'CodeCommit: AWS-managed Git repository. CodeBuild: Fully managed build service — compiles, tests, produces artifacts. CodeDeploy: Automated deployments to EC2, Lambda, ECS — supports rolling, blue/green deployments. CodePipeline: Orchestrates the entire CI/CD workflow, connecting CodeCommit → CodeBuild → CodeDeploy with approval stages.'),
-        QAItem('What is Amazon ECS and what is the difference between EC2 and Fargate launch types?',
-            'ECS (Elastic Container Service) is AWS\'s container orchestration service. EC2 launch type: You manage the underlying EC2 instances (OS patching, capacity planning, scaling). Fargate launch type: Serverless containers — AWS manages the infrastructure, you only define CPU/memory requirements. No EC2 management, pay per task, ideal for variable workloads.'),
-        QAItem('What is Amazon ECR and how does it integrate with ECS/EKS?',
-            'ECR (Elastic Container Registry) is a fully managed Docker container image registry. Benefits: Native IAM integration for access control, Image scanning for CVEs, Encryption at rest, Cross-region replication, and private network access via VPC endpoints. ECS/EKS can pull images from ECR without public internet using IAM roles.'),
-        QAItem('When would you choose EKS over ECS for container workloads?',
-            'Choose EKS (managed Kubernetes) when: Team has Kubernetes expertise, need portability across clouds (multi-cloud), complex workloads requiring K8s ecosystem (Helm, Istio, custom operators), or migrating existing K8s workloads. Choose ECS when: AWS-only, simpler container orchestration needed, tight AWS integration, cost-sensitive, or team lacks K8s experience.'),
+        QAItem('What is CloudFormation?', 'AWS\'s native service for defining infrastructure as code using YAML or JSON.'),
+        QAItem('What is Amazon ECR?', 'A secure registry to store and manage your Docker container images.'),
+        QAItem('ECS EC2 vs Fargate?', 'In EC2 mode, you manage the underlying servers. Fargate is serverless; AWS manages the servers for you.'),
+        QAItem('What is CodePipeline?', 'AWS\'s CI/CD service that automates building, testing, and deploying code.'),
       ],
     ),
     DayData(
       dayNumber: 7,
-      title: 'Monitoring, Security, Cost & Full Revision',
-      subtitle: 'CloudWatch, GuardDuty, KMS, Cost Explorer, Well-Architected',
-      tags: ['CloudWatch', 'Security', 'Revision'],
+      title: 'Security & Review',
+      subtitle: 'CloudWatch, KMS, Cost Management',
+      tags: ['CloudWatch', 'KMS'],
+      explanation: '''
+# Security, Monitoring & Governance
+
+## 1. CloudWatch & Logs
+Amazon CloudWatch provides monitoring and alerting for performance metrics (CPU, RAM). It also aggregates logs from EC2 instances and Lambda functions into central CloudWatch Log Groups for easy querying.
+
+## 2. KMS & Encryption
+AWS Key Management Service (KMS) enables you to create and manage the cryptographic keys used to encrypt data at rest across AWS services (like S3 and EBS).
+
+## 3. Cost Explorer
+The cloud is easy to use, making it easy to accidentally overspend. Cost Explorer helps you visualize, understand, and manage your AWS costs over time using custom reports and anomaly detection.
+
+## Real-World Example
+An engineer notices their monthly AWS bill spiked. They use **Cost Explorer** and discover an EC2 server running at 100% CPU. They check **CloudWatch Logs** and realize the server is under a brute-force attack. To protect sensitive customer data, they ensure the database uses **KMS Encryption** so even if the server is breached, the data remains scrambled and unreadable.
+''',
       schedule: [
-        ScheduleRow('9:00 – 10:30', 'CloudWatch: metrics, alarms, logs, dashboards', '⚙️ Setup alarm'),
-        ScheduleRow('10:30 – 12:00', 'CloudTrail, AWS Config, GuardDuty, Shield', '📖 Study + Enable'),
+        ScheduleRow('9:00 – 11:00', 'CloudWatch & Logs', '📖 Study'),
+        ScheduleRow('11:00 – 12:00', 'KMS & Encryption', '💻 Lab'),
         ScheduleRow('12:00 – 13:00', '🍽️ Lunch Break', '—', isBreak: true),
-        ScheduleRow('13:00 – 14:00', 'KMS, Secrets Manager, Certificate Manager', '🔬 Lab'),
-        ScheduleRow('14:00 – 15:00', 'AWS Pricing, Cost Explorer, Trusted Advisor', '🌐 Explore'),
-        ScheduleRow('15:00 – 16:30', 'Well-Architected Framework review', '📖 Study'),
-        ScheduleRow('16:30 – 17:30', 'Full Week Revision + Flashcards', '🃏 Revise all topics'),
-        ScheduleRow('17:30 – 18:00', 'Mock Exam Questions (SAA-C03 style)', '❓ Q&A'),
+        ScheduleRow('13:00 – 15:00', 'Cost Explorer', '⚙️ Analysis'),
+        ScheduleRow('15:00 – 17:00', 'Mock Exam', '🚀 Practice'),
+        ScheduleRow('17:00 – 18:00', 'Final Review', '📝 Summarize'),
       ],
-      covered: ['CloudWatch', 'Security', 'Cost Mgmt', 'Well-Architected'],
+      covered: ['Security', 'Billing', 'Metrics'],
       qa: [
-        QAItem('What is the difference between CloudWatch, CloudTrail, and AWS Config?',
-            'CloudWatch: Performance monitoring — metrics (CPU, memory), logs, alarms, dashboards. Answers "Is my system healthy?" CloudTrail: Audit trail — logs all API calls made in your AWS account. Answers "Who changed what?" AWS Config: Configuration compliance — records configuration history, evaluates resources against compliance rules. Answers "Is my infrastructure configured correctly?"'),
-        QAItem('What is AWS GuardDuty and how does it detect threats?',
-            'GuardDuty is an intelligent threat detection service that continuously monitors for malicious activity. It analyzes: VPC Flow Logs (unusual network patterns), CloudTrail events (suspicious API calls), DNS logs (communication with known malicious domains). Uses ML and threat intelligence feeds. Detects: cryptocurrency mining, credential compromise, port scanning, communication with C&C servers.'),
-        QAItem('What is AWS KMS and what is the difference between KMS and Secrets Manager?',
-            'KMS (Key Management Service): Manages cryptographic keys used to encrypt/decrypt data across AWS services (S3, EBS, RDS). Secrets Manager: Stores, retrieves, and automatically rotates secrets (DB passwords, API keys, tokens). Secrets are encrypted using KMS. Use KMS for encryption key management; use Secrets Manager for managing application secrets with automatic rotation.'),
-        QAItem('What are the 6 pillars of the AWS Well-Architected Framework?',
-            '1. Operational Excellence — run/monitor systems, continuously improve processes. 2. Security — protect information, systems, assets. 3. Reliability — perform intended functions correctly and consistently. 4. Performance Efficiency — use computing resources efficiently. 5. Cost Optimization — avoid unnecessary costs. 6. Sustainability — minimize environmental impact.'),
-        QAItem('How does AWS Trusted Advisor help with cost optimization and security?',
-            'Trusted Advisor provides real-time recommendations across 5 categories: Cost Optimization (identify idle EC2 instances, underutilized resources), Security (open security groups, MFA not enabled on root, public S3 buckets), Fault Tolerance (RDS backups, EC2 availability zones), Performance (high EC2 utilization), Service Limits (usage approaching limits).'),
+        QAItem('CloudWatch vs CloudTrail?', 'CloudWatch monitors performance metrics. CloudTrail logs "Who did what" for security audits.'),
+        QAItem('What is AWS KMS?', 'Key Management Service. It creates and manages cryptographic keys to encrypt data.'),
+        QAItem('What is AWS GuardDuty?', 'An intelligent threat detection service that monitors accounts for malicious activity.'),
+        QAItem('What is Trusted Advisor?', 'A tool providing real-time guidance to help provision resources optimally to save money and improve security.'),
       ],
     ),
   ],
@@ -484,206 +623,274 @@ const networkingData = TimetableData(
   id: 'networking',
   label: 'Networking',
   emoji: '🌐',
-  subtitle: 'OSI · TCP/IP · DNS · Routing · Switching · Firewalls · VPN · SDN',
+  subtitle: 'OSI · TCP/IP · Subnetting · Routing · Firewalls',
   days: [
     DayData(
       dayNumber: 1,
-      title: 'OSI Model & TCP/IP Stack',
-      subtitle: '7-layer OSI model, TCP/IP suite, encapsulation, protocols per layer',
-      tags: ['OSI', 'TCP/IP', 'Protocols'],
+      title: 'OSI Model & TCP/IP',
+      subtitle: 'Protocols, layers, encapsulation',
+      tags: ['OSI', 'TCP/IP'],
+      explanation: '''
+# OSI Model and TCP/IP Architecture
+
+## 1. OSI 7 Layers & TCP/IP Model
+The OSI model divides networking into 7 theoretical layers (Physical, Data Link, Network, Transport, Session, Presentation, Application). The TCP/IP model is a more practical 4-layer model that maps closely to the protocols actually used on the modern internet.
+
+## 2. Encapsulation
+As data travels from an application down to the physical cable, it undergoes **encapsulation**—adding specific protocol headers at each layer (e.g., adding an IP header at the Network layer). Upon arriving at the destination, it is decapsulated.
+
+## 3. Wireshark Basics
+Wireshark is a packet analyzer. It captures real-time data flowing over a network and allows engineers to inspect the exact encapsulation headers of every packet to troubleshoot issues.
+
+## Real-World Example
+When you open a web browser (**Application Layer**) to watch a video, the data is chopped into segments using UDP (**Transport Layer**). It is then stamped with IP addresses (**Network Layer**) to know where to go on the internet, and finally converted to electrical signals over your ethernet cable (**Physical Layer**). A network engineer could use **Wireshark** to intercept and inspect these packets in real-time.
+''',
+      imageAsset: 'assets/images/networking_concept.png',
       schedule: [
-        ScheduleRow('9:00 – 10:30', 'OSI 7 layers: Physical, Data Link, Network, Transport', '📖 Study + Diagram'),
-        ScheduleRow('10:30 – 12:00', 'OSI 7 layers: Session, Presentation, Application', '🧠 Notes + Examples'),
+        ScheduleRow('9:00 – 11:00', 'OSI 7 Layers', '📖 Study'),
+        ScheduleRow('11:00 – 12:00', 'TCP/IP Model', '💻 Compare'),
         ScheduleRow('12:00 – 13:00', '🍽️ Lunch Break', '—', isBreak: true),
-        ScheduleRow('13:00 – 14:30', 'TCP/IP 4-layer model vs OSI, protocol mapping', '📖 Study + Compare'),
-        ScheduleRow('14:30 – 16:00', 'Data encapsulation: frames, packets, segments, bits', '🔬 Trace a packet'),
-        ScheduleRow('16:00 – 17:30', 'Key protocols: HTTP, FTP, SMTP, DNS, ICMP, ARP', '💻 Wireshark capture'),
-        ScheduleRow('17:30 – 18:00', 'Revision + Notes', '📝 Summarize'),
+        ScheduleRow('13:00 – 15:00', 'Encapsulation', '⚙️ Learn'),
+        ScheduleRow('15:00 – 17:00', 'Wireshark basics', '🚀 Practice'),
+        ScheduleRow('17:00 – 18:00', 'Revision', '📝 Summarize'),
       ],
-      covered: ['OSI Model', 'TCP/IP', 'Encapsulation', 'Protocols'],
+      covered: ['OSI', 'Wireshark', 'Packets'],
       qa: [
-        QAItem('Name the 7 OSI layers in order and give an example protocol for each.',
-            'L1 Physical: Cables, hubs (Ethernet cable). L2 Data Link: MAC addressing, switches (Ethernet/802.11). L3 Network: Logical addressing, routing (IP, ICMP). L4 Transport: End-to-end delivery (TCP, UDP). L5 Session: Session management (NetBIOS, RPC). L6 Presentation: Encoding/encryption (TLS, JPEG). L7 Application: User-facing protocols (HTTP, DNS, FTP, SMTP). Mnemonic: "Please Do Not Throw Sausage Pizza Away"'),
-        QAItem('What is the difference between TCP and UDP?',
-            'TCP (Transmission Control Protocol): Connection-oriented, reliable, ordered delivery, error checking, flow control, 3-way handshake (SYN → SYN-ACK → ACK). Use for: web (HTTP/HTTPS), email, file transfer. UDP (User Datagram Protocol): Connectionless, unreliable, no ordering guarantees, low overhead, faster. Use for: video streaming, gaming, DNS, VoIP — where speed matters more than guaranteed delivery.'),
-        QAItem('What is data encapsulation and what is the PDU at each OSI layer?',
-            'Encapsulation wraps data with headers (and sometimes trailers) at each OSI layer as it travels down from Application to Physical. PDUs (Protocol Data Units): L7-L5: Data. L4 (Transport): Segment (TCP) / Datagram (UDP). L3 (Network): Packet. L2 (Data Link): Frame. L1 (Physical): Bits. De-encapsulation happens in reverse on the receiving end.'),
-        QAItem('What is the TCP 3-way handshake process?',
-            'The TCP 3-way handshake establishes a connection before data transfer: Step 1 — SYN: Client sends a SYN packet to server, proposing connection & initial sequence number. Step 2 — SYN-ACK: Server responds with SYN-ACK — acknowledges client\'s SYN, sends its own SYN. Step 3 — ACK: Client sends ACK to acknowledge server\'s SYN. Connection is now established. Teardown uses a 4-way FIN handshake.'),
-        QAItem('How does ARP work and what problem does it solve?',
-            'ARP (Address Resolution Protocol) maps an IP address (L3) to a MAC address (L2). Problem: Devices communicate locally using MAC addresses, but routing uses IP addresses. Process: Host broadcasts an ARP Request: "Who has IP 192.168.1.1? Tell 192.168.1.5". The device with that IP replies with its MAC address. The requesting host caches this in the ARP table. ARP is only for local subnet communication.'),
+        QAItem('What are the 7 OSI layers?', 'Physical, Data Link, Network, Transport, Session, Presentation, Application.'),
+        QAItem('TCP vs UDP?', 'TCP is reliable and guarantees delivery. UDP is fast but does not guarantee delivery (used for streaming).'),
+        QAItem('What is a MAC address?', 'A unique hardware identifier burned into a network card (Layer 2).'),
+        QAItem('What is encapsulation?', 'The process of adding headers (and trailers) to data as it moves down the OSI layers.'),
       ],
     ),
     DayData(
       dayNumber: 2,
-      title: 'IP Addressing, Subnetting & CIDR',
-      subtitle: 'IPv4/IPv6, subnet masks, CIDR notation, VLSM, subnetting practice',
-      tags: ['IPv4', 'IPv6', 'CIDR'],
+      title: 'IP Addressing & Subnetting',
+      subtitle: 'IPv4, IPv6, CIDR, Subnet Masks',
+      tags: ['IPv4', 'Subnetting'],
+      explanation: '''
+# IP Addressing and Subnetting
+
+## 1. IPv4 & IPv6 Basics
+IPv4 addresses consist of 32 bits (e.g., `192.168.1.1`). Because the world ran out of IPv4 addresses, IPv6 was introduced using 128-bit alphanumeric addresses to provide a virtually limitless supply.
+
+## 2. Public vs Private IPs
+Public IPs are unique across the global internet. Private IPs (like `10.x.x.x` or `192.168.x.x`) are used internally within a local network and cannot be routed on the internet directly.
+
+## 3. CIDR Notation & Subnetting Practice
+Subnetting divides a single large network into smaller sub-networks. **CIDR** (Classless Inter-Domain Routing) notation (like `/24`) indicates how many bits are used for the network portion, determining the number of available hosts.
+
+## Real-World Example
+A university is given a massive block of **Public IPs**. Instead of putting all 10,000 students and staff on one giant network, the IT admin uses **Subnetting** calculations. Using **CIDR Notation**, they slice the network into smaller segments: one private subnet for the dorms, one for the library, and a highly secure subnet for the administration to isolate traffic and improve performance.
+''',
+      imageAsset: 'assets/images/networking_day2.png',
       schedule: [
-        ScheduleRow('9:00 – 10:30', 'IPv4 address classes, public vs private ranges', '📖 Study + Notes'),
-        ScheduleRow('10:30 – 12:00', 'Subnet masks, binary conversion, network/host bits', '✍️ Practice binary'),
+        ScheduleRow('9:00 – 11:00', 'IPv4 & IPv6 Basics', '📖 Study'),
+        ScheduleRow('11:00 – 12:00', 'Public vs Private IPs', '💻 Lab'),
         ScheduleRow('12:00 – 13:00', '🍽️ Lunch Break', '—', isBreak: true),
-        ScheduleRow('13:00 – 14:30', 'CIDR notation, VLSM, subnetting calculations', '🔬 Subnetting exercises'),
-        ScheduleRow('14:30 – 16:00', 'IPv6: address format, types, advantages over IPv4', '📖 Study + Compare'),
-        ScheduleRow('16:00 – 17:30', 'NAT, PAT, DHCP concepts', '💻 Configure DHCP lab'),
-        ScheduleRow('17:30 – 18:00', 'Revision + Notes', '📝 Summarize'),
+        ScheduleRow('13:00 – 15:00', 'CIDR Notation', '⚙️ Math'),
+        ScheduleRow('15:00 – 17:00', 'Subnetting Practice', '🚀 Exercise'),
+        ScheduleRow('17:00 – 18:00', 'Revision', '📝 Summarize'),
       ],
-      covered: ['IPv4', 'IPv6', 'Subnetting', 'CIDR'],
+      covered: ['IPs', 'CIDR', 'Subnets'],
       qa: [
-        QAItem('What are the private IP address ranges defined by RFC 1918?',
-            'RFC 1918 defines three private ranges not routed on the internet: Class A: 10.0.0.0 – 10.255.255.255 (/8, ~16.7M hosts). Class B: 172.16.0.0 – 172.31.255.255 (/12, ~1M hosts). Class C: 192.168.0.0 – 192.168.255.255 (/16, ~65K hosts). Also note: 127.0.0.0/8 (loopback), 169.254.0.0/16 (link-local/APIPA when DHCP fails).'),
-        QAItem('How do you subnet 192.168.1.0/24 into 4 equal subnets?',
-            'To get 4 subnets, borrow 2 bits (2² = 4). New prefix: /26. Each subnet has 64 addresses (62 usable): Subnet 1: 192.168.1.0/26 (hosts: .1 – .62, broadcast: .63). Subnet 2: 192.168.1.64/26 (hosts: .65 – .126). Subnet 3: 192.168.1.128/26 (hosts: .129 – .190). Subnet 4: 192.168.1.192/26 (hosts: .193 – .254). Subnet mask: 255.255.255.192.'),
-        QAItem('What is CIDR and how does it improve upon classful addressing?',
-            'CIDR (Classless Inter-Domain Routing) uses variable-length subnet masks (VLSM), written as IP/prefix-length (e.g., 192.168.1.0/26). Improvements over classful: Eliminates rigid Class A/B/C boundaries, allows right-sizing of networks, enables route aggregation (supernetting — combining multiple routes into one, reducing routing table size), and slowed IPv4 address exhaustion.'),
-        QAItem('What are the key differences between IPv4 and IPv6?',
-            'IPv4: 32-bit, ~4.3 billion addresses, dotted-decimal notation, requires NAT, optional IPsec. IPv6: 128-bit, 340 undecillion addresses, colon-hex notation (e.g., 2001:db8::1), no NAT needed, built-in IPsec, auto-configuration (SLAAC), no broadcast (uses multicast), simplified header. IPv6 types: Unicast, Multicast, Anycast. Loopback: ::1. Link-local: fe80::/10.'),
-        QAItem('What is NAT and what problem does it solve?',
-            'NAT (Network Address Translation) translates private IP addresses to one (or a few) public IP addresses, allowing multiple devices to share a single public IP. Problem solved: IPv4 address exhaustion. Types: Static NAT (1:1 mapping), Dynamic NAT (pool of public IPs), PAT/NAT Overload (many-to-one using port numbers — most common in home/office routers).'),
+        QAItem('IPv4 vs IPv6?', 'IPv4 uses 32-bit addresses (running out). IPv6 uses 128-bit addresses (virtually infinite).'),
+        QAItem('What is a Private IP?', 'An IP address reserved for internal networks (e.g., 192.168.x.x) that cannot be routed on the public internet.'),
+        QAItem('What is CIDR?', 'Classless Inter-Domain Routing. A method of allocating IP addresses and IP routing (e.g., /24 means 256 IPs).'),
+        QAItem('Why do we subnet?', 'To divide a large network into smaller, efficient, and secure sub-networks.'),
       ],
     ),
     DayData(
       dayNumber: 3,
-      title: 'DNS, DHCP & Application Layer Protocols',
-      subtitle: 'DNS resolution, record types, DHCP, HTTP/S, FTP, SMTP, SSH',
-      tags: ['DNS', 'DHCP', 'HTTP/S'],
+      title: 'Routing & Switching',
+      subtitle: 'VLANs, OSPF, BGP, ARP',
+      tags: ['Routing', 'Switching'],
+      explanation: '''
+# Hardware: Switches and Routers
+
+## 1. Hubs vs Switches vs Routers
+Hubs blindly broadcast data to everyone. Switches intelligently forward data to a specific device using MAC tables. Routers connect entirely different networks together using IP addresses.
+
+## 2. ARP & MAC Tables
+Address Resolution Protocol (ARP) translates a known IP address into an unknown MAC address. Switches store these MAC addresses in a table to quickly forward frames.
+
+## 3. VLANs & Trunking
+Virtual LANs (VLANs) logically separate devices on the same physical switch. Trunking allows multiple VLANs to travel across a single cable connecting two switches.
+
+## 4. Routing (OSPF, BGP)
+Routers use protocols to find the best path for data. OSPF calculates the fastest route within an internal corporate network. BGP connects massive external networks and routes traffic across the global internet.
+
+## Real-World Example
+In a corporate office, HR and Engineering plug their computers into the exact same physical **Switch**. The admin creates two **VLANs** to securely isolate them. To send data, the PC uses **ARP** to find the router's MAC address. The **Router** then uses **BGP** routing protocols to forward that data out across the internet to reach Google's servers.
+''',
+      imageAsset: 'assets/images/networking_day3.png',
       schedule: [
-        ScheduleRow('9:00 – 10:30', 'DNS: resolution process, recursive vs iterative queries', '📖 Study + Diagram'),
-        ScheduleRow('10:30 – 12:00', 'DNS record types: A, AAAA, CNAME, MX, NS, TXT, PTR', '💻 nslookup/dig practice'),
+        ScheduleRow('9:00 – 11:00', 'Hubs vs Switches vs Routers', '📖 Study'),
+        ScheduleRow('11:00 – 12:00', 'ARP & MAC Tables', '💻 Lab'),
         ScheduleRow('12:00 – 13:00', '🍽️ Lunch Break', '—', isBreak: true),
-        ScheduleRow('13:00 – 14:30', 'DHCP: DORA process, leases, options, relay agents', '🔬 Configure DHCP'),
-        ScheduleRow('14:30 – 16:00', 'HTTP vs HTTPS, TLS handshake, status codes', '📖 Study + curl lab'),
-        ScheduleRow('16:00 – 17:30', 'FTP/SFTP, SMTP/POP3/IMAP, SSH port forwarding', '📝 Protocol comparison'),
-        ScheduleRow('17:30 – 18:00', 'Revision + Notes', '📝 Summarize'),
+        ScheduleRow('13:00 – 15:00', 'VLANs & Trunking', '⚙️ Configure'),
+        ScheduleRow('15:00 – 17:00', 'Routing (OSPF, BGP)', '🚀 Explore'),
+        ScheduleRow('17:00 – 18:00', 'Revision', '📝 Summarize'),
       ],
-      covered: ['DNS', 'DHCP', 'HTTP/S', 'SSH'],
+      covered: ['VLAN', 'BGP', 'OSPF'],
       qa: [
-        QAItem('Describe the full DNS resolution process when you type www.google.com in a browser.',
-            '1. Browser checks local cache. 2. OS checks hosts file. 3. Query sent to Recursive Resolver (ISP/configured DNS). 4. Resolver queries Root Nameserver → returns TLD (.com) nameserver. 5. Resolver queries TLD Nameserver → returns Google\'s Authoritative Nameserver. 6. Resolver queries Authoritative Nameserver → returns A record (IP). 7. Resolver caches result and returns IP to browser. 8. Browser connects to IP.'),
-        QAItem('What are the common DNS record types and their purposes?',
-            'A: Maps hostname → IPv4 address. AAAA: Maps hostname → IPv6 address. CNAME: Canonical Name — alias pointing to another hostname. MX: Mail Exchange — specifies mail servers for a domain (with priority). NS: Nameserver — delegates DNS zone to nameservers. TXT: Text — SPF, DKIM, domain verification. PTR: Pointer — reverse DNS, maps IP → hostname. SOA: Start of Authority — zone metadata.'),
-        QAItem('What is the DHCP DORA process?',
-            'DORA = 4-step DHCP IP assignment: D — Discover: Client broadcasts DHCPDISCOVER ("Anyone have an IP for me?"). O — Offer: Server sends DHCPOFFER with available IP, subnet, gateway, DNS. R — Request: Client broadcasts DHCPREQUEST accepting the offer. A — Acknowledge: Server sends DHCPACK confirming the lease. Client now has IP, subnet mask, default gateway, DNS, and lease duration.'),
-        QAItem('What is the TLS handshake and how does HTTPS secure communication?',
-            'TLS handshake: 1. Client sends ClientHello (TLS version, cipher suites). 2. Server sends ServerHello + certificate (public key). 3. Client verifies certificate against trusted CAs. 4. Key Exchange: Establish session key (using asymmetric crypto). 5. Both sides confirm with Finished message. 6. Encrypted symmetric communication begins. HTTPS = HTTP + TLS. Provides Confidentiality (encryption), Integrity (MAC), Authentication (certificates).'),
-        QAItem('What are common HTTP status code categories and key codes?',
-            '1xx Informational: 100 Continue. 2xx Success: 200 OK, 201 Created, 204 No Content. 3xx Redirection: 301 Moved Permanently, 302 Found, 304 Not Modified. 4xx Client Error: 400 Bad Request, 401 Unauthorized, 403 Forbidden, 404 Not Found, 429 Too Many Requests. 5xx Server Error: 500 Internal Server Error, 502 Bad Gateway, 503 Service Unavailable, 504 Gateway Timeout.'),
+        QAItem('Switch vs Router?', 'Switches connect devices within the same network (Layer 2). Routers connect different networks together (Layer 3).'),
+        QAItem('What is ARP?', 'Address Resolution Protocol. It maps a known IP address to an unknown MAC address.'),
+        QAItem('What is a VLAN?', 'A Virtual LAN. It logically separates network traffic on the same physical switch for security.'),
+        QAItem('OSPF vs BGP?', 'OSPF routes traffic *within* an organization (interior). BGP routes traffic *between* organizations/ISPs on the internet (exterior).'),
       ],
     ),
     DayData(
       dayNumber: 4,
-      title: 'Routing Protocols & Layer 3 Concepts',
-      subtitle: 'Static routing, RIP, OSPF, BGP, routing tables, default gateway',
-      tags: ['OSPF', 'BGP', 'Routing'],
+      title: 'Network Services (DNS, DHCP)',
+      subtitle: 'How the internet resolves names',
+      tags: ['DNS', 'DHCP'],
+      explanation: '''
+# Core Network Services
+
+## 1. DNS Hierarchy & Records
+The Domain Name System (DNS) translates domains like `amazon.com` into IPs. The hierarchy starts at Root servers, down to Top Level Domains (.com), and to Authoritative servers. Common records include A (IPv4), AAAA (IPv6), and CNAME (aliases).
+
+## 2. nslookup & dig
+These are command-line tools used by engineers to query DNS servers directly, allowing them to troubleshoot why a website name isn't resolving correctly.
+
+## 3. DHCP DORA Process
+DHCP assigns IP addresses automatically using the DORA process: **D**iscover (client looks for server), **O**ffer (server offers IP), **R**equest (client accepts), **A**cknowledge (server finalizes).
+
+## 4. NAT / PAT
+Network Address Translation (NAT) and Port Address Translation (PAT) allow dozens of internal devices with Private IPs to share a single Public IP address to access the internet securely.
+
+## Real-World Example
+When you walk into a coffee shop and connect your phone, a **DHCP** server instantly uses the **DORA process** to hand your phone an IP address. You open a browser and type `youtube.com`. Your phone uses **DNS** to resolve the name, and then your traffic uses **NAT** to share the coffee shop's single public internet connection alongside 30 other customers.
+''',
       schedule: [
-        ScheduleRow('9:00 – 10:30', 'How routing works: routing tables, longest prefix match', '📖 Study + Diagram'),
-        ScheduleRow('10:30 – 12:00', 'Static routing vs dynamic routing, administrative distance', '🔬 Configure static routes'),
+        ScheduleRow('9:00 – 11:00', 'DNS Hierarchy & Records', '📖 Study'),
+        ScheduleRow('11:00 – 12:00', 'nslookup & dig', '💻 Lab'),
         ScheduleRow('12:00 – 13:00', '🍽️ Lunch Break', '—', isBreak: true),
-        ScheduleRow('13:00 – 14:30', 'Distance-vector: RIP (hop count, max 15 hops, timers)', '📖 Study + Notes'),
-        ScheduleRow('14:30 – 16:00', 'Link-state: OSPF (areas, LSA, Dijkstra, DR/BDR)', '💻 OSPF lab (GNS3/Packet Tracer)'),
-        ScheduleRow('16:00 – 17:30', 'BGP: path-vector, AS numbers, eBGP vs iBGP, attributes', '📖 Study'),
-        ScheduleRow('17:30 – 18:00', 'Revision + Notes', '📝 Summarize'),
+        ScheduleRow('13:00 – 15:00', 'DHCP DORA Process', '⚙️ Process'),
+        ScheduleRow('15:00 – 17:00', 'NAT / PAT', '🚀 Setup'),
+        ScheduleRow('17:00 – 18:00', 'Revision', '📝 Summarize'),
       ],
-      covered: ['Static Routing', 'OSPF', 'BGP', 'RIP'],
+      covered: ['DNS', 'DHCP', 'NAT'],
       qa: [
-        QAItem('What is the difference between distance-vector and link-state routing protocols?',
-            'Distance-Vector (RIP, EIGRP): Each router knows only its neighbors and distances to destinations. Shares routing table with neighbors periodically. Simple but slow convergence, susceptible to routing loops. Metric: hop count. Link-State (OSPF, IS-IS): Each router knows the full network topology. Floods LSAs to all routers. Runs Dijkstra\'s algorithm. Fast convergence, scalable, loop-free. Metric: cost (based on bandwidth).'),
-        QAItem('What is Administrative Distance (AD) and what are the AD values for common protocols?',
-            'AD is a measure of the trustworthiness of a routing source — lower is more trusted. Connected: 0. Static: 1. eBGP: 20. OSPF: 110. RIP: 120. iBGP: 200. Unknown: 255 (not used). Example: If OSPF and RIP both know a route, OSPF wins (110 < 120).'),
-        QAItem('What is OSPF and what are its key concepts (areas, DR, LSA)?',
-            'OSPF (Open Shortest Path First) is a link-state, classless, open-standard IGP. Key concepts: Areas: Hierarchical structure — Area 0 (backbone) connects all other areas, reducing LSA flooding. DR/BDR: On multi-access segments, a Designated Router (DR) and Backup DR elected to reduce adjacencies. LSAs: Link State Advertisements — routers exchange LSA types. Metric: Cost = 100Mbps / interface bandwidth.'),
-        QAItem('What is BGP and why is it called the "protocol of the internet"?',
-            'BGP (Border Gateway Protocol) is an Exterior Gateway Protocol — routes between Autonomous Systems (AS) on the internet. Called the "protocol of the internet" because it\'s the glue connecting all ISPs and large networks. Key features: Path-vector protocol (tracks full AS path to prevent loops), policy-based routing (rich attributes: AS-PATH, LOCAL-PREF, MED, NEXT-HOP), highly scalable (handles 900K+ routes). eBGP: Between different ASes. iBGP: Within same AS.'),
-        QAItem('What is the longest prefix match rule in routing?',
-            'When a router has multiple routes matching a destination IP, it uses the most specific route — the one with the longest prefix (highest subnet mask). Example: For destination 192.168.1.5: Route 1 = 192.168.0.0/16 (matches), Route 2 = 192.168.1.0/24 (matches), Route 3 = 192.168.1.0/28 (matches). Router picks Route 3 (/28) — longest match = most specific. Default route (0.0.0.0/0) is always the shortest prefix — last resort.'),
+        QAItem('What is DNS?', 'Domain Name System. It acts as the internet\'s phonebook, translating names like google.com into IP addresses.'),
+        QAItem('What is DHCP?', 'Dynamic Host Configuration Protocol. It automatically assigns IP addresses to devices joining a network.'),
+        QAItem('What are common DNS records?', 'A (maps name to IPv4), AAAA (maps to IPv6), CNAME (alias), MX (mail servers).'),
+        QAItem('What is NAT?', 'Network Address Translation. It translates private internal IPs into a single public IP to access the internet.'),
       ],
     ),
     DayData(
       dayNumber: 5,
-      title: 'Switching, VLANs & Spanning Tree',
-      subtitle: 'Ethernet, MAC tables, VLANs, 802.1Q trunking, STP, EtherChannel',
-      tags: ['VLANs', 'STP', 'Trunking'],
+      title: 'Network Security & Firewalls',
+      subtitle: 'Firewalls, IDS/IPS, ACLs',
+      tags: ['Firewalls', 'Security'],
+      explanation: '''
+# Defending the Network
+
+## 1. Firewall Types & Writing ACLs
+Firewalls stand between your secure network and the untrusted internet. You control them by writing Access Control Lists (ACLs)—strict rules that allow or deny traffic based on IP address and port numbers (like Port 443 for HTTPS).
+
+## 2. IDS vs IPS
+An **Intrusion Detection System (IDS)** monitors network traffic for malicious activity and sends alerts. An **Intrusion Prevention System (IPS)** analyzes the traffic and actively drops malicious packets to stop attacks instantly.
+
+## 3. VPNs & IPsec
+A Virtual Private Network (VPN) creates a secure, encrypted tunnel over the public internet, allowing remote workers to access internal corporate networks securely. IPsec is a common protocol suite used to encrypt these tunnels.
+
+## Real-World Example
+An employee working from a coffee shop connects to the corporate network using an **IPsec VPN**. They attempt to access an internal database. The corporate **Firewall** checks its **ACLs** and allows the secure VPN traffic. Later, a hacker attempts a port scan on the firewall; the **IPS** detects the malicious signature and instantly bans the hacker's IP address.
+''',
       schedule: [
-        ScheduleRow('9:00 – 10:30', 'Ethernet switching: MAC address table, flooding, forwarding', '📖 Study + Diagram'),
-        ScheduleRow('10:30 – 12:00', 'VLANs: segmentation, access ports, inter-VLAN routing', '💻 Configure VLANs'),
+        ScheduleRow('9:00 – 11:00', 'Firewall Types', '📖 Study'),
+        ScheduleRow('11:00 – 12:00', 'Writing ACLs', '💻 Lab'),
         ScheduleRow('12:00 – 13:00', '🍽️ Lunch Break', '—', isBreak: true),
-        ScheduleRow('13:00 – 14:30', '802.1Q trunk ports, native VLAN, DTP', '🔬 Trunk lab'),
-        ScheduleRow('14:30 – 16:00', 'Spanning Tree Protocol (STP): root bridge, port states, RSTP', '📖 Study + Observe STP'),
-        ScheduleRow('16:00 – 17:30', 'EtherChannel (LACP/PAgP), port-channels', '⚙️ Configure EtherChannel'),
-        ScheduleRow('17:30 – 18:00', 'Revision + Notes', '📝 Summarize'),
+        ScheduleRow('13:00 – 15:00', 'IDS vs IPS', '⚙️ Compare'),
+        ScheduleRow('15:00 – 17:00', 'VPNs & IPsec', '🚀 Secure'),
+        ScheduleRow('17:00 – 18:00', 'Revision', '📝 Summarize'),
       ],
-      covered: ['VLANs', 'STP/RSTP', '802.1Q', 'EtherChannel'],
+      covered: ['ACLs', 'IPS', 'VPN'],
       qa: [
-        QAItem('How does a switch learn and build its MAC address table?',
-            'A switch builds its MAC table (CAM table) through source address learning: When a frame arrives, the switch records the source MAC + incoming port in the table. For forwarding: if destination MAC is in the table → unicast forward to that port only. If unknown → flood to all ports except source (unknown unicast flooding). Entries age out after the aging timer (default 300s).'),
-        QAItem('What are VLANs and what problem do they solve?',
-            'VLANs (Virtual LANs) logically segment a physical network into separate broadcast domains without needing separate physical switches. Problems solved: Broadcast control (limit broadcasts to VLAN members), Security (HR and Finance on same switch but isolated), Flexibility (group users by function not location), Cost (fewer physical switches needed). VLANs require a Layer 3 device for inter-VLAN routing.'),
-        QAItem('What is 802.1Q trunking and what is the native VLAN?',
-            '802.1Q is the IEEE standard for VLAN tagging on trunk links. A trunk port carries multiple VLANs between switches/routers. Each frame gets a 4-byte 802.1Q tag inserted (contains VLAN ID). Native VLAN: Frames in the native VLAN are sent untagged over the trunk (default VLAN 1). Security best practice: change the native VLAN to an unused VLAN to prevent VLAN hopping attacks.'),
-        QAItem('What is Spanning Tree Protocol (STP) and what problem does it solve?',
-            'STP (IEEE 802.1D) prevents Layer 2 loops in redundant switch topologies. Without STP, loops cause broadcast storms (frames loop forever) crashing networks. How it works: Elects a Root Bridge (lowest Bridge ID = priority + MAC). Each non-root switch finds its Root Port (best path to root). Per segment, one Designated Port is elected. All other redundant ports are Blocked. RSTP (802.1w): much faster convergence (seconds vs 30-50s for STP).'),
-        QAItem('What is EtherChannel and what are LACP and PAgP?',
-            'EtherChannel (Link Aggregation) bundles multiple physical links (2-8) between switches into one logical link, increasing bandwidth and providing redundancy. STP sees it as one link, avoiding blocked ports. LACP (Link Aggregation Control Protocol, 802.3ad): Open standard, negotiates link aggregation with the partner. PAgP (Port Aggregation Protocol): Cisco proprietary. All links must match: speed, duplex, VLAN configuration.'),
+        QAItem('What is a Firewall?', 'A network security device that monitors and filters incoming and outgoing network traffic based on security rules.'),
+        QAItem('IDS vs IPS?', 'IDS detects threats and alerts you. IPS detects threats and actively blocks them.'),
+        QAItem('What is a VPN?', 'Virtual Private Network. It creates a secure, encrypted tunnel over the public internet.'),
+        QAItem('What is Port 443?', 'The default port used for secure HTTPS web traffic.'),
       ],
     ),
     DayData(
       dayNumber: 6,
-      title: 'Firewalls, ACLs, VPNs & Network Security',
-      subtitle: 'Stateful firewalls, ACLs, IPsec, SSL VPN, IDS/IPS, Zero Trust',
-      tags: ['Firewall', 'VPN', 'ACLs'],
+      title: 'Wireless Networking & Troubleshooting',
+      subtitle: 'Wi-Fi Standards, Ping, Traceroute',
+      tags: ['Wi-Fi', 'Troubleshooting'],
+      explanation: '''
+# Wireless Communications and Diagnostics
+
+## 1. 802.11 Standards & Wireless Security
+Wi-Fi operates on 802.11 standards using radio frequencies (2.4GHz for range, 5GHz for speed). Because radio waves travel openly through the air, encrypting the data using WPA3 (Wi-Fi Protected Access 3) is absolutely critical to prevent eavesdropping.
+
+## 2. Ping & Traceroute
+When networks fail, command-line tools are required. **Ping** sends an echo request to test basic reachability to an IP address. **Traceroute** maps the exact path and every router hop a packet takes, showing exactly where a connection drops.
+
+## 3. Network Diagrams
+Before troubleshooting, engineers create and read network topologies and diagrams to understand exactly how routers, switches, and firewalls are physically and logically connected.
+
+## Real-World Example
+A user complains the office **Wi-Fi** (running on **802.11**) is broken because they cannot reach a specific website. The network engineer opens a terminal and runs **Ping**. The ping works, proving the server is online. The engineer then runs **Traceroute** and discovers the connection drops exactly at the ISP's regional router. The engineer now knows the issue is with the ISP, not the local wireless network.
+''',
       schedule: [
-        ScheduleRow('9:00 – 10:30', 'Stateful vs stateless firewalls, firewall zones (DMZ)', '📖 Study + Diagram'),
-        ScheduleRow('10:30 – 12:00', 'ACLs: standard vs extended, numbered vs named', '💻 Configure ACLs'),
+        ScheduleRow('9:00 – 11:00', '802.11 Standards', '📖 Study'),
+        ScheduleRow('11:00 – 12:00', 'Wireless Security (WPA3)', '💻 Lab'),
         ScheduleRow('12:00 – 13:00', '🍽️ Lunch Break', '—', isBreak: true),
-        ScheduleRow('13:00 – 14:30', 'VPN types: Site-to-Site IPsec, Remote Access SSL VPN', '📖 Study + Compare'),
-        ScheduleRow('14:30 – 16:00', 'IDS vs IPS, NGFW features, WAF', '🔬 Study + Lab'),
-        ScheduleRow('16:00 – 17:30', 'Zero Trust model, network segmentation, microsegmentation', '📖 Study'),
-        ScheduleRow('17:30 – 18:00', 'Revision + Notes', '📝 Summarize'),
+        ScheduleRow('13:00 – 15:00', 'Ping & Traceroute', '⚙️ Practice'),
+        ScheduleRow('15:00 – 17:00', 'Network Diagrams', '🚀 Draw'),
+        ScheduleRow('17:00 – 18:00', 'Revision', '📝 Summarize'),
       ],
-      covered: ['Firewall', 'IPsec VPN', 'ACLs', 'Zero Trust'],
+      covered: ['Wi-Fi', 'Ping', 'Traceroute'],
       qa: [
-        QAItem('What is the difference between a stateful and stateless firewall?',
-            'Stateless firewall: Inspects each packet independently against static rules (ACLs). Doesn\'t track connection state. Fast but less secure — must explicitly allow return traffic. Stateful firewall: Tracks the state of connections (NEW, ESTABLISHED, RELATED). Automatically allows return traffic for established connections. More secure because it understands context. NGFW adds: deep packet inspection (DPI), application awareness (Layer 7), user identity, IPS integration.'),
-        QAItem('What are ACLs in networking and what is the implicit deny rule?',
-            'ACLs (Access Control Lists) are ordered lists of permit/deny rules applied to router interfaces to filter traffic. Types: Standard ACL: Filters by source IP only (numbered 1-99). Extended ACL: Filters by source/destination IP, protocol, ports (numbered 100-199). Rules are processed top-down — first match wins. Implicit Deny: At the end of every ACL is an invisible "deny any" — any traffic not explicitly permitted is dropped.'),
-        QAItem('What is IPsec VPN and what are its two modes (Transport vs Tunnel)?',
-            'IPsec is a suite of protocols for secure IP communication (authentication + encryption). Two modes: Transport Mode: Encrypts only the payload (data), original IP header preserved — used for end-to-end communication (host to host). Tunnel Mode: Encrypts the entire original packet and adds a new IP header — used for site-to-site VPNs (gateway to gateway). IPsec uses AH (integrity, no encryption) or ESP (integrity + encryption). IKE handles key exchange.'),
-        QAItem('What is the difference between IDS and IPS?',
-            'IDS (Intrusion Detection System): Passively monitors network traffic, detects threats/anomalies, and alerts — but does NOT block traffic. Deployed out-of-band (traffic copy via SPAN port). IPS (Intrusion Prevention System): Inline device that actively blocks detected threats in real time. Can drop packets, reset connections, block IPs. Detection methods: Signature-based (known attack patterns), Anomaly-based (deviation from baseline), Policy-based.'),
-        QAItem('What is Zero Trust Network Architecture (ZTNA)?',
-            'Zero Trust is a security model based on "Never trust, always verify" — no implicit trust based on network location. Core principles: Verify explicitly: Always authenticate/authorize using all available data (identity, location, device, service). Least privilege access: Limit user/device access with just-in-time and just-enough access. Assume breach: Minimize blast radius, segment access, encrypt everything, use analytics. Replaces the outdated castle-and-moat (perimeter) security model.'),
+        QAItem('What is the difference between 2.4GHz and 5GHz Wi-Fi?', '2.4GHz travels farther but is slower. 5GHz is faster but has a shorter range.'),
+        QAItem('What does Ping do?', 'It sends an ICMP Echo Request to a target to check if it is reachable over the network.'),
+        QAItem('What does Traceroute do?', 'It shows the exact path and every router hop a packet takes to reach a destination.'),
+        QAItem('What is a MAC address filtering?', 'A security feature that only allows specific hardware MAC addresses to connect to a Wi-Fi network.'),
       ],
     ),
     DayData(
       dayNumber: 7,
-      title: 'Wireless, Cloud Networking & SDN',
-      subtitle: 'Wi-Fi standards, WPA3, SD-WAN, SDN concepts, network automation',
-      tags: ['Wi-Fi', 'SDN', 'Automation'],
+      title: 'Advanced Concepts & Review',
+      subtitle: 'SDN, QoS, Full Review',
+      tags: ['SDN', 'QoS'],
+      explanation: '''
+# Modern Network Engineering
+
+## 1. SDN & Network Automation
+Traditional networking requires engineers to log into individual routers manually. **Software-Defined Networking (SDN)** centralizes control. A central software controller pushes configurations to hundreds of hardware devices simultaneously using automation APIs.
+
+## 2. QoS (Quality of Service)
+QoS is a feature that prioritizes certain types of network traffic over others. It ensures that time-sensitive applications (like voice or video calls) are processed before bulk data transfers (like file downloads).
+
+## 3. Troubleshooting Scenarios
+Tying everything together. Diagnosing complex outages requires a solid understanding of the OSI model, starting at Layer 1 (is the cable plugged in?) and moving up to Layer 7 (is the DNS server failing?).
+
+## Real-World Example
+In a crowded corporate office, 100 people are downloading large files while the CEO is hosting a critical video conference. Without intervention, the video call would freeze. The engineer configures **QoS** via their centralized **SDN** controller to prioritize VoIP (Voice over IP) traffic. The controller instantly updates all switches in the building. The downloads slow down slightly, but the CEO's video call remains perfectly clear.
+''',
       schedule: [
-        ScheduleRow('9:00 – 10:30', 'Wi-Fi standards: 802.11a/b/g/n/ac/ax, bands, channels', '📖 Study + Compare'),
-        ScheduleRow('10:30 – 12:00', 'WPA2 vs WPA3, wireless security, SSID, hidden networks', '🔬 Wireless security lab'),
+        ScheduleRow('9:00 – 11:00', 'SDN & Network Automation', '📖 Study'),
+        ScheduleRow('11:00 – 12:00', 'QoS (Quality of Service)', '💻 Lab'),
         ScheduleRow('12:00 – 13:00', '🍽️ Lunch Break', '—', isBreak: true),
-        ScheduleRow('13:00 – 14:30', 'SDN: control plane vs data plane, OpenFlow, controllers', '📖 Study + Diagram'),
-        ScheduleRow('14:30 – 16:00', 'SD-WAN, cloud networking basics (overlay networks)', '📖 Study'),
-        ScheduleRow('16:00 – 17:30', 'Network automation: Ansible for networking, NETCONF, REST APIs', '💻 Ansible network module'),
-        ScheduleRow('17:30 – 18:00', 'Full revision + Mock Q&A', '📝 Flashcards'),
+        ScheduleRow('13:00 – 15:00', 'Troubleshooting Scenarios', '⚙️ Solve'),
+        ScheduleRow('15:00 – 17:00', 'Mock Exam', '🚀 Practice'),
+        ScheduleRow('17:00 – 18:00', 'Final Review', '📝 Summarize'),
       ],
-      covered: ['Wi-Fi 6', 'SDN', 'SD-WAN', 'Automation'],
+      covered: ['SDN', 'QoS', 'Review'],
       qa: [
-        QAItem('What are the Wi-Fi 802.11 standards and their key characteristics?',
-            '802.11b: 2.4GHz, 11Mbps. 802.11a: 5GHz, 54Mbps. 802.11g: 2.4GHz, 54Mbps. 802.11n (Wi-Fi 4): 2.4/5GHz, 600Mbps, MIMO. 802.11ac (Wi-Fi 5): 5GHz, up to 3.5Gbps, MU-MIMO, beamforming. 802.11ax (Wi-Fi 6/6E): 2.4/5/6GHz, up to 9.6Gbps, OFDMA, BSS Coloring, better performance in dense environments. 2.4GHz = better range, more interference. 5/6GHz = faster, shorter range.'),
-        QAItem('What are the differences between WPA2 and WPA3?',
-            'WPA2: Uses AES-CCMP encryption, PSK or 802.1X enterprise. Vulnerable to KRACK attack and offline dictionary attacks on PSK. WPA3: Uses SAE (Simultaneous Authentication of Equals) — replaces PSK, protects against offline dictionary attacks. Forward Secrecy: Past sessions can\'t be decrypted even if password is compromised. WPA3-Enterprise: 192-bit security. Easy Connect: Simplified IoT device onboarding via QR code. WPA3 is the current standard (mandatory since 2020 for Wi-Fi certification).'),
-        QAItem('What is SDN (Software-Defined Networking) and how does it separate control and data planes?',
-            'SDN decouples the network\'s control logic from the underlying hardware. Traditional networking: control plane (routing decisions) and data plane (packet forwarding) are both on each device. SDN: Control Plane is centralized in an SDN Controller (OpenDaylight, ONOS). Data Plane remains on network devices. Communication via OpenFlow protocol. Benefits: centralized management, programmability, rapid policy changes, network virtualization.'),
-        QAItem('What is SD-WAN and how does it differ from traditional WAN?',
-            'Traditional WAN: Uses MPLS circuits (expensive, rigid, long provisioning), traffic must backhaul to data center for internet. SD-WAN: Software-defined overlay on any transport (MPLS, broadband, LTE, 5G). Features: Centralized control (one dashboard manages all sites), Application-aware routing, Dynamic path selection (automatically use best path), Direct internet breakout (cloud traffic goes directly, not through DC), Zero-touch provisioning.'),
-        QAItem('How is Ansible used for network automation and what protocols does it use?',
-            'Ansible automates network device configuration using agentless connections. Network modules use: SSH/CLI (most network devices — Cisco IOS, Juniper), NETCONF/YANG (structured data exchange, RFC 6241), REST APIs (RESTCONF, modern devices). Key concepts: Network modules: cisco.ios.ios_config, juniper.junos, arista.eos. connection: network_cli for SSH-based devices. Use cases: bulk config changes, compliance checks, rollback, inventory management.'),
+        QAItem('What is SDN?', 'Software-Defined Networking. It separates the control plane (brains) from the data plane (hardware) for centralized management.'),
+        QAItem('What is QoS?', 'Quality of Service. It prioritizes specific network traffic (like Voice/Video) to ensure smooth performance.'),
+        QAItem('What is VoIP?', 'Voice over IP. Technology that allows you to make voice calls using a broadband Internet connection instead of a regular phone line.'),
+        QAItem('Why automate networks?', 'To reduce human error, deploy changes instantly across thousands of devices, and maintain consistency.'),
       ],
     ),
   ],
 );
 
-// All timetables list
-const List<TimetableData> allTimetables = [devopsData, awsData, networkingData];
+final List<TimetableData> allTimetables = [
+  devopsData,
+  awsData,
+  networkingData,
+];

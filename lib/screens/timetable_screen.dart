@@ -1,6 +1,11 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:table_calendar/table_calendar.dart';
+import 'package:intl/intl.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import '../data/timetable_data.dart';
+import '../services/notification_service.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 //  THEME & COLORS
@@ -73,54 +78,8 @@ LinearGradient tabActiveGradient(String id) {
 // ─────────────────────────────────────────────────────────────────────────────
 //  TIMETABLE SCREEN
 // ─────────────────────────────────────────────────────────────────────────────
-class TimetableScreen extends StatefulWidget {
+class TimetableScreen extends StatelessWidget {
   const TimetableScreen({super.key});
-
-  @override
-  State<TimetableScreen> createState() => _TimetableScreenState();
-}
-
-class _TimetableScreenState extends State<TimetableScreen>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-  final Map<String, bool> _completed = {};
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(
-        length: allTimetables.length, vsync: this);
-    _loadProgress();
-  }
-
-  Future<void> _loadProgress() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      for (final tt in allTimetables) {
-        for (final day in tt.days) {
-          final key = '${tt.id}_day_${day.dayNumber}';
-          _completed[key] = prefs.getBool(key) ?? false;
-        }
-      }
-    });
-  }
-
-  Future<void> _toggleComplete(String key) async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _completed[key] = !(_completed[key] ?? false);
-    });
-    await prefs.setBool(key, _completed[key]!);
-  }
-
-  int _doneCount(TimetableData tt) =>
-      tt.days.where((d) => _completed['${tt.id}_day_${d.dayNumber}'] == true).length;
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -146,18 +105,19 @@ class _TimetableScreenState extends State<TimetableScreen>
             child: Column(
               children: [
                 _buildHeader(),
-                _buildTabBar(),
                 Expanded(
-                  child: TabBarView(
-                    controller: _tabController,
-                    children: allTimetables.map((tt) {
-                      return _TimetablePanel(
-                        data: tt,
-                        completedMap: _completed,
-                        onToggle: (key) => _toggleComplete(key),
-                        doneCount: _doneCount(tt),
-                      );
-                    }).toList(),
+                  child: Center(
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      physics: const BouncingScrollPhysics(),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: allTimetables.map((tt) => _buildSquareCard(context, tt)).toList(),
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -216,92 +176,187 @@ class _TimetableScreenState extends State<TimetableScreen>
     );
   }
 
-  Widget _buildTabBar() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      child: AnimatedBuilder(
-        animation: _tabController,
-        builder: (context, _) {
-          return Row(
-            children: List.generate(allTimetables.length, (i) {
-              final tt = allTimetables[i];
-              final isActive = _tabController.index == i;
-              return Expanded(
-                child: GestureDetector(
-                  onTap: () => _tabController.animateTo(i),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 250),
-                    margin: const EdgeInsets.symmetric(horizontal: 4),
-                    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 6),
-                    decoration: BoxDecoration(
-                      gradient: isActive ? tabActiveGradient(tt.id) : null,
-                      color: isActive ? null : AppColors.card,
-                      border: Border.all(
-                        color: isActive
-                            ? primaryColor(tt.id)
-                            : AppColors.cardBorder,
-                        width: isActive ? 1.5 : 1,
-                      ),
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: isActive
-                          ? [
-                              BoxShadow(
-                                color: glowColor(tt.id),
-                                blurRadius: 16,
-                                offset: const Offset(0, 2),
-                              ),
-                            ]
-                          : null,
-                    ),
-                    child: Column(
-                      children: [
-                        Text(tt.emoji, style: const TextStyle(fontSize: 20)),
-                        const SizedBox(height: 2),
-                        Text(
-                          tt.label,
-                          style: TextStyle(
-                            color: isActive
-                                ? primaryColor(tt.id)
-                                : AppColors.textSecondary,
-                            fontSize: 11,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            }),
-          );
-        },
+  Widget _buildSquareCard(BuildContext context, TimetableData tt) {
+    final color = primaryColor(tt.id);
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => TimetableDetailScreen(data: tt)),
+        );
+      },
+      child: Container(
+        width: 140,
+        height: 140,
+        margin: const EdgeInsets.symmetric(horizontal: 8),
+        decoration: BoxDecoration(
+          color: const Color(0x12FFFFFF),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: color.withValues(alpha: 0.5), width: 1.5),
+          boxShadow: [
+            BoxShadow(color: color.withValues(alpha: 0.2), blurRadius: 16, offset: const Offset(0, 8)),
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(tt.emoji, style: const TextStyle(fontSize: 40)),
+            const SizedBox(height: 12),
+            Text(
+              tt.label,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: color,
+                fontSize: 14,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-//  PANEL (one timetable)
+//  DETAIL SCREEN (one timetable)
 // ─────────────────────────────────────────────────────────────────────────────
-class _TimetablePanel extends StatelessWidget {
+class TimetableDetailScreen extends StatefulWidget {
   final TimetableData data;
-  final Map<String, bool> completedMap;
-  final void Function(String key) onToggle;
-  final int doneCount;
+  const TimetableDetailScreen({super.key, required this.data});
 
-  const _TimetablePanel({
-    required this.data,
-    required this.completedMap,
-    required this.onToggle,
-    required this.doneCount,
-  });
+  @override
+  State<TimetableDetailScreen> createState() => _TimetableDetailScreenState();
+}
+
+class _TimetableDetailScreenState extends State<TimetableDetailScreen> {
+  DateTime? _startDate;
+  final Map<String, bool> _completed = {};
+  DateTime _focusedDay = DateTime.now();
+  DateTime? _selectedDay;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedDay = _focusedDay;
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    final prefs = await SharedPreferences.getInstance();
+    final startStr = prefs.getString('${widget.data.id}_start_date');
+    if (startStr != null) {
+      _startDate = DateTime.parse(startStr);
+      _focusedDay = _startDate!;
+      _selectedDay = DateTime.now();
+    }
+    for (final day in widget.data.days) {
+      final key = '${widget.data.id}_day_${day.dayNumber}';
+      _completed[key] = prefs.getBool(key) ?? false;
+    }
+    if (mounted) setState(() {});
+  }
+
+  Future<void> _startPlan() async {
+    final prefs = await SharedPreferences.getInstance();
+    final now = DateTime.now();
+    final start = DateTime(now.year, now.month, now.day);
+    await prefs.setString('${widget.data.id}_start_date', start.toIso8601String());
+
+    await NotificationService().requestPermissions();
+
+    setState(() {
+      _startDate = start;
+      _focusedDay = start;
+      _selectedDay = start;
+    });
+
+    _scheduleAllNotifications(start);
+  }
+
+  Future<void> _scheduleAllNotifications(DateTime start) async {
+    for (int i = 0; i < widget.data.days.length; i++) {
+      final day = widget.data.days[i];
+      final key = '${widget.data.id}_day_${day.dayNumber}';
+      if (_completed[key] == true) continue;
+
+      // Schedule reminder for 8:00 PM on that specific day
+      final scheduleDate = start.add(Duration(days: i));
+      final notificationTime = DateTime(
+        scheduleDate.year, scheduleDate.month, scheduleDate.day, 20, 0, 0);
+
+      final id = widget.data.id.hashCode + day.dayNumber;
+
+      await NotificationService().scheduleDailyReminder(
+        id: id,
+        title: 'Study Reminder: ${widget.data.label}',
+        body: 'Don\'t forget to complete Day ${day.dayNumber} learning today!',
+        scheduledDate: notificationTime,
+      );
+    }
+  }
+
+  Future<void> _toggleComplete(DayData day) async {
+    final prefs = await SharedPreferences.getInstance();
+    final key = '${widget.data.id}_day_${day.dayNumber}';
+    final isDone = !(_completed[key] ?? false);
+
+    setState(() {
+      _completed[key] = isDone;
+    });
+    await prefs.setBool(key, isDone);
+
+    final notifId = widget.data.id.hashCode + day.dayNumber;
+    if (isDone) {
+      await NotificationService().cancelNotification(notifId);
+    } else {
+      if (_startDate != null) {
+        final scheduleDate = _startDate!.add(Duration(days: day.dayNumber - 1));
+        final notificationTime = DateTime(
+            scheduleDate.year, scheduleDate.month, scheduleDate.day, 20, 0, 0);
+        await NotificationService().scheduleDailyReminder(
+          id: notifId,
+          title: 'Study Reminder: ${widget.data.label}',
+          body: 'Don\'t forget to complete Day ${day.dayNumber} learning today!',
+          scheduledDate: notificationTime,
+        );
+      }
+    }
+  }
+
+  int get _doneCount =>
+      widget.data.days.where((d) => _completed['${widget.data.id}_day_${d.dayNumber}'] == true).length;
+
+  DayData? _getDayDataForDate(DateTime date) {
+    if (_startDate == null) return null;
+    final cleanDate = DateTime(date.year, date.month, date.day);
+    final cleanStart = DateTime(_startDate!.year, _startDate!.month, _startDate!.day);
+    final diff = cleanDate.difference(cleanStart).inDays;
+    
+    if (diff >= 0 && diff < widget.data.days.length) {
+      return widget.data.days[diff];
+    }
+    return null;
+  }
 
   @override
   Widget build(BuildContext context) {
-    final pct = doneCount / data.days.length;
-    final color = primaryColor(data.id);
+    final pct = widget.data.days.isEmpty ? 0.0 : _doneCount / widget.data.days.length;
+    final color = primaryColor(widget.data.id);
 
-    return CustomScrollView(
+    return Scaffold(
+      backgroundColor: AppColors.bg,
+      appBar: AppBar(
+        backgroundColor: AppColors.bg,
+        elevation: 0,
+        iconTheme: IconThemeData(color: color),
+        title: Text(
+          widget.data.label,
+          style: TextStyle(color: color, fontWeight: FontWeight.w800, fontSize: 16),
+        ),
+        centerTitle: true,
+      ),
+      body: CustomScrollView(
       slivers: [
         SliverToBoxAdapter(
           child: Padding(
@@ -309,18 +364,16 @@ class _TimetablePanel extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Section title
                 Row(
                   children: [
-                    Text(data.emoji,
-                        style: const TextStyle(fontSize: 28)),
+                    Text(widget.data.emoji, style: const TextStyle(fontSize: 28)),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            '${data.label} — 7-Day Plan',
+                            '${widget.data.label} — 7-Day Plan',
                             style: TextStyle(
                               color: color,
                               fontSize: 18,
@@ -328,7 +381,7 @@ class _TimetablePanel extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            data.subtitle,
+                            widget.data.subtitle,
                             style: const TextStyle(
                               color: AppColors.textSecondary,
                               fontSize: 11,
@@ -340,39 +393,257 @@ class _TimetablePanel extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 14),
-                // Progress bar
                 _ProgressBar(
-                    id: data.id,
-                    doneCount: doneCount,
-                    total: data.days.length,
+                    id: widget.data.id,
+                    doneCount: _doneCount,
+                    total: widget.data.days.length,
                     pct: pct,
                     color: color),
-                const SizedBox(height: 10),
+                const SizedBox(height: 14),
+                
+                // Calendar or Start Button
+                if (_startDate == null)
+                  _buildStartPlanButton(color)
+                else
+                  _buildCalendar(color),
+                  
+                const SizedBox(height: 16),
               ],
             ),
           ),
         ),
-        SliverList(
-          delegate: SliverChildBuilderDelegate(
-            (context, i) {
-              final day = data.days[i];
-              final key = '${data.id}_day_${day.dayNumber}';
-              final isDone = completedMap[key] ?? false;
-              return Padding(
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-                child: _DayCard(
-                  day: day,
-                  isDone: isDone,
-                  primaryColor: color,
-                  onToggle: () => onToggle(key),
+        
+        // Show only the selected day, or all if none selected
+        if (_startDate != null)
+          SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (context, i) {
+                final day = widget.data.days[i];
+                final dayDate = _startDate!.add(Duration(days: i));
+                
+                // If a day is selected in calendar, only show that day's card
+                if (_selectedDay != null) {
+                  final isSame = isSameDay(_selectedDay, dayDate);
+                  if (!isSame) return const SizedBox.shrink();
+                }
+
+                final key = '${widget.data.id}_day_${day.dayNumber}';
+                final isDone = _completed[key] ?? false;
+                
+                return Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 4, bottom: 6),
+                        child: Text(
+                          DateFormat('EEEE, MMM d').format(dayDate),
+                          style: TextStyle(
+                            color: isSameDay(DateTime.now(), dayDate) 
+                                ? color 
+                                : AppColors.textSecondary,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                      _DayCard(
+                        day: day,
+                        isDone: isDone,
+                        primaryColor: color,
+                        onToggle: () => _toggleComplete(day),
+                      ),
+                    ],
+                  ),
+                );
+              },
+              childCount: widget.data.days.length,
+            ),
+          ),
+        const SliverToBoxAdapter(child: SizedBox(height: 50)),
+      ],
+    ));
+  }
+
+  Widget _buildStartPlanButton(Color color) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: const Color(0x12FFFFFF),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: color.withValues(alpha: 0.3), width: 1.0),
+            boxShadow: [
+              BoxShadow(
+                color: color.withValues(alpha: 0.05),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
                 ),
-              );
-            },
-            childCount: data.days.length,
+                child: Icon(Icons.rocket_launch_rounded, color: color, size: 24),
+              ),
+              const SizedBox(height: 10),
+              const Text(
+                'Ready to begin?',
+                style: TextStyle(color: AppColors.textPrimary, fontSize: 16, fontWeight: FontWeight.w700),
+              ),
+              const SizedBox(height: 6),
+              const Text(
+                'Start the plan to map your schedule to the calendar and get daily reminders.',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: AppColors.textSecondary, fontSize: 12, height: 1.3),
+              ),
+              const SizedBox(height: 16),
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [color, color.withValues(alpha: 0.8)],
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: color.withValues(alpha: 0.2),
+                      blurRadius: 8,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(12),
+                    onTap: _startPlan,
+                    splashColor: Colors.white.withValues(alpha: 0.2),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                      child: const Text(
+                        'Start 7-Day Plan Today',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
-        const SliverToBoxAdapter(child: SizedBox(height: 30)),
-      ],
+      ),
+    );
+  }
+
+  Widget _buildCalendar(Color color) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+        child: AspectRatio(
+          aspectRatio: 1.0,
+          child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: const Color(0x1AFFFFFF),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: color.withValues(alpha: 0.3), width: 1.5),
+            boxShadow: [
+              BoxShadow(
+                color: color.withValues(alpha: 0.1),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              ),
+            ],
+          ),
+          child: TableCalendar(
+            firstDay: _startDate!.subtract(const Duration(days: 30)),
+            lastDay: _startDate!.add(const Duration(days: 60)),
+            focusedDay: _focusedDay,
+            calendarFormat: CalendarFormat.month,
+            selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+            onDaySelected: (selectedDay, focusedDay) {
+              setState(() {
+                // Toggle selection off if tapping the same day
+                if (isSameDay(_selectedDay, selectedDay)) {
+                  _selectedDay = null; 
+                } else {
+                  _selectedDay = selectedDay;
+                }
+                _focusedDay = focusedDay;
+              });
+            },
+            calendarStyle: CalendarStyle(
+              defaultTextStyle: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w500),
+              weekendTextStyle: const TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.w500),
+              outsideTextStyle: const TextStyle(color: AppColors.textMuted),
+              todayDecoration: BoxDecoration(
+                color: color.withValues(alpha: 0.15),
+                shape: BoxShape.circle,
+                border: Border.all(color: color.withValues(alpha: 0.5), width: 1.5),
+              ),
+              selectedDecoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [color, color.withValues(alpha: 0.7)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(color: color.withValues(alpha: 0.4), blurRadius: 8, offset: const Offset(0, 4)),
+                ],
+              ),
+              markerDecoration: const BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+              ),
+            ),
+            headerStyle: HeaderStyle(
+              formatButtonVisible: false,
+              titleCentered: true,
+              titleTextStyle: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+              leftChevronIcon: Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(color: const Color(0x1AFFFFFF), borderRadius: BorderRadius.circular(8)),
+                child: const Icon(Icons.chevron_left, color: Colors.white, size: 20),
+              ),
+              rightChevronIcon: Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(color: const Color(0x1AFFFFFF), borderRadius: BorderRadius.circular(8)),
+                child: const Icon(Icons.chevron_right, color: Colors.white, size: 20),
+              ),
+            ),
+            daysOfWeekStyle: const DaysOfWeekStyle(
+              weekdayStyle: TextStyle(color: AppColors.textSecondary, fontSize: 13, fontWeight: FontWeight.w600),
+              weekendStyle: TextStyle(color: AppColors.textMuted, fontSize: 13, fontWeight: FontWeight.w600),
+            ),
+            eventLoader: (day) {
+              final dayData = _getDayDataForDate(day);
+              if (dayData != null) {
+                return ['Has Plan']; // Shows a dot marker
+              }
+              return [];
+            },
+          ),
+        ),
+        ),
+      ),
     );
   }
 }
@@ -395,39 +666,45 @@ class _ProgressBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      decoration: BoxDecoration(
-        color: AppColors.card,
-        border: Border.all(color: AppColors.cardBorder),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(16),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          decoration: BoxDecoration(
+            color: const Color(0x12FFFFFF),
+            border: Border.all(color: const Color(0x2AFFFFFF), width: 1.5),
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Column(
             children: [
-              const Text('📊 Overall Progress',
-                  style: TextStyle(
-                      color: AppColors.textSecondary,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600)),
-              Text('$doneCount / $total days completed',
-                  style: const TextStyle(
-                      color: AppColors.textMuted, fontSize: 11)),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('📊 Overall Progress',
+                      style: TextStyle(
+                          color: AppColors.textPrimary,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700)),
+                  Text('$doneCount / $total days completed',
+                      style: const TextStyle(
+                          color: AppColors.textSecondary, fontSize: 12)),
+                ],
+              ),
+              const SizedBox(height: 12),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(999),
+                child: LinearProgressIndicator(
+                  value: pct,
+                  minHeight: 8,
+                  backgroundColor: const Color(0x1AFFFFFF),
+                  valueColor: AlwaysStoppedAnimation<Color>(color),
+                ),
+              ),
             ],
           ),
-          const SizedBox(height: 8),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(999),
-            child: LinearProgressIndicator(
-              value: pct,
-              minHeight: 6,
-              backgroundColor: const Color(0x1AFFFFFF),
-              valueColor: AlwaysStoppedAnimation<Color>(color),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -461,25 +738,33 @@ class _DayCardState extends State<_DayCard> {
     final done = widget.isDone;
     final color = widget.primaryColor;
 
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
-      decoration: BoxDecoration(
-        color: done
-            ? Color.alphaBlend(const Color(0x0A10B981), AppColors.card)
-            : AppColors.card,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: done ? AppColors.accentGreen.withValues(alpha: 0.35) : AppColors.cardBorder,
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 350),
+          curve: Curves.easeOutCubic,
+          decoration: BoxDecoration(
+            color: done
+                ? Color.alphaBlend(const Color(0x1A10B981), const Color(0x1AFFFFFF))
+                : const Color(0x12FFFFFF),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: done ? AppColors.accentGreen.withValues(alpha: 0.5) : const Color(0x2AFFFFFF),
+              width: 1.5,
+            ),
+            boxShadow: done
+                ? [BoxShadow(color: AppColors.accentGreen.withValues(alpha: 0.15), blurRadius: 20)]
+                : [BoxShadow(color: Colors.black.withValues(alpha: 0.3), blurRadius: 24, offset: const Offset(0, 10))],
+          ),
+          child: Column(
+            children: [
+              _buildHeader(color, done),
+              if (_expanded) _buildBody(color),
+            ],
+          ),
         ),
-        boxShadow: done
-            ? [BoxShadow(color: AppColors.accentGreen.withValues(alpha: 0.08), blurRadius: 12)]
-            : null,
-      ),
-      child: Column(
-        children: [
-          _buildHeader(color, done),
-          if (_expanded) _buildBody(color),
-        ],
       ),
     );
   }
@@ -488,7 +773,7 @@ class _DayCardState extends State<_DayCard> {
     return GestureDetector(
       onTap: () => setState(() => _expanded = !_expanded),
       child: Container(
-        padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
+        padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
         decoration: BoxDecoration(
           borderRadius: _expanded
               ? const BorderRadius.vertical(top: Radius.circular(16))
@@ -498,15 +783,15 @@ class _DayCardState extends State<_DayCard> {
           children: [
             // Day badge
             Container(
-              width: 44,
-              height: 44,
+              width: 36,
+              height: 36,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [color, color.withValues(alpha: 0.7)],
                 ),
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(8),
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -516,7 +801,7 @@ class _DayCardState extends State<_DayCard> {
                     style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w800,
-                      fontSize: 16,
+                      fontSize: 14,
                     ),
                   ),
                   const Text(
@@ -525,7 +810,6 @@ class _DayCardState extends State<_DayCard> {
                       color: Colors.white70,
                       fontSize: 7,
                       fontWeight: FontWeight.w700,
-                      letterSpacing: 0.5,
                     ),
                   ),
                 ],
@@ -617,14 +901,101 @@ class _DayCardState extends State<_DayCard> {
         border: Border(top: BorderSide(color: AppColors.cardBorder)),
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // Schedule table
           _ScheduleTable(day: widget.day, color: color),
           // Tags
           _TagsRow(tags: widget.day.covered, color: color),
+          // Explanation
+          if (widget.day.explanation != null)
+            _ExplanationSection(
+              explanation: widget.day.explanation!,
+              imageAsset: widget.day.imageAsset,
+              color: color,
+            ),
           // Q&A
           _QASection(qa: widget.day.qa, color: color),
         ],
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  EXPLANATION SECTION
+// ─────────────────────────────────────────────────────────────────────────────
+class _ExplanationSection extends StatelessWidget {
+  final String explanation;
+  final String? imageAsset;
+  final Color color;
+
+  const _ExplanationSection({
+    required this.explanation,
+    this.imageAsset,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(14, 16, 14, 6),
+      child: Container(
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.05),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: color.withValues(alpha: 0.2)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (imageAsset != null)
+              ClipRRect(
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(11)),
+                child: Image.asset(
+                  imageAsset!,
+                  width: double.infinity,
+                  height: 120,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            Padding(
+              padding: const EdgeInsets.all(14),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.menu_book, size: 16, color: color),
+                      const SizedBox(width: 6),
+                      Text(
+                        'Textbook Explanation',
+                        style: TextStyle(
+                          color: color,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  MarkdownBody(
+                    data: explanation,
+                    styleSheet: MarkdownStyleSheet(
+                      p: const TextStyle(color: AppColors.textSecondary, fontSize: 13, height: 1.5),
+                      h1: const TextStyle(color: AppColors.textPrimary, fontSize: 18, fontWeight: FontWeight.w800, height: 1.6),
+                      h2: const TextStyle(color: AppColors.textPrimary, fontSize: 16, fontWeight: FontWeight.w700, height: 1.5),
+                      h3: const TextStyle(color: AppColors.textPrimary, fontSize: 14, fontWeight: FontWeight.w600, height: 1.4),
+                      strong: TextStyle(color: color, fontWeight: FontWeight.w700),
+                      em: const TextStyle(color: AppColors.textMuted, fontStyle: FontStyle.italic),
+                      listBullet: TextStyle(color: color),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
