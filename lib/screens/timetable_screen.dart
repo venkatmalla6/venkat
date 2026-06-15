@@ -6,6 +6,8 @@ import 'package:intl/intl.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import '../data/timetable_data.dart';
 import '../services/notification_service.dart';
+import '../services/firestore_service.dart';
+import 'markdown_view_screen.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 //  THEME & COLORS
@@ -260,6 +262,30 @@ class _TimetableDetailScreenState extends State<TimetableDetailScreen> {
       _completed[key] = prefs.getBool(key) ?? false;
     }
     if (mounted) setState(() {});
+
+    final progress = await FirestoreService().getTimetableProgress(
+      widget.data.id,
+    );
+    if (progress != null) {
+      if (progress['startDate'] != null) {
+        _startDate = DateTime.parse(progress['startDate'] as String);
+        _focusedDay = _startDate!;
+        _selectedDay = DateTime.now();
+        await prefs.setString(
+          '${widget.data.id}_start_date',
+          _startDate!.toIso8601String(),
+        );
+      }
+      if (progress['days'] != null) {
+        final daysMap = progress['days'] as Map<String, dynamic>;
+        for (final entry in daysMap.entries) {
+          final key = '${widget.data.id}_day_${entry.key}';
+          _completed[key] = entry.value == true;
+          await prefs.setBool(key, entry.value == true);
+        }
+      }
+      if (mounted) setState(() {});
+    }
   }
 
   Future<void> _startPlan() async {
@@ -270,6 +296,7 @@ class _TimetableDetailScreenState extends State<TimetableDetailScreen> {
       '${widget.data.id}_start_date',
       start.toIso8601String(),
     );
+    await FirestoreService().saveStartDate(widget.data.id, start);
 
     await NotificationService().requestPermissions();
 
@@ -319,6 +346,11 @@ class _TimetableDetailScreenState extends State<TimetableDetailScreen> {
       _completed[key] = isDone;
     });
     await prefs.setBool(key, isDone);
+    await FirestoreService().saveDayCompletion(
+      widget.data.id,
+      day.dayNumber,
+      isDone,
+    );
 
     final notifId = widget.data.id.hashCode + day.dayNumber;
     if (isDone) {
@@ -488,6 +520,7 @@ class _TimetableDetailScreenState extends State<TimetableDetailScreen> {
                         isDone: isDone,
                         primaryColor: color,
                         onToggle: () => _toggleComplete(day),
+                        timetableId: widget.data.id,
                       ),
                     ],
                   ),
@@ -826,12 +859,14 @@ class _DayCard extends StatefulWidget {
   final bool isDone;
   final Color primaryColor;
   final VoidCallback onToggle;
+  final String timetableId;
 
   const _DayCard({
     required this.day,
     required this.isDone,
     required this.primaryColor,
     required this.onToggle,
+    required this.timetableId,
   });
 
   @override
@@ -1042,12 +1077,39 @@ class _DayCardState extends State<_DayCard> {
           // Tags
           _TagsRow(tags: widget.day.covered, color: color),
           // Explanation
-          if (widget.day.explanation != null)
+          if (widget.day.explanation != null) ...[
             _ExplanationSection(
               explanation: widget.day.explanation!,
               imageAsset: widget.day.imageAsset,
               color: color,
             ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(14, 0, 14, 16),
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => MarkdownViewScreen(
+                        day: widget.day,
+                        timetableId: widget.timetableId,
+                      ),
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.fullscreen),
+                label: const Text('Read Full Study Notes'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: color.withValues(alpha: 0.1),
+                  foregroundColor: color,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+            ),
+          ],
           // Q&A
           _QASection(qa: widget.day.qa, color: color),
         ],
