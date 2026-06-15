@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../data/timetable_data.dart';
 import '../services/notification_service.dart';
 import '../services/firestore_service.dart';
@@ -1112,6 +1113,12 @@ class _DayCardState extends State<_DayCard> {
           ],
           // Q&A
           _QASection(qa: widget.day.qa, color: color),
+          // Custom Tasks
+          _CustomTasksSection(
+            timetableId: widget.timetableId,
+            dayNumber: widget.day.dayNumber,
+            color: color,
+          ),
         ],
       ),
     );
@@ -1663,6 +1670,216 @@ class _QAItemWidget extends StatelessWidget {
                 ),
               ),
             ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  CUSTOM TASKS SECTION
+// ─────────────────────────────────────────────────────────────────────────────
+class _CustomTasksSection extends StatelessWidget {
+  final String timetableId;
+  final int dayNumber;
+  final Color color;
+
+  const _CustomTasksSection({
+    required this.timetableId,
+    required this.dayNumber,
+    required this.color,
+  });
+
+  void _showAddTaskDialog(BuildContext context) {
+    final TextEditingController controller = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: AppColors.card,
+          title: const Text(
+            'Add Custom Task',
+            style: TextStyle(color: AppColors.textPrimary),
+          ),
+          content: TextField(
+            controller: controller,
+            style: const TextStyle(color: AppColors.textPrimary),
+            decoration: InputDecoration(
+              hintText: 'e.g. Watch YouTube tutorial',
+              hintStyle: const TextStyle(color: AppColors.textMuted),
+              enabledBorder: const UnderlineInputBorder(
+                borderSide: BorderSide(color: AppColors.cardBorder),
+              ),
+              focusedBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: color),
+              ),
+            ),
+            autofocus: true,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text(
+                'Cancel',
+                style: TextStyle(color: AppColors.textMuted),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                if (controller.text.trim().isNotEmpty) {
+                  FirestoreService().addCustomTask(
+                    timetableId,
+                    dayNumber,
+                    controller.text.trim(),
+                  );
+                  Navigator.pop(context);
+                }
+              },
+              child: Text(
+                'Add',
+                style: TextStyle(color: color, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        border: Border(top: BorderSide(color: AppColors.cardBorder)),
+        color: Color(0x05FFFFFF),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '📝 Custom Tasks',
+                style: TextStyle(
+                  color: color,
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              IconButton(
+                icon: Icon(Icons.add_circle, color: color, size: 20),
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                onPressed: () => _showAddTaskDialog(context),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          StreamBuilder<QuerySnapshot>(
+            stream: FirestoreService().getCustomTasksStream(timetableId),
+            builder: (context, snapshot) {
+              if (snapshot.hasError) {
+                return const Text(
+                  'Error loading tasks',
+                  style: TextStyle(color: AppColors.textMuted, fontSize: 12),
+                );
+              }
+              if (!snapshot.hasData) {
+                return const SizedBox(
+                  height: 20,
+                  child: Center(
+                    child: SizedBox(
+                      width: 14,
+                      height: 14,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: AppColors.textMuted,
+                      ),
+                    ),
+                  ),
+                );
+              }
+
+              final docs = snapshot.data!.docs.where((doc) {
+                final data = doc.data() as Map<String, dynamic>?;
+                return data != null && data['dayNumber'] == dayNumber;
+              }).toList();
+
+              docs.sort((a, b) {
+                final aData = a.data() as Map<String, dynamic>;
+                final bData = b.data() as Map<String, dynamic>;
+                final aTime = aData['createdAt'] as Timestamp?;
+                final bTime = bData['createdAt'] as Timestamp?;
+                if (aTime == null || bTime == null) return 0;
+                return aTime.compareTo(bTime);
+              });
+
+              if (docs.isEmpty) {
+                return const Text(
+                  'No custom tasks added for this day.',
+                  style: TextStyle(color: AppColors.textMuted, fontSize: 12),
+                );
+              }
+
+              return Column(
+                children: docs.map((doc) {
+                  final data = doc.data() as Map<String, dynamic>;
+                  final isCompleted = data['isCompleted'] == true;
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () => FirestoreService().updateCustomTask(
+                            timetableId,
+                            doc.id,
+                            !isCompleted,
+                          ),
+                          child: Icon(
+                            isCompleted
+                                ? Icons.check_box
+                                : Icons.check_box_outline_blank,
+                            color: isCompleted
+                                ? AppColors.accentGreen
+                                : AppColors.textMuted,
+                            size: 20,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            data['text'] ?? '',
+                            style: TextStyle(
+                              color: isCompleted
+                                  ? AppColors.textMuted
+                                  : AppColors.textPrimary,
+                              fontSize: 13,
+                              decoration: isCompleted
+                                  ? TextDecoration.lineThrough
+                                  : null,
+                            ),
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () => FirestoreService().deleteCustomTask(
+                            timetableId,
+                            doc.id,
+                          ),
+                          child: const Icon(
+                            Icons.delete_outline,
+                            color: AppColors.textMuted,
+                            size: 18,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }).toList(),
+              );
+            },
+          ),
         ],
       ),
     );

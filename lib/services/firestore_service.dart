@@ -64,4 +64,57 @@ class FirestoreService {
     }
     return null;
   }
+
+  // Collection: users -> {uid} -> timetables -> {timetableId} -> customTasks -> {taskId}
+  CollectionReference? _customTasksRef(String timetableId) {
+    return _timetableRef(timetableId)?.collection('customTasks');
+  }
+
+  Future<void> addCustomTask(
+    String timetableId,
+    int dayNumber,
+    String text,
+  ) async {
+    try {
+      final ref = _customTasksRef(timetableId);
+      if (ref == null) return;
+      await ref.add({
+        'dayNumber': dayNumber,
+        'text': text,
+        'isCompleted': false,
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+    } catch (e) {
+      debugPrint('Error adding custom task: $e');
+    }
+  }
+
+  Future<void> updateCustomTask(
+    String timetableId,
+    String taskId,
+    bool isCompleted,
+  ) async {
+    try {
+      final ref = _customTasksRef(timetableId);
+      if (ref == null) return;
+      await ref.doc(taskId).update({'isCompleted': isCompleted});
+    } catch (e) {
+      debugPrint('Error updating custom task: $e');
+    }
+  }
+
+  Future<void> deleteCustomTask(String timetableId, String taskId) async {
+    try {
+      final ref = _customTasksRef(timetableId);
+      if (ref == null) return;
+      await ref.doc(taskId).delete();
+    } catch (e) {
+      debugPrint('Error deleting custom task: $e');
+    }
+  }
+
+  Stream<QuerySnapshot>? getCustomTasksStream(String timetableId) {
+    final ref = _customTasksRef(timetableId);
+    return ref?.snapshots();
+  }
 }
