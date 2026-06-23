@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "871496746385",
+    "project_id": "venkat-d22fa",
+    "storage_bucket": "venkat-d22fa.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:871496746385:android:a77e5c0fc99c157d3c8630",
+        "android_client_info": {
+          "package_name": "com.example.venkat"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCbkTnS2hssyCkpz8q2-eSGD3gi8QBDUE8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
