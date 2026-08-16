@@ -1,0 +1,2585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pencil Sketch Interactive Login | Art & Light</title>
+  <meta name="description" content="An artistic hand-drawn pencil sketch interactive login page with switch toggle animation, warm yellow canvas, and expressive character interactions.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  
+  <style>
+    /* ==========================================================================
+       PENCIL SKETCH INTERACTIVE LOGIN EXPERIENCE
+       Artistic Handcrafted Aesthetic & Lighting Architecture
+       ========================================================================== */
+
+    :root {
+      --bg-dark: #141416;
+      --bg-dark-grid: rgba(255, 255, 255, 0.04);
+      --bg-yellow-base: #FFDA44;
+      --bg-yellow-warm: #FFE478;
+      --bg-yellow-deep: #F0B800;
+      
+      --ink-primary: #18181B;
+      --ink-secondary: #52525B;
+      --ink-muted: #71717A;
+      --ink-light: #F4F4F5;
+      
+      --graphite-stroke: #1C1917;
+      --graphite-shadow: rgba(24, 24, 27, 0.16);
+      --graphite-shadow-lg: rgba(24, 24, 27, 0.22);
+      
+      --sketch-paper-white: #FFFFFF;
+      --sketch-paper-offwhite: #FAF8F5;
+      --sketch-card-dark: #18181C;
+      --sketch-card-dark-surface: #222228;
+      
+      --accent-amber: #D97706;
+      --accent-red: #DC2626;
+      --accent-green: #16A34A;
+      
+      --font-main: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-sketch: 'Caveat', cursive, sans-serif;
+      --font-mono: 'Space Mono', monospace;
+      
+      --transition-smooth: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      --transition-bounce: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    html, body {
+      width: 100%;
+      min-height: 100vh;
+      font-family: var(--font-main);
+      overflow-x: hidden;
+      position: relative;
+      color: var(--ink-primary);
+      user-select: none;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .handwritten {
+      font-family: var(--font-sketch);
+    }
+
+    .svg-filters {
+      position: absolute;
+      width: 0;
+      height: 0;
+      pointer-events: none;
+    }
+
+    /* Background Canvas & Lighting Mechanics */
+    .canvas-background {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      transition: background-color 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+      overflow: hidden;
+    }
+
+    body.light-off .canvas-background {
+      background-color: var(--bg-dark);
+    }
+
+    body.light-on .canvas-background {
+      background-color: var(--bg-yellow-base);
+      background: radial-gradient(circle at 18% 18%, var(--bg-yellow-warm) 0%, var(--bg-yellow-base) 45%, var(--bg-yellow-deep) 100%);
+    }
+
+    .paper-texture {
+      position: absolute;
+      inset: 0;
+      opacity: 0.28;
+      pointer-events: none;
+      background-image: radial-gradient(#1c1917 0.75px, transparent 0.75px), radial-gradient(#1c1917 0.75px, transparent 0.75px);
+      background-size: 24px 24px;
+      background-position: 0 0, 12px 12px;
+      transition: opacity 0.6s ease;
+    }
+
+    body.light-off .paper-texture {
+      opacity: 0.15;
+      background-image: radial-gradient(#ffffff 0.75px, transparent 0.75px);
+    }
+
+    .graphite-grid {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background-size: 40px 40px;
+      background-image: 
+        linear-gradient(to right, rgba(28, 25, 23, 0.05) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(28, 25, 23, 0.05) 1px, transparent 1px);
+      opacity: 0.8;
+      transition: opacity 0.6s ease;
+    }
+
+    body.light-off .graphite-grid {
+      background-image: 
+        linear-gradient(to right, var(--bg-dark-grid) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--bg-dark-grid) 1px, transparent 1px);
+      opacity: 0.5;
+    }
+
+    .dark-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 15, 18, 0.92);
+      opacity: 1;
+      transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+      pointer-events: none;
+    }
+
+    body.light-on .dark-overlay {
+      opacity: 0;
+    }
+
+    .light-beam {
+      position: absolute;
+      top: 100px;
+      left: 90px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.95) 0%, rgba(255, 228, 120, 0.6) 50%, transparent 80%);
+      transform: scale(0);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .light-beam.flash {
+      animation: lightBurst 0.9s cubic-bezier(0.1, 0.9, 0.2, 1) forwards;
+    }
+
+    @keyframes lightBurst {
+      0% { transform: scale(0); opacity: 1; }
+      50% { opacity: 0.8; }
+      100% { transform: scale(320); opacity: 0; }
+    }
+
+    /* Top Navigation */
+    .top-nav {
+      position: relative;
+      z-index: 20;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.25rem 2.5rem;
+      transition: var(--transition-smooth);
+    }
+
+    .brand-sketch {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      transition: color 0.4s ease;
+    }
+
+    body.light-off .brand-sketch {
+      color: #E4E4E7;
+    }
+
+    body.light-on .brand-sketch {
+      color: var(--ink-primary);
+    }
+
+    .brand-title strong {
+      font-family: var(--font-sketch);
+      font-size: 1.6rem;
+      margin-left: 2px;
+      font-weight: 700;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .card-theme-toggle {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(8px);
+      border: 1.5px solid var(--graphite-stroke);
+      border-radius: 30px;
+      padding: 0.25rem 0.5rem;
+      box-shadow: 2px 2px 0 var(--graphite-stroke);
+    }
+
+    body.light-off .card-theme-toggle {
+      background: rgba(30, 30, 36, 0.8);
+      border-color: #52525B;
+      box-shadow: 2px 2px 0 #3f3f46;
+    }
+
+    .toggle-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding-left: 0.35rem;
+      color: inherit;
+    }
+
+    body.light-off .toggle-label {
+      color: #A1A1AA;
+    }
+
+    .theme-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      background: transparent;
+      border: none;
+      padding: 0.3rem 0.65rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+      border-radius: 20px;
+      cursor: pointer;
+      color: inherit;
+      transition: all 0.25s ease;
+    }
+
+    body.light-off .theme-btn {
+      color: #D4D4D8;
+    }
+
+    .theme-btn.active {
+      background: var(--ink-primary);
+      color: #FFFFFF;
+    }
+
+    body.light-off .theme-btn.active {
+      background: #FFFFFF;
+      color: #18181B;
+    }
+
+    .color-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      border: 1px solid currentColor;
+    }
+
+    .color-dot.white {
+      background-color: #FFFFFF;
+    }
+
+    .color-dot.black {
+      background-color: #18181B;
+    }
+
+    .icon-tool-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      background: rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(8px);
+      border: 1.5px solid var(--graphite-stroke);
+      border-radius: 30px;
+      padding: 0.45rem 0.9rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 2px 2px 0 var(--graphite-stroke);
+      transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.3s ease;
+    }
+
+    body.light-off .icon-tool-btn {
+      background: rgba(30, 30, 36, 0.8);
+      border-color: #52525B;
+      color: #E4E4E7;
+      box-shadow: 2px 2px 0 #3f3f46;
+    }
+
+    .icon-tool-btn:hover {
+      transform: translate(-1px, -1px);
+      box-shadow: 3px 3px 0 var(--graphite-stroke);
+      background: rgba(255, 255, 255, 0.5);
+    }
+
+    body.light-off .icon-tool-btn:hover {
+      box-shadow: 3px 3px 0 #52525B;
+      background: rgba(45, 45, 55, 0.9);
+    }
+
+    .icon-tool-btn:active {
+      transform: translate(1px, 1px);
+      box-shadow: 1px 1px 0 var(--graphite-stroke);
+    }
+
+    /* Switch Station */
+    .switch-station {
+      position: absolute;
+      top: 90px;
+      left: 55px;
+      z-index: 30;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .switch-plate {
+      position: relative;
+      width: 76px;
+      height: 120px;
+      background: #FAF8F2;
+      border: 3.5px solid #1C1917;
+      border-radius: 12px;
+      box-shadow: 5px 6px 0 rgba(28, 25, 23, 0.85);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 0;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.2s ease;
+      filter: url(#pencil-texture);
+    }
+
+    body.light-off .switch-plate {
+      background: #27272A;
+      border-color: #71717A;
+      box-shadow: 4px 6px 0 #09090B;
+    }
+
+    .switch-plate:hover {
+      transform: translate(-2px, -2px) scale(1.02);
+      box-shadow: 7px 8px 0 var(--graphite-stroke);
+    }
+
+    body.light-off .switch-plate:hover {
+      box-shadow: 6px 8px 0 #09090B;
+    }
+
+    .plate-screw {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 2px solid #1C1917;
+      background: #E4E4E7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    body.light-off .plate-screw {
+      border-color: #71717A;
+      background: #3F3F46;
+    }
+
+    .screw-slot {
+      width: 8px;
+      height: 2px;
+      background: #1C1917;
+      transform: rotate(35deg);
+    }
+
+    body.light-off .screw-slot {
+      background: #A1A1AA;
+    }
+
+    .plate-screw.bottom .screw-slot {
+      transform: rotate(-50deg);
+    }
+
+    .switch-toggle-frame {
+      width: 40px;
+      height: 62px;
+      background: #D4D4D8;
+      border: 2.5px solid #1C1917;
+      border-radius: 6px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    body.light-off .switch-toggle-frame {
+      background: #18181B;
+      border-color: #52525B;
+    }
+
+    .toggle-rocker {
+      position: absolute;
+      left: 2px;
+      right: 2px;
+      height: 32px;
+      background: #FFFFFF;
+      border: 2px solid #1C1917;
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      transition: top 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease, background-color 0.2s ease;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    body.light-off .toggle-rocker {
+      top: 24px;
+      background: #52525B;
+      border-color: #27272A;
+      box-shadow: 0 -3px 4px rgba(0, 0, 0, 0.4);
+    }
+
+    body.light-on .toggle-rocker {
+      top: 2px;
+      background: #FEF08A;
+      box-shadow: 0 6px 8px rgba(0, 0, 0, 0.25);
+    }
+
+    .rocker-label {
+      font-size: 0.62rem;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    body.light-off .rocker-label.on {
+      opacity: 0.2;
+    }
+
+    body.light-off .rocker-label.off {
+      color: #F87171;
+      opacity: 1;
+    }
+
+    body.light-on .rocker-label.on {
+      color: #16A34A;
+      opacity: 1;
+    }
+
+    body.light-on .rocker-label.off {
+      opacity: 0.2;
+    }
+
+    .rocker-ridge {
+      width: 14px;
+      height: 2px;
+      background: #71717A;
+      border-radius: 1px;
+    }
+
+    .switch-label-sketch {
+      position: absolute;
+      left: 90px;
+      top: 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      white-space: nowrap;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--ink-primary);
+      pointer-events: none;
+      transition: color 0.4s ease;
+    }
+
+    body.light-off .switch-label-sketch {
+      color: #E4E4E7;
+    }
+
+    .sketch-arrow {
+      margin-top: -6px;
+      margin-left: -2px;
+      transform: rotate(-15deg);
+    }
+
+    .switch-hint {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.85rem;
+      font-size: 0.85rem;
+      font-family: var(--font-sketch);
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #FCD34D;
+      transition: opacity 0.4s ease;
+    }
+
+    body.light-on .switch-hint {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .pulse-indicator {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #FCD34D;
+      box-shadow: 0 0 10px #FCD34D;
+      animation: pulseDot 1.4s infinite ease-in-out;
+    }
+
+    @keyframes pulseDot {
+      0%, 100% { transform: scale(0.9); opacity: 0.4; }
+      50% { transform: scale(1.4); opacity: 1; box-shadow: 0 0 16px #FCD34D; }
+    }
+
+    /* Main Stage */
+    .stage-container {
+      position: relative;
+      z-index: 10;
+      max-width: 1240px;
+      min-height: calc(100vh - 120px);
+      margin: 0 auto;
+      padding: 1rem 2rem 3rem;
+      display: grid;
+      grid-template-columns: 1.05fr 1fr;
+      align-items: center;
+      gap: 2.5rem;
+    }
+
+    /* Character Arena */
+    .character-arena {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+    }
+
+    .character-wrapper {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .sketch-bubble {
+      position: absolute;
+      top: -45px;
+      left: 50%;
+      transform: translateX(-40%) scale(0.9);
+      background: #FFFFFF;
+      border: 2.5px solid #1C1917;
+      border-radius: 18px;
+      padding: 0.6rem 1.15rem;
+      box-shadow: 3px 4px 0 #1C1917;
+      z-index: 15;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      filter: url(#rough-edge);
+    }
+
+    body.light-off .sketch-bubble {
+      background: #27272A;
+      border-color: #E4E4E7;
+      box-shadow: 3px 4px 0 #09090B;
+    }
+
+    .bubble-content {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #1C1917;
+      white-space: nowrap;
+    }
+
+    body.light-off .bubble-content {
+      color: #F4F4F5;
+    }
+
+    .bubble-tail {
+      position: absolute;
+      bottom: -10px;
+      left: 35px;
+      width: 14px;
+      height: 14px;
+      background: #FFFFFF;
+      border-right: 2.5px solid #1C1917;
+      border-bottom: 2.5px solid #1C1917;
+      transform: rotate(45deg);
+    }
+
+    body.light-off .bubble-tail {
+      background: #27272A;
+      border-color: #E4E4E7;
+    }
+
+    .sketch-human-svg {
+      filter: url(#pencil-texture);
+      overflow: visible;
+      transition: transform 0.4s ease;
+    }
+
+    .character-group {
+      transform-origin: bottom center;
+    }
+
+    body.light-on .char-head-group {
+      animation: breatheHead 3.5s ease-in-out infinite;
+    }
+
+    @keyframes breatheHead {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-3px); }
+    }
+
+    #eyeL, #eyeR {
+      animation: eyeBlink 4.5s infinite ease-in-out;
+      transform-origin: center;
+    }
+
+    @keyframes eyeBlink {
+      0%, 46%, 50%, 100% { transform: scaleY(1); }
+      48% { transform: scaleY(0.1); }
+    }
+
+    .character-arena.walking-intro {
+      animation: characterWalkIn 2.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    }
+
+    @keyframes characterWalkIn {
+      0% { transform: translate(-350px, 30px); opacity: 0; }
+      20% { opacity: 1; }
+      55% { transform: translate(-140px, -40px); }
+      75% { transform: translate(-140px, -40px); }
+      100% { transform: translate(0, 0); }
+    }
+
+    .character-doodles {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .doodle-star {
+      position: absolute;
+      font-size: 1.4rem;
+      color: #1C1917;
+      opacity: 0.6;
+      animation: floatStar 3s ease-in-out infinite alternate;
+    }
+
+    .doodle-star.s1 { top: 15%; right: 10%; animation-delay: 0.2s; }
+    .doodle-star.s2 { top: 45%; left: -5%; animation-delay: 1.2s; }
+
+    @keyframes floatStar {
+      0% { transform: translateY(0) rotate(0deg) scale(0.85); }
+      100% { transform: translateY(-8px) rotate(20deg) scale(1.15); }
+    }
+
+    /* Login Card */
+    .login-arena {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .login-card-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 460px;
+      perspective: 1000px;
+    }
+
+    .card-tape {
+      position: absolute;
+      width: 60px;
+      height: 22px;
+      background: rgba(254, 240, 138, 0.7);
+      border: 1px dashed rgba(28, 25, 23, 0.4);
+      z-index: 12;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+      pointer-events: none;
+    }
+
+    .tape-top-left {
+      top: -10px;
+      left: 20px;
+      transform: rotate(-12deg);
+    }
+
+    .tape-top-right {
+      top: -10px;
+      right: 20px;
+      transform: rotate(14deg);
+    }
+
+    .login-card {
+      position: relative;
+      width: 100%;
+      border-radius: 20px;
+      padding: 2.2rem 2.2rem 1.8rem;
+      transition: background-color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease;
+      filter: url(#rough-edge);
+    }
+
+    body.light-off .login-card {
+      opacity: 0.25;
+      filter: blur(1px) grayscale(60%);
+      pointer-events: none;
+      transform: translateY(12px) scale(0.97);
+    }
+
+    body.light-on .login-card {
+      opacity: 1;
+      filter: none;
+      pointer-events: auto;
+      transform: translateY(0) scale(1);
+    }
+
+    .login-card.theme-white {
+      background: var(--sketch-paper-white);
+      border: 3.5px solid var(--ink-primary);
+      box-shadow: 
+        8px 10px 0 var(--ink-primary),
+        0 20px 35px var(--graphite-shadow-lg);
+      color: var(--ink-primary);
+    }
+
+    .login-card.theme-black {
+      background: var(--sketch-card-dark);
+      border: 3.5px solid #E4E4E7;
+      box-shadow: 
+        8px 10px 0 #09090B,
+        0 20px 40px rgba(0, 0, 0, 0.5);
+      color: #FAFAFA;
+    }
+
+    .card-header {
+      margin-bottom: 1.35rem;
+    }
+
+    .header-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.76rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 0.25rem 0.65rem;
+      border-radius: 12px;
+      margin-bottom: 0.65rem;
+    }
+
+    .theme-white .header-badge {
+      background: #FEF3C7;
+      color: #92400E;
+      border: 1.5px solid #F59E0B;
+    }
+
+    .theme-black .header-badge {
+      background: #27272A;
+      color: #FDE68A;
+      border: 1.5px solid #71717A;
+    }
+
+    .card-title {
+      font-size: 2.1rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      margin-bottom: 0.35rem;
+    }
+
+    .card-subtitle {
+      font-size: 0.95rem;
+      color: var(--ink-secondary);
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .theme-black .card-subtitle {
+      color: #A1A1AA;
+    }
+
+    .subtitle-flourish {
+      margin-top: 2px;
+      stroke: currentColor;
+      opacity: 0.7;
+    }
+
+    .demo-quickfill {
+      margin-bottom: 1.25rem;
+    }
+
+    .demo-chip {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      background: rgba(254, 240, 138, 0.35);
+      border: 1.5px dashed var(--ink-primary);
+      border-radius: 10px;
+      padding: 0.45rem 0.8rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--ink-primary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .theme-black .demo-chip {
+      background: rgba(39, 39, 42, 0.7);
+      border-color: #71717A;
+      color: #E4E4E7;
+    }
+
+    .demo-chip:hover {
+      background: #FEF08A;
+      transform: translateY(-1px);
+    }
+
+    .theme-black .demo-chip:hover {
+      background: #3F3F46;
+    }
+
+    /* Forms */
+    .auth-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.15rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .form-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.86rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    .label-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .sketch-pencil-indicator {
+      font-family: var(--font-sketch);
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--accent-amber);
+      opacity: 0;
+      transform: translateY(3px);
+      transition: all 0.25s ease;
+    }
+
+    .form-group.focused .sketch-pencil-indicator {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .forgot-link {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: inherit;
+      text-decoration: underline;
+      text-decoration-style: wavy;
+      text-decoration-thickness: 1.5px;
+      transition: color 0.2s ease;
+    }
+
+    .forgot-link:hover {
+      color: var(--accent-amber);
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      border-radius: 12px;
+      transition: all 0.2s ease;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--ink-secondary);
+      pointer-events: none;
+      transition: color 0.2s ease;
+    }
+
+    .theme-black .input-icon {
+      color: #A1A1AA;
+    }
+
+    .sketch-input {
+      width: 100%;
+      padding: 0.75rem 1rem 0.75rem 2.85rem;
+      font-family: var(--font-main);
+      font-size: 0.95rem;
+      font-weight: 500;
+      border-radius: 12px;
+      outline: none;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .theme-white .sketch-input {
+      background: var(--sketch-paper-offwhite);
+      border: 2.5px solid var(--ink-primary);
+      color: var(--ink-primary);
+      box-shadow: 2px 3px 0 var(--graphite-shadow);
+    }
+
+    .theme-white .sketch-input:focus {
+      background: #FFFFFF;
+      border-color: var(--ink-primary);
+      box-shadow: 4px 5px 0 var(--ink-primary);
+      transform: translate(-1px, -1px);
+    }
+
+    .theme-black .sketch-input {
+      background: var(--sketch-card-dark-surface);
+      border: 2.5px solid #52525B;
+      color: #FFFFFF;
+      box-shadow: 2px 3px 0 #09090B;
+    }
+
+    .theme-black .sketch-input:focus {
+      background: #18181B;
+      border-color: #F4F4F5;
+      box-shadow: 4px 5px 0 #E4E4E7;
+      transform: translate(-1px, -1px);
+    }
+
+    .sketch-input::placeholder {
+      color: #A1A1AA;
+      font-weight: 400;
+    }
+
+    .theme-black .sketch-input::placeholder {
+      color: #71717A;
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: 12px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--ink-secondary);
+      padding: 4px;
+      border-radius: 6px;
+      transition: color 0.2s ease, transform 0.15s ease;
+    }
+
+    .theme-black .password-toggle {
+      color: #A1A1AA;
+    }
+
+    .password-toggle:hover {
+      color: var(--ink-primary);
+      transform: scale(1.1);
+    }
+
+    .theme-black .password-toggle:hover {
+      color: #FFFFFF;
+    }
+
+    .password-meter {
+      display: none;
+      flex-direction: column;
+      gap: 4px;
+      margin-top: 0.35rem;
+    }
+
+    .password-meter.active {
+      display: flex;
+    }
+
+    .meter-track {
+      width: 100%;
+      height: 6px;
+      background: #E4E4E7;
+      border-radius: 4px;
+      overflow: hidden;
+      border: 1px solid var(--ink-primary);
+    }
+
+    .theme-black .meter-track {
+      background: #27272A;
+      border-color: #71717A;
+    }
+
+    .meter-bar {
+      height: 100%;
+      width: 0%;
+      border-radius: 4px;
+      transition: width 0.3s ease, background-color 0.3s ease;
+    }
+
+    .meter-label {
+      font-size: 0.72rem;
+      font-family: var(--font-mono);
+      font-weight: 600;
+      color: var(--ink-muted);
+    }
+
+    .field-error {
+      display: none;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--accent-red);
+      margin-top: 2px;
+    }
+
+    .form-group.has-error .field-error {
+      display: block;
+    }
+
+    .theme-white .form-group.has-error .sketch-input {
+      border-color: var(--accent-red);
+      background: #FEF2F2;
+    }
+
+    .theme-black .form-group.has-error .sketch-input {
+      border-color: #EF4444;
+      background: #2A1717;
+    }
+
+    .form-auxiliary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 0.1rem;
+    }
+
+    .sketch-checkbox-container {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      cursor: pointer;
+      font-size: 0.88rem;
+      font-weight: 600;
+    }
+
+    .sketch-checkbox-container input {
+      position: absolute;
+      opacity: 0;
+      cursor: pointer;
+      height: 0;
+      width: 0;
+    }
+
+    .sketch-checkmark {
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .theme-white .sketch-checkmark {
+      background: #FAF8F5;
+      border: 2px solid var(--ink-primary);
+      box-shadow: 2px 2px 0 var(--graphite-shadow);
+    }
+
+    .theme-black .sketch-checkmark {
+      background: var(--sketch-card-dark-surface);
+      border: 2px solid #71717A;
+      box-shadow: 2px 2px 0 #09090B;
+    }
+
+    .check-path {
+      stroke-dasharray: 20;
+      stroke-dashoffset: 20;
+      transition: stroke-dashoffset 0.25s ease;
+    }
+
+    .sketch-checkbox-container input:checked ~ .sketch-checkmark {
+      background: #FEF08A;
+    }
+
+    .theme-black .sketch-checkbox-container input:checked ~ .sketch-checkmark {
+      background: #FDE047;
+      color: #18181B;
+      border-color: #FDE047;
+    }
+
+    .sketch-checkbox-container input:checked ~ .sketch-checkmark .check-path {
+      stroke-dashoffset: 0;
+    }
+
+    .sketch-submit-btn {
+      position: relative;
+      width: 100%;
+      padding: 0.9rem 1.5rem;
+      border-radius: 14px;
+      font-family: var(--font-main);
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      cursor: pointer;
+      overflow: hidden;
+      transition: transform 0.15s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+      margin-top: 0.4rem;
+    }
+
+    .theme-white .sketch-submit-btn {
+      background: var(--ink-primary);
+      color: #FFFFFF;
+      border: 2.5px solid var(--ink-primary);
+      box-shadow: 4px 5px 0 #000000;
+    }
+
+    .theme-black .sketch-submit-btn {
+      background: #FDE047;
+      color: #18181B;
+      border: 2.5px solid #FDE047;
+      box-shadow: 4px 5px 0 #CA8A04;
+    }
+
+    .sketch-submit-btn:hover {
+      transform: translate(-2px, -2px);
+    }
+
+    .theme-white .sketch-submit-btn:hover {
+      box-shadow: 6px 7px 0 #000000;
+      background: #27272A;
+    }
+
+    .theme-black .sketch-submit-btn:hover {
+      box-shadow: 6px 7px 0 #CA8A04;
+      background: #FEF08A;
+    }
+
+    .sketch-submit-btn:active {
+      transform: translate(2px, 2px);
+      box-shadow: 2px 2px 0 currentColor;
+    }
+
+    .btn-content {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.65rem;
+    }
+
+    .btn-arrow {
+      transition: transform 0.2s ease;
+    }
+
+    .sketch-submit-btn:hover .btn-arrow {
+      transform: translateX(4px);
+    }
+
+    .spinner-sketch {
+      animation: spin 0.8s linear infinite;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    @keyframes spin {
+      100% { transform: rotate(360deg); }
+    }
+
+    .sketch-divider {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin: 1.15rem 0 0.95rem;
+    }
+
+    .divider-line {
+      flex: 1;
+      height: 2px;
+      background: #E4E4E7;
+    }
+
+    .theme-white .divider-line {
+      background: #E4E4E7;
+    }
+
+    .theme-black .divider-line {
+      background: #3F3F46;
+    }
+
+    .divider-text {
+      font-size: 1.25rem;
+      color: var(--ink-secondary);
+      white-space: nowrap;
+    }
+
+    .theme-black .divider-text {
+      color: #A1A1AA;
+    }
+
+    .social-auth-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.65rem;
+    }
+
+    .social-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.65rem 0.5rem;
+      border-radius: 12px;
+      font-family: var(--font-main);
+      font-size: 0.84rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .theme-white .social-btn {
+      background: #FAF8F5;
+      border: 2px solid var(--ink-primary);
+      color: var(--ink-primary);
+      box-shadow: 2px 3px 0 var(--graphite-shadow);
+    }
+
+    .theme-white .social-btn:hover {
+      background: #FFFFFF;
+      transform: translate(-1px, -1px);
+      box-shadow: 3px 4px 0 var(--ink-primary);
+    }
+
+    .theme-black .social-btn {
+      background: var(--sketch-card-dark-surface);
+      border: 2px solid #52525B;
+      color: #FAFAFA;
+      box-shadow: 2px 3px 0 #09090B;
+    }
+
+    .theme-black .social-btn:hover {
+      background: #27272A;
+      border-color: #E4E4E7;
+      transform: translate(-1px, -1px);
+      box-shadow: 3px 4px 0 #E4E4E7;
+    }
+
+    .card-footer {
+      margin-top: 1.25rem;
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--ink-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.35rem;
+    }
+
+    .theme-black .card-footer {
+      color: #A1A1AA;
+    }
+
+    .signup-link {
+      font-weight: 700;
+      color: inherit;
+      text-decoration: underline;
+      text-decoration-style: wavy;
+    }
+
+    /* Modals */
+    .sketch-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(6px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .sketch-modal {
+      position: relative;
+      max-width: 420px;
+      width: 100%;
+      background: #FFFFFF;
+      border: 3.5px solid #1C1917;
+      border-radius: 20px;
+      padding: 2.2rem;
+      box-shadow: 8px 10px 0 #1C1917;
+      text-align: center;
+      filter: url(#rough-edge);
+      animation: popModal 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes popModal {
+      0% { transform: scale(0.85) translateY(20px); opacity: 0; }
+      100% { transform: scale(1) translateY(0); opacity: 1; }
+    }
+
+    .modal-stamp {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      border: 2px dashed #16A34A;
+      color: #16A34A;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      transform: rotate(8deg);
+    }
+
+    .modal-icon-circle {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 1.25rem;
+      background: #FEF08A;
+      border: 2.5px solid #1C1917;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-title {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .modal-desc {
+      font-size: 0.92rem;
+      color: var(--ink-secondary);
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+    }
+
+    .modal-input-box {
+      margin-bottom: 1.25rem;
+    }
+
+    .modal-btn-row {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .modal-close-btn {
+      flex: 1;
+      padding: 0.8rem 1.25rem;
+      background: #1C1917;
+      color: #FFFFFF;
+      border: 2px solid #1C1917;
+      border-radius: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 3px 4px 0 #71717A;
+      transition: all 0.2s ease;
+    }
+
+    .modal-close-btn:hover {
+      transform: translate(-1px, -1px);
+      box-shadow: 4px 5px 0 #71717A;
+    }
+
+    .modal-secondary-btn {
+      flex: 1;
+      padding: 0.8rem 1.25rem;
+      background: #FAF8F5;
+      color: #1C1917;
+      border: 2px solid #1C1917;
+      border-radius: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    @media (max-width: 980px) {
+      .stage-container {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        padding-top: 4rem;
+      }
+      
+      .switch-station {
+        top: 75px;
+        left: 20px;
+        transform: scale(0.85);
+        transform-origin: top left;
+      }
+      
+      .character-arena {
+        order: 2;
+        height: 280px;
+      }
+
+      .character-wrapper {
+        transform: scale(0.8);
+      }
+
+      .login-arena {
+        order: 1;
+      }
+      
+      .top-nav {
+        padding: 1rem 1.5rem;
+      }
+
+      .card-theme-toggle {
+        display: none;
+      }
+    }
+
+    @media (max-width: 540px) {
+      .login-card {
+        padding: 1.6rem 1.4rem;
+      }
+      
+      .card-title {
+        font-size: 1.75rem;
+      }
+
+      .social-auth-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .top-nav {
+        padding: 0.75rem 1rem;
+      }
+
+      .btn-text {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body class="light-off">
+
+  <!-- SVG Filters for Authentic Graphite Pencil & Paper Texture -->
+  <svg class="svg-filters" aria-hidden="true" width="0" height="0">
+    <defs>
+      <filter id="pencil-texture" x="-10%" y="-10%" width="120%" height="120%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="4" result="noise" />
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="2.2" xChannelSelector="R" yChannelSelector="G" />
+      </filter>
+      
+      <filter id="rough-edge">
+        <feTurbulence type="turbulence" baseFrequency="0.05" numOctaves="2" result="turbulence"/>
+        <feDisplacementMap in2="turbulence" in="SourceGraphic" scale="1.5" xChannelSelector="R" yChannelSelector="G"/>
+      </filter>
+      
+      <pattern id="crosshatch" width="8" height="8" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
+        <line x1="0" y1="0" x2="0" y2="8" stroke="#1c1917" stroke-width="0.8" opacity="0.25" />
+      </pattern>
+      <pattern id="crosshatch-dense" width="6" height="6" patternTransform="rotate(-45 0 0)" patternUnits="userSpaceOnUse">
+        <line x1="0" y1="0" x2="0" y2="6" stroke="#1c1917" stroke-width="0.9" opacity="0.35" />
+      </pattern>
+    </defs>
+  </svg>
+
+  <!-- Background Canvas & Paper Texture Overlay -->
+  <div class="canvas-background">
+    <div class="paper-texture"></div>
+    <div class="graphite-grid"></div>
+    <div class="dark-overlay"></div>
+    <div class="light-beam"></div>
+  </div>
+
+  <!-- Top Floating Controls -->
+  <header class="top-nav">
+    <div class="brand-sketch">
+      <svg class="brand-icon" viewBox="0 0 32 32" width="28" height="28">
+        <path d="M4,28 L8,18 L22,4 L28,10 L14,24 L4,28 Z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" />
+        <path d="M19,7 L25,13" fill="none" stroke="currentColor" stroke-width="2" />
+        <path d="M4,28 L9,26 L6,23 Z" fill="currentColor" />
+      </svg>
+      <span class="brand-title">Atelier<strong>Draft</strong></span>
+    </div>
+
+    <div class="top-actions">
+      <!-- Theme Card Mode Toggle (White Card vs Ink Black Card) -->
+      <div class="card-theme-toggle" title="Switch Card Style">
+        <span class="toggle-label">Card Style:</span>
+        <button type="button" class="theme-btn active" id="cardStyleWhite" data-style="white">
+          <span class="color-dot white"></span> White
+        </button>
+        <button type="button" class="theme-btn" id="cardStyleBlack" data-style="black">
+          <span class="color-dot black"></span> Black Ink
+        </button>
+      </div>
+
+      <!-- Sound FX Toggle Button -->
+      <button type="button" class="icon-tool-btn" id="soundToggle" title="Toggle Sound Effects">
+        <svg class="sound-on-icon" viewBox="0 0 24 24" width="20" height="20">
+          <path d="M11 5L6 9H2v6h4l5 4V5z" fill="currentColor"/>
+          <path d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <svg class="sound-off-icon hidden" viewBox="0 0 24 24" width="20" height="20">
+          <path d="M11 5L6 9H2v6h4l5 4V5z" fill="currentColor"/>
+          <line x1="23" y1="9" x2="17" y2="15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <line x1="17" y1="9" x2="23" y2="15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span class="btn-text">Sound ON</span>
+      </button>
+
+      <!-- Replay Animation Button -->
+      <button type="button" class="icon-tool-btn" id="replayIntroBtn" title="Replay Character Walk & Light Switch Intro">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M1 4v6h6M23 20v-6h-6" />
+          <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15" />
+        </svg>
+        <span class="btn-text">Replay Intro</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Interactive Light Switch on Wall (Pencil Sketch Style) -->
+  <div class="switch-station" id="switchStation">
+    <div class="switch-plate" id="switchPlate" title="Click to toggle the switch!">
+      <!-- Hand-drawn screws -->
+      <div class="plate-screw top">
+        <div class="screw-slot"></div>
+      </div>
+      
+      <div class="switch-toggle-frame">
+        <div class="toggle-track">
+          <div class="toggle-rocker" id="toggleRocker">
+            <span class="rocker-label on">I</span>
+            <span class="rocker-ridge"></span>
+            <span class="rocker-label off">O</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="plate-screw bottom">
+        <div class="screw-slot"></div>
+      </div>
+
+      <!-- Pencil annotations around switch -->
+      <div class="switch-label-sketch">
+        <span class="handwritten">LIGHT</span>
+        <svg class="sketch-arrow" viewBox="0 0 40 20" width="36" height="18">
+          <path d="M5,10 Q20,2 32,8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          <path d="M27,4 L33,8 L28,12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+      </div>
+    </div>
+    <div class="switch-hint" id="switchHint">
+      <span class="pulse-indicator"></span>
+      <span class="hint-text">Turn ON the switch</span>
+    </div>
+  </div>
+
+  <!-- Main Experience Stage -->
+  <main class="stage-container">
+    
+    <!-- Left Area: The Animated Pencil-Sketched Human Character -->
+    <div class="character-arena" id="characterArena">
+      <div class="character-wrapper" id="characterWrapper">
+        
+        <!-- Speech Bubble from Character -->
+        <div class="sketch-bubble" id="characterBubble">
+          <div class="bubble-content handwritten" id="bubbleText">Let me turn on the light for you! ✨</div>
+          <div class="bubble-tail"></div>
+        </div>
+
+        <!-- Master SVG Pencil Sketch Character -->
+        <svg id="sketchHuman" class="sketch-human-svg" viewBox="0 0 280 440" width="280" height="440">
+          <g id="humanRoot" class="character-group">
+            
+            <!-- Floor Shadow -->
+            <ellipse id="charShadow" cx="140" cy="425" rx="65" ry="10" fill="url(#crosshatch)" opacity="0.7"/>
+
+            <!-- Legs & Shoes -->
+            <g id="charLegs" class="char-limb">
+              <!-- Left Leg -->
+              <path class="sketch-line leg-l" d="M120,270 L115,350 L110,418" stroke="#1c1917" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+              <!-- Left Shoe -->
+              <path class="sketch-line shoe-l" d="M110,418 Q95,418 88,424 Q105,428 122,423 Z" fill="#1c1917" stroke="#1c1917" stroke-width="2"/>
+
+              <!-- Right Leg -->
+              <path class="sketch-line leg-r" d="M155,270 L158,350 L162,418" stroke="#1c1917" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+              <!-- Right Shoe -->
+              <path class="sketch-line shoe-r" d="M162,418 Q178,418 186,424 Q168,428 152,423 Z" fill="#1c1917" stroke="#1c1917" stroke-width="2"/>
+            </g>
+
+            <!-- Torso / Jacket -->
+            <g id="charTorso">
+              <!-- Main Coat Body -->
+              <path class="sketch-line torso-body" d="M102,150 Q92,205 95,275 Q140,285 180,275 Q184,205 174,150 Z" 
+                    fill="#fff8ee" stroke="#1c1917" stroke-width="4" stroke-linejoin="round"/>
+              <!-- Shading on torso -->
+              <path d="M100,165 Q95,215 97,270 Q120,275 125,270 Q115,200 118,160 Z" fill="url(#crosshatch)" opacity="0.6"/>
+              
+              <!-- Jacket Collar & Lapels -->
+              <path class="sketch-line" d="M120,150 L138,190 L156,150" fill="none" stroke="#1c1917" stroke-width="3" stroke-linecap="round"/>
+              <path class="sketch-line" d="M138,190 L138,278" stroke="#1c1917" stroke-width="2.5" stroke-dasharray="4,3"/>
+              
+              <!-- Buttons -->
+              <circle cx="138" cy="210" r="3" fill="#1c1917"/>
+              <circle cx="138" cy="235" r="3" fill="#1c1917"/>
+              <circle cx="138" cy="260" r="3" fill="#1c1917"/>
+            </g>
+
+            <!-- Head & Face -->
+            <g id="charHead" class="char-head-group">
+              <!-- Neck -->
+              <path class="sketch-line" d="M128,140 L128,155 M148,140 L148,155" stroke="#1c1917" stroke-width="3.5"/>
+              
+              <!-- Head Outline -->
+              <ellipse class="sketch-line head-base" cx="138" cy="100" rx="36" ry="42" 
+                       fill="#fff9f0" stroke="#1c1917" stroke-width="4"/>
+              
+              <!-- Hair -->
+              <path class="sketch-line hair" d="M102,96 Q100,60 138,52 Q176,60 174,96 Q178,72 165,58 Q140,46 112,62 Q100,75 102,96 Z" 
+                    fill="#1c1917" stroke="#1c1917" stroke-width="2"/>
+              <path d="M112,66 Q128,78 142,68 Q155,80 168,72" fill="none" stroke="#1c1917" stroke-width="3" stroke-linecap="round"/>
+
+              <!-- Ears -->
+              <path class="sketch-line" d="M102,100 Q98,108 103,115" stroke="#1c1917" stroke-width="3" fill="none"/>
+              <path class="sketch-line" d="M174,100 Q178,108 173,115" stroke="#1c1917" stroke-width="3" fill="none"/>
+
+              <!-- Eyes & Glasses -->
+              <g id="charEyes" class="eyes-normal">
+                <!-- Eyebrows -->
+                <path id="eyebrowL" class="sketch-line" d="M116,88 Q124,84 130,87" stroke="#1c1917" stroke-width="3" stroke-linecap="round" fill="none"/>
+                <path id="eyebrowR" class="sketch-line" d="M146,87 Q152,84 160,88" stroke="#1c1917" stroke-width="3" stroke-linecap="round" fill="none"/>
+
+                <!-- Eyes -->
+                <ellipse id="eyeL" cx="123" cy="98" rx="4.5" ry="5.5" fill="#1c1917"/>
+                <circle id="eyeGleamL" cx="121.5" cy="96" r="1.5" fill="#ffffff"/>
+
+                <ellipse id="eyeR" cx="153" cy="98" rx="4.5" ry="5.5" fill="#1c1917"/>
+                <circle id="eyeGleamR" cx="151.5" cy="96" r="1.5" fill="#ffffff"/>
+
+                <!-- Glasses -->
+                <rect x="112" y="88" width="22" height="20" rx="6" fill="none" stroke="#1c1917" stroke-width="2.5"/>
+                <rect x="142" y="88" width="22" height="20" rx="6" fill="none" stroke="#1c1917" stroke-width="2.5"/>
+                <path d="M134,97 L142,97" stroke="#1c1917" stroke-width="2.5"/>
+              </g>
+
+              <!-- Nose -->
+              <path class="sketch-line" d="M138,98 L135,112 L141,113" fill="none" stroke="#1c1917" stroke-width="2.5" stroke-linecap="round"/>
+
+              <!-- Mouth -->
+              <path id="charMouth" class="sketch-line mouth-smile" d="M128,124 Q138,133 148,124" 
+                    fill="none" stroke="#1c1917" stroke-width="3" stroke-linecap="round"/>
+
+              <!-- Cheek blush -->
+              <g class="blush" opacity="0.4">
+                <line x1="108" y1="110" x2="114" y2="105" stroke="#ef4444" stroke-width="1.8"/>
+                <line x1="112" y1="112" x2="118" y2="107" stroke="#ef4444" stroke-width="1.8"/>
+                <line x1="158" y1="107" x2="164" y2="112" stroke="#ef4444" stroke-width="1.8"/>
+                <line x1="162" y1="105" x2="168" y2="110" stroke="#ef4444" stroke-width="1.8"/>
+              </g>
+            </g>
+
+            <!-- Left Arm (Articulated for Switch Flip) -->
+            <g id="charLeftArm" class="arm-interactive">
+              <path id="armLDefault" class="sketch-line" d="M96,160 Q70,200 65,250 Q63,265 60,275" 
+                    stroke="#1c1917" stroke-width="4" stroke-linecap="round" fill="none"/>
+              
+              <path id="armLReach" class="sketch-line hidden" d="M98,160 Q70,90 40,25 Q35,12 28,5" 
+                    stroke="#1c1917" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+              
+              <g id="handLReach" class="hidden">
+                <path d="M28,5 Q20,2 16,10 Q22,18 28,16" fill="#fff9f0" stroke="#1c1917" stroke-width="3"/>
+                <path d="M22,8 L8,-5" stroke="#1c1917" stroke-width="3.5" stroke-linecap="round"/>
+              </g>
+            </g>
+
+            <!-- Right Arm & Hands -->
+            <g id="charRightArm" class="arm-interactive">
+              <path id="armRDefault" class="sketch-line" d="M178,160 Q200,205 205,255 Q208,268 212,278" 
+                    stroke="#1c1917" stroke-width="4" stroke-linecap="round" fill="none"/>
+              
+              <g id="handRThumbsUp" class="hidden">
+                <path d="M212,250 Q230,245 234,230 Q238,215 228,215 Q220,225 212,240" fill="#fff9f0" stroke="#1c1917" stroke-width="3"/>
+                <path d="M228,215 L228,200" stroke="#1c1917" stroke-width="4" stroke-linecap="round"/>
+              </g>
+            </g>
+
+            <!-- Hands Covering Eyes (Password typing mode) -->
+            <g id="handsCoverEyes" class="hands-cover-group hidden">
+              <!-- Left Hand covering left eye -->
+              <g transform="translate(102, 75)">
+                <path class="sketch-line" d="M-8,35 Q10,18 18,12 Q28,10 26,22 Q20,32 5,42 Z" fill="#fff9f0" stroke="#1c1917" stroke-width="3"/>
+                <path d="M12,14 L24,16 M10,19 L22,22 M8,25 L19,28" stroke="#1c1917" stroke-width="2.2" stroke-linecap="round"/>
+              </g>
+              <!-- Right Hand covering right eye -->
+              <g transform="translate(142, 75)">
+                <path class="sketch-line" d="M36,35 Q18,18 10,12 Q0,10 2,22 Q8,32 23,42 Z" fill="#fff9f0" stroke="#1c1917" stroke-width="3"/>
+                <path d="M16,14 L4,16 M18,19 L6,22 M20,25 L9,28" stroke="#1c1917" stroke-width="2.2" stroke-linecap="round"/>
+              </g>
+            </g>
+
+            <!-- Mascot Pencil in Pocket -->
+            <g id="mascotPencil" transform="translate(175, 230) rotate(25)">
+              <path d="M0,0 L6,0 L6,35 L3,42 L0,35 Z" fill="#f59e0b" stroke="#1c1917" stroke-width="1.8"/>
+              <path d="M0,0 L6,0 L6,8 L0,8 Z" fill="#f43f5e"/>
+              <path d="M2,38 L4,38 L3,42 Z" fill="#1c1917"/>
+            </g>
+
+          </g>
+        </svg>
+
+        <!-- Floating Sketch Doodles -->
+        <div class="character-doodles">
+          <span class="doodle-star s1">✦</span>
+          <span class="doodle-star s2">✧</span>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Right Area: The High-Aesthetic Login Card Container -->
+    <div class="login-arena">
+      
+      <div class="login-card-wrapper" id="loginCardWrapper">
+        <div class="card-tape tape-top-left"></div>
+        <div class="card-tape tape-top-right"></div>
+        
+        <!-- The Main Interactive Login Card -->
+        <div class="login-card theme-white" id="loginCard">
+          
+          <!-- Card Header -->
+          <div class="card-header">
+            <div class="header-badge">
+              <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="8" cy="8" r="6"/>
+                <path d="M8 4v4l2.5 2.5"/>
+              </svg>
+              <span>Handcrafted Workspace</span>
+            </div>
+            
+            <h1 class="card-title">Welcome Back</h1>
+            <p class="card-subtitle">
+              Sign in to your creative atelier.
+              <svg class="subtitle-flourish" viewBox="0 0 120 12" width="120" height="12">
+                <path d="M2,6 Q30,1 60,7 Q90,12 118,5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </p>
+          </div>
+
+          <!-- Fast Demo Auto-fill Helper -->
+          <div class="demo-quickfill">
+            <button type="button" class="demo-chip" id="quickFillBtn" title="Click to quickly fill sample credentials">
+              <span class="chip-spark">✏️</span> Try Demo Fill: <strong>artist@sketch.studio</strong>
+            </button>
+          </div>
+
+          <!-- The Login Form -->
+          <form class="auth-form" id="loginForm" novalidate>
+            
+            <!-- Email Input Group -->
+            <div class="form-group" id="emailGroup">
+              <label for="emailInput" class="form-label">
+                <span>Email Address</span>
+                <span class="sketch-pencil-indicator" id="emailPencil">✏️ sketching...</span>
+              </label>
+              
+              <div class="input-wrapper">
+                <div class="input-icon">
+                  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <rect x="2" y="4" width="20" height="16" rx="2" />
+                    <path d="M22 6L12 13 2 6" />
+                  </svg>
+                </div>
+                
+                <input 
+                  type="email" 
+                  id="emailInput" 
+                  name="email" 
+                  class="sketch-input" 
+                  placeholder="name@example.com" 
+                  autocomplete="email"
+                  required
+                >
+              </div>
+              <span class="field-error" id="emailError">Please enter a valid email address</span>
+            </div>
+
+            <!-- Password Input Group -->
+            <div class="form-group" id="passwordGroup">
+              <div class="label-row">
+                <label for="passwordInput" class="form-label">
+                  <span>Password</span>
+                  <span class="sketch-pencil-indicator" id="passwordPencil">🙈 Character covered eyes!</span>
+                </label>
+                <a href="#forgot" class="forgot-link" id="forgotPasswordLink">Forgot?</a>
+              </div>
+              
+              <div class="input-wrapper">
+                <div class="input-icon">
+                  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                  </svg>
+                </div>
+                
+                <input 
+                  type="password" 
+                  id="passwordInput" 
+                  name="password" 
+                  class="sketch-input" 
+                  placeholder="Enter your secret key" 
+                  autocomplete="current-password"
+                  required
+                >
+
+                <!-- Show/Hide Password Button -->
+                <button type="button" class="password-toggle" id="togglePasswordBtn" title="Toggle password visibility">
+                  <svg class="eye-open" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                  <svg class="eye-closed hidden" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                    <line x1="1" y1="1" x2="23" y2="23" />
+                  </svg>
+                </button>
+              </div>
+              
+              <!-- Sketch Password Strength Meter -->
+              <div class="password-meter" id="passwordMeter">
+                <div class="meter-track">
+                  <div class="meter-bar" id="meterBar"></div>
+                </div>
+                <div class="meter-label" id="meterLabel">Password strength: Empty</div>
+              </div>
+              <span class="field-error" id="passwordError">Password must be at least 6 characters</span>
+            </div>
+
+            <!-- Remember Me & Preferences -->
+            <div class="form-auxiliary">
+              <label class="sketch-checkbox-container" id="rememberMeContainer">
+                <input type="checkbox" id="rememberMeCheckbox" name="remember">
+                <span class="sketch-checkmark">
+                  <svg viewBox="0 0 16 16" width="14" height="14">
+                    <path class="check-path" d="M3,8 L6,12 L13,3" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+                <span class="checkbox-text">Keep me signed in</span>
+              </label>
+            </div>
+
+            <!-- Sign In Submit Button -->
+            <button type="submit" class="sketch-submit-btn" id="submitBtn">
+              <span class="btn-content">
+                <span class="btn-label">Sign In to Canvas</span>
+                <svg class="btn-arrow" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                  <polyline points="12 5 19 12 12 19" />
+                </svg>
+              </span>
+              <span class="spinner-sketch hidden" id="submitSpinner">
+                <svg viewBox="0 0 24 24" width="22" height="22">
+                  <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="3" stroke-dasharray="35" stroke-dashoffset="10"/>
+                </svg>
+              </span>
+            </button>
+
+          </form>
+
+          <!-- Divider -->
+          <div class="sketch-divider">
+            <span class="divider-line"></span>
+            <span class="divider-text handwritten">or continue with</span>
+            <span class="divider-line"></span>
+          </div>
+
+          <!-- Social Login Sketched Badges -->
+          <div class="social-auth-grid">
+            <button type="button" class="social-btn" title="Sign in with Google" onclick="handleSocialAuth('Google')">
+              <svg viewBox="0 0 24 24" width="18" height="18">
+                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/>
+                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/>
+              </svg>
+              <span>Google</span>
+            </button>
+
+            <button type="button" class="social-btn" title="Sign in with GitHub" onclick="handleSocialAuth('GitHub')">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+              </svg>
+              <span>GitHub</span>
+            </button>
+
+            <button type="button" class="social-btn" title="Sign in with Apple" onclick="handleSocialAuth('Apple')">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.87c.6-1.07 1-2.57.81-4.07-1.32.08-2.85.9-3.74 1.94-.59.69-1.12 2.22-.92 3.69 1.48.11 2.95-.77 3.85-1.56z"/>
+              </svg>
+              <span>Apple</span>
+            </button>
+          </div>
+
+          <!-- Card Footer -->
+          <div class="card-footer">
+            <span>Don't have a draft book?</span>
+            <a href="#signup" class="signup-link" id="signUpLink">Create an account</a>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Interactive Modal: Success -->
+  <div class="sketch-modal-backdrop hidden" id="successModal">
+    <div class="sketch-modal">
+      <div class="modal-stamp">APPROVED</div>
+      <div class="modal-icon-circle">
+        <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="#1c1917" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+      </div>
+      <h2 class="modal-title handwritten">Authentication Successful!</h2>
+      <p class="modal-desc" id="modalUserMsg">Welcome back, artist! Your sketchbook workspace is loaded.</p>
+      <button type="button" class="modal-close-btn" id="modalCloseBtn">Continue to Dashboard</button>
+    </div>
+  </div>
+
+  <!-- Interactive Modal: Forgot Password -->
+  <div class="sketch-modal-backdrop hidden" id="forgotModal">
+    <div class="sketch-modal">
+      <h2 class="modal-title handwritten">Reset Your Key</h2>
+      <p class="modal-desc">Enter your email and we'll send a hand-sketched recovery link.</p>
+      <div class="modal-input-box">
+        <input type="email" id="forgotEmailInput" class="sketch-input" placeholder="artist@sketch.studio">
+      </div>
+      <div class="modal-btn-row">
+        <button type="button" class="modal-secondary-btn" id="forgotCancelBtn">Cancel</button>
+        <button type="button" class="modal-close-btn" id="forgotSubmitBtn">Send Link</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Audio Synthesis Script & Logic -->
+  <script>
+    class SketchAudioEngine {
+      constructor() {
+        this.ctx = null;
+        this.enabled = true;
+      }
+
+      init() {
+        if (!this.ctx) {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (AudioCtx) this.ctx = new AudioCtx();
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+
+      toggleSound(forceState) {
+        if (typeof forceState === 'boolean') {
+          this.enabled = forceState;
+        } else {
+          this.enabled = !this.enabled;
+        }
+        return this.enabled;
+      }
+
+      playSwitchOn() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(1400, now);
+        osc.frequency.exponentialRampToValueAtTime(120, now + 0.04);
+        gain.gain.setValueAtTime(0.7, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.045);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.05);
+
+        const chimeOsc = this.ctx.createOscillator();
+        const chimeGain = this.ctx.createGain();
+        chimeOsc.type = 'sine';
+        chimeOsc.frequency.setValueAtTime(523.25, now + 0.02);
+        chimeOsc.frequency.exponentialRampToValueAtTime(1046.50, now + 0.08);
+        chimeGain.gain.setValueAtTime(0.001, now);
+        chimeGain.gain.setValueAtTime(0.18, now + 0.02);
+        chimeGain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+        chimeOsc.connect(chimeGain);
+        chimeGain.connect(this.ctx.destination);
+        chimeOsc.start(now + 0.02);
+        chimeOsc.stop(now + 0.5);
+      }
+
+      playSwitchOff() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(600, now);
+        osc.frequency.exponentialRampToValueAtTime(60, now + 0.06);
+        gain.gain.setValueAtTime(0.6, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.065);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.07);
+      }
+
+      playPencilScribble() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const bufferSize = this.ctx.sampleRate * 0.035;
+        const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+        const noise = this.ctx.createBufferSource();
+        noise.buffer = buffer;
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.setValueAtTime(2800 + Math.random() * 1000, now);
+        filter.Q.setValueAtTime(3.0, now);
+        const gain = this.ctx.createGain();
+        gain.gain.setValueAtTime(0.12, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.035);
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.ctx.destination);
+        noise.start(now);
+        noise.stop(now + 0.04);
+      }
+
+      playButtonClick() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(480, now);
+        osc.frequency.exponentialRampToValueAtTime(240, now + 0.04);
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.045);
+      }
+
+      playSuccessChime() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const notes = [523.25, 659.25, 783.99, 1046.50];
+        notes.forEach((freq, index) => {
+          const startTime = now + index * 0.07;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, startTime);
+          gain.gain.setValueAtTime(0.001, startTime);
+          gain.gain.linearRampToValueAtTime(0.25, startTime + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.0001, startTime + 0.6);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(startTime);
+          osc.stop(startTime + 0.65);
+        });
+      }
+
+      playErrorBuzz() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(140, now);
+        osc.frequency.linearRampToValueAtTime(110, now + 0.12);
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.15);
+      }
+    }
+
+    const sound = new SketchAudioEngine();
+
+    // Interactive Controller
+    document.addEventListener('DOMContentLoaded', () => {
+      const body = document.body;
+      const switchPlate = document.getElementById('switchPlate');
+      const lightBeam = document.querySelector('.light-beam');
+      const characterArena = document.getElementById('characterArena');
+      const characterBubble = document.getElementById('characterBubble');
+      const bubbleText = document.getElementById('bubbleText');
+      const replayIntroBtn = document.getElementById('replayIntroBtn');
+      const soundToggle = document.getElementById('soundToggle');
+      
+      const armLDefault = document.getElementById('armLDefault');
+      const armLReach = document.getElementById('armLReach');
+      const handLReach = document.getElementById('handLReach');
+      const armRDefault = document.getElementById('armRDefault');
+      const handRThumbsUp = document.getElementById('handRThumbsUp');
+      const handsCoverEyes = document.getElementById('handsCoverEyes');
+      const charMouth = document.getElementById('charMouth');
+      
+      const cardStyleWhite = document.getElementById('cardStyleWhite');
+      const cardStyleBlack = document.getElementById('cardStyleBlack');
+      const loginCard = document.getElementById('loginCard');
+      
+      const loginForm = document.getElementById('loginForm');
+      const emailInput = document.getElementById('emailInput');
+      const passwordInput = document.getElementById('passwordInput');
+      const togglePasswordBtn = document.getElementById('togglePasswordBtn');
+      const quickFillBtn = document.getElementById('quickFillBtn');
+      const rememberMeCheckbox = document.getElementById('rememberMeCheckbox');
+      const submitBtn = document.getElementById('submitBtn');
+      const submitSpinner = document.getElementById('submitSpinner');
+      const btnContent = document.querySelector('.btn-content');
+      
+      const emailGroup = document.getElementById('emailGroup');
+      const passwordGroup = document.getElementById('passwordGroup');
+      const passwordMeter = document.getElementById('passwordMeter');
+      const meterBar = document.getElementById('meterBar');
+      const meterLabel = document.getElementById('meterLabel');
+      
+      const successModal = document.getElementById('successModal');
+      const modalCloseBtn = document.getElementById('modalCloseBtn');
+      const modalUserMsg = document.getElementById('modalUserMsg');
+      const forgotPasswordLink = document.getElementById('forgotPasswordLink');
+      const forgotModal = document.getElementById('forgotModal');
+      const forgotCancelBtn = document.getElementById('forgotCancelBtn');
+      const forgotSubmitBtn = document.getElementById('forgotSubmitBtn');
+      const forgotEmailInput = document.getElementById('forgotEmailInput');
+
+      let isLightOn = false;
+      let isIntroPlaying = false;
+
+      function setCharacterBubble(text, duration = 0) {
+        if (bubbleText) {
+          bubbleText.innerHTML = text;
+          characterBubble.style.opacity = '1';
+          characterBubble.style.transform = 'translateX(-40%) scale(1)';
+        }
+        if (duration > 0) {
+          setTimeout(() => {
+            if (bubbleText.innerHTML === text) {
+              characterBubble.style.opacity = '0.9';
+            }
+          }, duration);
+        }
+      }
+
+      function setCharacterPose(pose) {
+        armLDefault.classList.remove('hidden');
+        armLReach.classList.add('hidden');
+        handLReach.classList.add('hidden');
+        armRDefault.classList.remove('hidden');
+        handRThumbsUp.classList.add('hidden');
+        handsCoverEyes.classList.add('hidden');
+
+        if (charMouth) charMouth.setAttribute('d', 'M128,124 Q138,133 148,124');
+
+        switch (pose) {
+          case 'reach-switch':
+            armLDefault.classList.add('hidden');
+            armLReach.classList.remove('hidden');
+            handLReach.classList.remove('hidden');
+            break;
+          case 'cover-eyes':
+            handsCoverEyes.classList.remove('hidden');
+            armLDefault.classList.add('hidden');
+            armRDefault.classList.add('hidden');
+            if (charMouth) charMouth.setAttribute('d', 'M130,126 Q138,122 146,126');
+            break;
+          case 'thumbs-up':
+            armRDefault.classList.add('hidden');
+            handRThumbsUp.classList.remove('hidden');
+            if (charMouth) charMouth.setAttribute('d', 'M126,122 Q138,138 150,122');
+            break;
+          case 'confused':
+            if (charMouth) charMouth.setAttribute('d', 'M128,127 Q138,120 148,127');
+            break;
+        }
+      }
+
+      function triggerLightBeam() {
+        if (lightBeam) {
+          lightBeam.classList.remove('flash');
+          void lightBeam.offsetWidth;
+          lightBeam.classList.add('flash');
+        }
+      }
+
+      function turnLightOn(animateCharacter = false) {
+        isLightOn = true;
+        body.classList.remove('light-off');
+        body.classList.add('light-on');
+        sound.playSwitchOn();
+        triggerLightBeam();
+
+        if (!animateCharacter) {
+          setCharacterPose('idle');
+          setCharacterBubble("There we go! Canvas is lit ✨", 3500);
+        }
+      }
+
+      function turnLightOff() {
+        isLightOn = false;
+        body.classList.remove('light-on');
+        body.classList.add('light-off');
+        sound.playSwitchOff();
+        setCharacterPose('confused');
+        setCharacterBubble("Who turned off the atelier light? 🔦", 4000);
+      }
+
+      function toggleLight() {
+        if (isLightOn) turnLightOff();
+        else turnLightOn();
+      }
+
+      switchPlate.addEventListener('click', toggleLight);
+
+      function playIntroSequence() {
+        if (isIntroPlaying) return;
+        isIntroPlaying = true;
+
+        body.classList.remove('light-on');
+        body.classList.add('light-off');
+        isLightOn = false;
+
+        setCharacterBubble("Hold on, let me turn on the switch for you... 💡");
+        setCharacterPose('idle');
+
+        characterArena.classList.remove('walking-intro');
+        void characterArena.offsetWidth;
+        characterArena.classList.add('walking-intro');
+
+        setTimeout(() => {
+          setCharacterPose('reach-switch');
+          setCharacterBubble("Just a second... *click*");
+        }, 1100);
+
+        setTimeout(() => {
+          turnLightOn(true);
+          setCharacterBubble("Voila! Welcome to the atelier ✨");
+        }, 1500);
+
+        setTimeout(() => {
+          setCharacterPose('idle');
+          characterArena.classList.remove('walking-intro');
+          isIntroPlaying = false;
+          setTimeout(() => { emailInput.focus(); }, 400);
+        }, 2400);
+      }
+
+      replayIntroBtn.addEventListener('click', () => {
+        sound.playButtonClick();
+        playIntroSequence();
+      });
+
+      function setCardStyle(style) {
+        sound.playButtonClick();
+        if (style === 'white') {
+          loginCard.classList.remove('theme-black');
+          loginCard.classList.add('theme-white');
+          cardStyleWhite.classList.add('active');
+          cardStyleBlack.classList.remove('active');
+          setCharacterBubble("White paper card selected 📜");
+        } else {
+          loginCard.classList.remove('theme-white');
+          loginCard.classList.add('theme-black');
+          cardStyleBlack.classList.add('active');
+          cardStyleWhite.classList.remove('active');
+          setCharacterBubble("Black ink card selected 🖋️");
+        }
+      }
+
+      cardStyleWhite.addEventListener('click', () => setCardStyle('white'));
+      cardStyleBlack.addEventListener('click', () => setCardStyle('black'));
+
+      const soundOnIcon = document.querySelector('.sound-on-icon');
+      const soundOffIcon = document.querySelector('.sound-off-icon');
+      const soundText = soundToggle.querySelector('.btn-text');
+
+      soundToggle.addEventListener('click', () => {
+        const isNowOn = sound.toggleSound();
+        if (isNowOn) {
+          soundOnIcon.classList.remove('hidden');
+          soundOffIcon.classList.add('hidden');
+          soundText.textContent = 'Sound ON';
+          sound.playButtonClick();
+          setCharacterBubble("Sound effects enabled! 🎵");
+        } else {
+          soundOnIcon.classList.add('hidden');
+          soundOffIcon.classList.remove('hidden');
+          soundText.textContent = 'Sound OFF';
+        }
+      });
+
+      emailInput.addEventListener('focus', () => {
+        emailGroup.classList.add('focused');
+        if (!passwordInput.matches(':focus')) {
+          setCharacterPose('idle');
+          setCharacterBubble("What's your artist email? ✏️");
+        }
+      });
+
+      emailInput.addEventListener('blur', () => {
+        emailGroup.classList.remove('focused');
+        validateEmail(false);
+      });
+
+      passwordInput.addEventListener('focus', () => {
+        passwordGroup.classList.add('focused');
+        passwordMeter.classList.add('active');
+        setCharacterPose('cover-eyes');
+        setCharacterBubble("I'm looking away! Your secret is safe 🙈");
+      });
+
+      passwordInput.addEventListener('blur', () => {
+        passwordGroup.classList.remove('focused');
+        if (passwordInput.value.length === 0) passwordMeter.classList.remove('active');
+        setCharacterPose('idle');
+        setCharacterBubble("I won't tell anyone 😉", 2500);
+        validatePassword(false);
+      });
+
+      function handleTypingScribble() {
+        sound.playPencilScribble();
+      }
+
+      emailInput.addEventListener('input', () => {
+        handleTypingScribble();
+        if (emailGroup.classList.contains('has-error')) validateEmail(false);
+      });
+
+      passwordInput.addEventListener('input', () => {
+        handleTypingScribble();
+        updatePasswordStrength(passwordInput.value);
+        if (passwordGroup.classList.contains('has-error')) validatePassword(false);
+      });
+
+      function updatePasswordStrength(val) {
+        let score = 0;
+        if (!val) {
+          meterBar.style.width = '0%';
+          meterBar.style.backgroundColor = '#E4E4E7';
+          meterLabel.textContent = 'Password strength: Empty';
+          return;
+        }
+        if (val.length >= 6) score += 1;
+        if (val.length >= 10) score += 1;
+        if (/[A-Z]/.test(val)) score += 1;
+        if (/[0-9]/.test(val)) score += 1;
+        if (/[^A-Za-z0-9]/.test(val)) score += 1;
+
+        switch (score) {
+          case 1:
+            meterBar.style.width = '25%';
+            meterBar.style.backgroundColor = '#EF4444';
+            meterLabel.textContent = 'Strength: Weak sketch ✏️';
+            break;
+          case 2:
+          case 3:
+            meterBar.style.width = '60%';
+            meterBar.style.backgroundColor = '#F59E0B';
+            meterLabel.textContent = 'Strength: Getting solid 📐';
+            break;
+          case 4:
+          case 5:
+            meterBar.style.width = '100%';
+            meterBar.style.backgroundColor = '#16A34A';
+            meterLabel.textContent = 'Strength: Masterpiece lock 🎨!';
+            break;
+        }
+      }
+
+      togglePasswordBtn.addEventListener('click', () => {
+        sound.playButtonClick();
+        const eyeOpen = togglePasswordBtn.querySelector('.eye-open');
+        const eyeClosed = togglePasswordBtn.querySelector('.eye-closed');
+        if (passwordInput.type === 'password') {
+          passwordInput.type = 'text';
+          eyeOpen.classList.add('hidden');
+          eyeClosed.classList.remove('hidden');
+          setCharacterBubble("Peeking through fingers! 👀");
+        } else {
+          passwordInput.type = 'password';
+          eyeOpen.classList.remove('hidden');
+          eyeClosed.classList.add('hidden');
+          setCharacterBubble("Hidden again! 🙈");
+        }
+      });
+
+      quickFillBtn.addEventListener('click', () => {
+        sound.playButtonClick();
+        emailInput.value = 'artist@sketch.studio';
+        passwordInput.value = 'Palette#2026Master';
+        updatePasswordStrength(passwordInput.value);
+        passwordMeter.classList.add('active');
+        validateEmail(false);
+        validatePassword(false);
+        setCharacterBubble("Demo draft credentials loaded! 🚀");
+      });
+
+      rememberMeCheckbox.addEventListener('change', () => sound.playButtonClick());
+
+      function validateEmail(showError = true) {
+        const val = emailInput.value.trim();
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const isValid = emailRegex.test(val);
+        if (!isValid && showError) emailGroup.classList.add('has-error');
+        else if (isValid) emailGroup.classList.remove('has-error');
+        return isValid;
+      }
+
+      function validatePassword(showError = true) {
+        const val = passwordInput.value;
+        const isValid = val.length >= 6;
+        if (!isValid && showError) passwordGroup.classList.add('has-error');
+        else if (isValid) passwordGroup.classList.remove('has-error');
+        return isValid;
+      }
+
+      loginForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        if (!isLightOn) turnLightOn();
+        const isEmailValid = validateEmail(true);
+        const isPasswordValid = validatePassword(true);
+
+        if (!isEmailValid || !isPasswordValid) {
+          sound.playErrorBuzz();
+          setCharacterPose('confused');
+          setCharacterBubble("Check the draft details, something's missing! ✏️");
+          loginCard.style.animation = 'shakeCard 0.4s ease';
+          setTimeout(() => { loginCard.style.animation = ''; }, 450);
+          return;
+        }
+
+        sound.playButtonClick();
+        submitBtn.disabled = true;
+        btnContent.classList.add('hidden');
+        submitSpinner.classList.remove('hidden');
+        setCharacterBubble("Validating your sketch credentials... ⏳");
+
+        setTimeout(() => {
+          submitBtn.disabled = false;
+          btnContent.classList.remove('hidden');
+          submitSpinner.classList.add('hidden');
+          sound.playSuccessChime();
+          setCharacterPose('thumbs-up');
+          setCharacterBubble("You're in! Welcome to the atelier! 🎉", 5000);
+          modalUserMsg.textContent = `Welcome back, ${emailInput.value}! Your sketch workspace is loaded and ready.`;
+          successModal.classList.remove('hidden');
+        }, 1200);
+      });
+
+      modalCloseBtn.addEventListener('click', () => {
+        sound.playButtonClick();
+        successModal.classList.add('hidden');
+        setCharacterPose('idle');
+      });
+
+      forgotPasswordLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        sound.playButtonClick();
+        forgotModal.classList.remove('hidden');
+        forgotEmailInput.value = emailInput.value || '';
+        forgotEmailInput.focus();
+      });
+
+      forgotCancelBtn.addEventListener('click', () => {
+        sound.playButtonClick();
+        forgotModal.classList.add('hidden');
+      });
+
+      forgotSubmitBtn.addEventListener('click', () => {
+        const val = forgotEmailInput.value.trim();
+        if (!val || !val.includes('@')) {
+          sound.playErrorBuzz();
+          forgotEmailInput.style.borderColor = '#EF4444';
+          return;
+        }
+        sound.playSuccessChime();
+        forgotModal.classList.add('hidden');
+        setCharacterBubble("Reset sketch link sent to your inbox! 📬", 4000);
+      });
+
+      window.handleSocialAuth = function(provider) {
+        if (!isLightOn) turnLightOn();
+        sound.playButtonClick();
+        setCharacterBubble(`Connecting via ${provider}... 🎨`);
+        setTimeout(() => {
+          sound.playSuccessChime();
+          modalUserMsg.textContent = `Authenticated successfully with ${provider}!`;
+          successModal.classList.remove('hidden');
+          setCharacterPose('thumbs-up');
+        }, 800);
+      };
+
+      const styleSheet = document.createElement('style');
+      styleSheet.textContent = `
+        @keyframes shakeCard {
+          0%, 100% { transform: translateX(0); }
+          20% { transform: translateX(-8px); }
+          40% { transform: translateX(8px); }
+          60% { transform: translateX(-5px); }
+          80% { transform: translateX(5px); }
+        }
+      `;
+      document.head.appendChild(styleSheet);
+
+      setTimeout(() => {
+        playIntroSequence();
+      }, 400);
+    });
+  </script>
+</body>
+</html>

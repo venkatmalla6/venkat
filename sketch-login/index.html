@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pencil Sketch Interactive Login | Art & Light</title>
+  <meta name="description" content="An artistic hand-drawn pencil sketch interactive login page with switch toggle animation, warm yellow canvas, and expressive character interactions.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="light-off">
+
+  <!-- SVG Filters for Authentic Graphite Pencil & Paper Texture -->
+  <svg class="svg-filters" aria-hidden="true" width="0" height="0">
+    <defs>
+      <!-- Graphite sketch stroke roughness filter -->
+      <filter id="pencil-texture" x="-10%" y="-10%" width="120%" height="120%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="4" result="noise" />
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="2.2" xChannelSelector="R" yChannelSelector="G" />
+      </filter>
+      
+      <!-- Subtle rough paper filter -->
+      <filter id="rough-edge">
+        <feTurbulence type="turbulence" baseFrequency="0.05" numOctaves="2" result="turbulence"/>
+        <feDisplacementMap in2="turbulence" in="SourceGraphic" scale="1.5" xChannelSelector="R" yChannelSelector="G"/>
+      </filter>
+      
+      <!-- Sketch shading pattern -->
+      <pattern id="crosshatch" width="8" height="8" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
+        <line x1="0" y1="0" x2="0" y2="8" stroke="#1c1917" stroke-width="0.8" opacity="0.25" />
+      </pattern>
+      <pattern id="crosshatch-dense" width="6" height="6" patternTransform="rotate(-45 0 0)" patternUnits="userSpaceOnUse">
+        <line x1="0" y1="0" x2="0" y2="6" stroke="#1c1917" stroke-width="0.9" opacity="0.35" />
+      </pattern>
+    </defs>
+  </svg>
+
+  <!-- Background Canvas & Paper Texture Overlay -->
+  <div class="canvas-background">
+    <div class="paper-texture"></div>
+    <div class="graphite-grid"></div>
+    <div class="dark-overlay"></div>
+    <div class="light-beam"></div>
+  </div>
+
+  <!-- Top Floating Controls -->
+  <header class="top-nav">
+    <div class="brand-sketch">
+      <svg class="brand-icon" viewBox="0 0 32 32" width="28" height="28">
+        <path d="M4,28 L8,18 L22,4 L28,10 L14,24 L4,28 Z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" />
+        <path d="M19,7 L25,13" fill="none" stroke="currentColor" stroke-width="2" />
+        <path d="M4,28 L9,26 L6,23 Z" fill="currentColor" />
+      </svg>
+      <span class="brand-title">Atelier<strong>Draft</strong></span>
+    </div>
+
+    <div class="top-actions">
+      <!-- Theme Card Mode Toggle (White Card vs Ink Black Card) -->
+      <div class="card-theme-toggle" title="Switch Card Style">
+        <span class="toggle-label">Card Style:</span>
+        <button type="button" class="theme-btn active" id="cardStyleWhite" data-style="white">
+          <span class="color-dot white"></span> White
+        </button>
+        <button type="button" class="theme-btn" id="cardStyleBlack" data-style="black">
+          <span class="color-dot black"></span> Black Ink
+        </button>
+      </div>
+
+      <!-- Sound FX Toggle Button -->
+      <button type="button" class="icon-tool-btn" id="soundToggle" title="Toggle Sound Effects">
+        <svg class="sound-on-icon" viewBox="0 0 24 24" width="20" height="20">
+          <path d="M11 5L6 9H2v6h4l5 4V5z" fill="currentColor"/>
+          <path d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <svg class="sound-off-icon hidden" viewBox="0 0 24 24" width="20" height="20">
+          <path d="M11 5L6 9H2v6h4l5 4V5z" fill="currentColor"/>
+          <line x1="23" y1="9" x2="17" y2="15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <line x1="17" y1="9" x2="23" y2="15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span class="btn-text">Sound ON</span>
+      </button>
+
+      <!-- Replay Animation Button -->
+      <button type="button" class="icon-tool-btn" id="replayIntroBtn" title="Replay Character Walk & Light Switch Intro">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M1 4v6h6M23 20v-6h-6" />
+          <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15" />
+        </svg>
+        <span class="btn-text">Replay Intro</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Interactive Light Switch on Wall (Pencil Sketch Style) -->
+  <div class="switch-station" id="switchStation">
+    <div class="switch-plate-shadow"></div>
+    <div class="switch-plate" id="switchPlate" title="Click to toggle the switch!">
+      <!-- Hand-drawn screws -->
+      <div class="plate-screw top">
+        <div class="screw-slot"></div>
+      </div>
+      
+      <div class="switch-toggle-frame">
+        <div class="toggle-track">
+          <div class="toggle-rocker" id="toggleRocker">
+            <span class="rocker-label on">I</span>
+            <span class="rocker-ridge"></span>
+            <span class="rocker-label off">O</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="plate-screw bottom">
+        <div class="screw-slot"></div>
+      </div>
+
+      <!-- Pencil annotations around switch -->
+      <div class="switch-label-sketch">
+        <span class="handwritten">LIGHT</span>
+        <svg class="sketch-arrow" viewBox="0 0 40 20" width="36" height="18">
+          <path d="M5,10 Q20,2 32,8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          <path d="M27,4 L33,8 L28,12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+      </div>
+    </div>
+    <div class="switch-hint" id="switchHint">
+      <span class="pulse-indicator"></span>
+      <span class="hint-text">Turn ON the switch</span>
+    </div>
+  </div>
+
+  <!-- Main Experience Stage -->
+  <main class="stage-container">
+    
+    <!-- Left Area: The Animated Pencil-Sketched Human Character -->
+    <div class="character-arena" id="characterArena">
+      <div class="character-wrapper" id="characterWrapper">
+        
+        <!-- Speech Bubble from Character -->
+        <div class="sketch-bubble" id="characterBubble">
+          <div class="bubble-content handwritten" id="bubbleText">Let me turn on the light for you! ✨</div>
+          <div class="bubble-tail"></div>
+        </div>
+
+        <!-- Master SVG Pencil Sketch Character -->
+        <svg id="sketchHuman" class="sketch-human-svg" viewBox="0 0 280 440" width="280" height="440">
+          <g id="humanRoot" class="character-group">
+            
+            <!-- Floor Shadow (Graphite crosshatch) -->
+            <ellipse id="charShadow" cx="140" cy="425" rx="65" ry="10" fill="url(#crosshatch)" opacity="0.7"/>
+
+            <!-- Legs & Shoes -->
+            <g id="charLegs" class="char-limb">
+              <!-- Left Leg -->
+              <path class="sketch-line leg-l" d="M120,270 L115,350 L110,418" stroke="#1c1917" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+              <!-- Left Shoe -->
+              <path class="sketch-line shoe-l" d="M110,418 Q95,418 88,424 Q105,428 122,423 Z" fill="#1c1917" stroke="#1c1917" stroke-width="2"/>
+
+              <!-- Right Leg -->
+              <path class="sketch-line leg-r" d="M155,270 L158,350 L162,418" stroke="#1c1917" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+              <!-- Right Shoe -->
+              <path class="sketch-line shoe-r" d="M162,418 Q178,418 186,424 Q168,428 152,423 Z" fill="#1c1917" stroke="#1c1917" stroke-width="2"/>
+            </g>
+
+            <!-- Torso / Jacket (Hand-sketched with hatch texture) -->
+            <g id="charTorso">
+              <!-- Main Coat Body -->
+              <path class="sketch-line torso-body" d="M102,150 Q92,205 95,275 Q140,285 180,275 Q184,205 174,150 Z" 
+                    fill="#fff8ee" stroke="#1c1917" stroke-width="4" stroke-linejoin="round"/>
+              <!-- Shading on torso -->
+              <path d="M100,165 Q95,215 97,270 Q120,275 125,270 Q115,200 118,160 Z" fill="url(#crosshatch)" opacity="0.6"/>
+              
+              <!-- Jacket Collar & Lapels -->
+              <path class="sketch-line" d="M120,150 L138,190 L156,150" fill="none" stroke="#1c1917" stroke-width="3" stroke-linecap="round"/>
+              <path class="sketch-line" d="M138,190 L138,278" stroke="#1c1917" stroke-width="2.5" stroke-dasharray="4,3"/>
+              
+              <!-- Buttons -->
+              <circle cx="138" cy="210" r="3" fill="#1c1917"/>
+              <circle cx="138" cy="235" r="3" fill="#1c1917"/>
+              <circle cx="138" cy="260" r="3" fill="#1c1917"/>
+            </g>
+
+            <!-- Head & Face -->
+            <g id="charHead" class="char-head-group">
+              <!-- Neck -->
+              <path class="sketch-line" d="M128,140 L128,155 M148,140 L148,155" stroke="#1c1917" stroke-width="3.5"/>
+              
+              <!-- Head Outline -->
+              <ellipse class="sketch-line head-base" cx="138" cy="100" rx="36" ry="42" 
+                       fill="#fff9f0" stroke="#1c1917" stroke-width="4"/>
+              
+              <!-- Hair (Charcoal strokes) -->
+              <path class="sketch-line hair" d="M102,96 Q100,60 138,52 Q176,60 174,96 Q178,72 165,58 Q140,46 112,62 Q100,75 102,96 Z" 
+                    fill="#1c1917" stroke="#1c1917" stroke-width="2"/>
+              <!-- Hair bangs sketch lines -->
+              <path d="M112,66 Q128,78 142,68 Q155,80 168,72" fill="none" stroke="#1c1917" stroke-width="3" stroke-linecap="round"/>
+
+              <!-- Ears -->
+              <path class="sketch-line" d="M102,100 Q98,108 103,115" stroke="#1c1917" stroke-width="3" fill="none"/>
+              <path class="sketch-line" d="M174,100 Q178,108 173,115" stroke="#1c1917" stroke-width="3" fill="none"/>
+
+              <!-- Eyes & Glasses / Eyebrows -->
+              <g id="charEyes" class="eyes-normal">
+                <!-- Left Eyebrow -->
+                <path id="eyebrowL" class="sketch-line" d="M116,88 Q124,84 130,87" stroke="#1c1917" stroke-width="3" stroke-linecap="round" fill="none"/>
+                <!-- Right Eyebrow -->
+                <path id="eyebrowR" class="sketch-line" d="M146,87 Q152,84 160,88" stroke="#1c1917" stroke-width="3" stroke-linecap="round" fill="none"/>
+
+                <!-- Left Eye -->
+                <ellipse id="eyeL" cx="123" cy="98" rx="4.5" ry="5.5" fill="#1c1917"/>
+                <circle id="eyeGleamL" cx="121.5" cy="96" r="1.5" fill="#ffffff"/>
+
+                <!-- Right Eye -->
+                <ellipse id="eyeR" cx="153" cy="98" rx="4.5" ry="5.5" fill="#1c1917"/>
+                <circle id="eyeGleamR" cx="151.5" cy="96" r="1.5" fill="#ffffff"/>
+
+                <!-- Glasses (Stylish Sketch Frames) -->
+                <rect x="112" y="88" width="22" height="20" rx="6" fill="none" stroke="#1c1917" stroke-width="2.5"/>
+                <rect x="142" y="88" width="22" height="20" rx="6" fill="none" stroke="#1c1917" stroke-width="2.5"/>
+                <path d="M134,97 L142,97" stroke="#1c1917" stroke-width="2.5"/>
+              </g>
+
+              <!-- Nose -->
+              <path class="sketch-line" d="M138,98 L135,112 L141,113" fill="none" stroke="#1c1917" stroke-width="2.5" stroke-linecap="round"/>
+
+              <!-- Mouth (Dynamic) -->
+              <path id="charMouth" class="sketch-line mouth-smile" d="M128,124 Q138,133 148,124" 
+                    fill="none" stroke="#1c1917" stroke-width="3" stroke-linecap="round"/>
+
+              <!-- Cheek blush sketch hatches -->
+              <g class="blush" opacity="0.4">
+                <line x1="108" y1="110" x2="114" y2="105" stroke="#ef4444" stroke-width="1.8"/>
+                <line x1="112" y1="112" x2="118" y2="107" stroke="#ef4444" stroke-width="1.8"/>
+                <line x1="158" y1="107" x2="164" y2="112" stroke="#ef4444" stroke-width="1.8"/>
+                <line x1="162" y1="105" x2="168" y2="110" stroke="#ef4444" stroke-width="1.8"/>
+              </g>
+            </g>
+
+            <!-- Left Arm (Articulated for Switch Flip / Gestures) -->
+            <g id="charLeftArm" class="arm-interactive">
+              <!-- Default resting / waving position -->
+              <path id="armLDefault" class="sketch-line" d="M96,160 Q70,200 65,250 Q63,265 60,275" 
+                    stroke="#1c1917" stroke-width="4" stroke-linecap="round" fill="none"/>
+              <!-- Switch-flipping reached-up arm -->
+              <path id="armLReach" class="sketch-line hidden" d="M98,160 Q70,90 40,25 Q35,12 28,5" 
+                    stroke="#1c1917" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+              <!-- Left hand switch clicker -->
+              <g id="handLReach" class="hidden">
+                <path d="M28,5 Q20,2 16,10 Q22,18 28,16" fill="#fff9f0" stroke="#1c1917" stroke-width="3"/>
+                <!-- Pointing index finger -->
+                <path d="M22,8 L8,-5" stroke="#1c1917" stroke-width="3.5" stroke-linecap="round"/>
+                <!-- Finger click energy sparks -->
+                <path class="click-sparks" d="M4,-12 L2,-6 M-2,-2 L-8,-5 M0,6 L-6,10" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round"/>
+              </g>
+            </g>
+
+            <!-- Right Arm & Hands (For covering eyes / waving / typing) -->
+            <g id="charRightArm" class="arm-interactive">
+              <!-- Default resting arm -->
+              <path id="armRDefault" class="sketch-line" d="M178,160 Q200,205 205,255 Q208,268 212,278" 
+                    stroke="#1c1917" stroke-width="4" stroke-linecap="round" fill="none"/>
+              <!-- Thumbs up gesture -->
+              <g id="handRThumbsUp" class="hidden">
+                <path d="M212,250 Q230,245 234,230 Q238,215 228,215 Q220,225 212,240" fill="#fff9f0" stroke="#1c1917" stroke-width="3"/>
+                <path d="M228,215 L228,200" stroke="#1c1917" stroke-width="4" stroke-linecap="round"/>
+              </g>
+            </g>
+
+            <!-- Hands Covering Eyes (Password typing mode - peek-a-boo) -->
+            <g id="handsCoverEyes" class="hands-cover-group hidden">
+              <!-- Left Hand covering left eye -->
+              <g transform="translate(102, 75)">
+                <path class="sketch-line" d="M-8,35 Q10,18 18,12 Q28,10 26,22 Q20,32 5,42 Z" fill="#fff9f0" stroke="#1c1917" stroke-width="3"/>
+                <!-- Fingers -->
+                <path d="M12,14 L24,16 M10,19 L22,22 M8,25 L19,28" stroke="#1c1917" stroke-width="2.2" stroke-linecap="round"/>
+              </g>
+              <!-- Right Hand covering right eye -->
+              <g transform="translate(142, 75)">
+                <path class="sketch-line" d="M36,35 Q18,18 10,12 Q0,10 2,22 Q8,32 23,42 Z" fill="#fff9f0" stroke="#1c1917" stroke-width="3"/>
+                <!-- Fingers -->
+                <path d="M16,14 L4,16 M18,19 L6,22 M20,25 L9,28" stroke="#1c1917" stroke-width="2.2" stroke-linecap="round"/>
+              </g>
+            </g>
+
+            <!-- Mascot Pencil in Pocket / Hand -->
+            <g id="mascotPencil" transform="translate(175, 230) rotate(25)">
+              <path d="M0,0 L6,0 L6,35 L3,42 L0,35 Z" fill="#f59e0b" stroke="#1c1917" stroke-width="1.8"/>
+              <path d="M0,0 L6,0 L6,8 L0,8 Z" fill="#f43f5e"/>
+              <path d="M2,38 L4,38 L3,42 Z" fill="#1c1917"/>
+            </g>
+
+          </g>
+        </svg>
+
+        <!-- Floating Sketch Doodles & Notes -->
+        <div class="character-doodles">
+          <span class="doodle-star s1">✦</span>
+          <span class="doodle-star s2">✧</span>
+          <span class="doodle-line">~ ~ ~</span>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Right Area: The High-Aesthetic Login Card Container -->
+    <div class="login-arena">
+      
+      <div class="login-card-wrapper" id="loginCardWrapper">
+        <!-- Hand-drawn Paper Tape / Pin Accents -->
+        <div class="card-tape tape-top-left"></div>
+        <div class="card-tape tape-top-right"></div>
+        
+        <!-- The Main Interactive Login Card -->
+        <div class="login-card theme-white" id="loginCard">
+          
+          <!-- Card Header with Sketch Flair -->
+          <div class="card-header">
+            <div class="header-badge">
+              <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="8" cy="8" r="6"/>
+                <path d="M8 4v4l2.5 2.5"/>
+              </svg>
+              <span>Handcrafted Workspace</span>
+            </div>
+            
+            <h1 class="card-title">Welcome Back</h1>
+            <p class="card-subtitle">
+              Sign in to your creative atelier.
+              <svg class="subtitle-flourish" viewBox="0 0 120 12" width="120" height="12">
+                <path d="M2,6 Q30,1 60,7 Q90,12 118,5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </p>
+          </div>
+
+          <!-- Fast Demo Auto-fill Helper -->
+          <div class="demo-quickfill">
+            <button type="button" class="demo-chip" id="quickFillBtn" title="Click to quickly fill sample credentials">
+              <span class="chip-spark">✏️</span> Try Demo Fill: <strong>artist@sketch.studio</strong>
+            </button>
+          </div>
+
+          <!-- The Login Form -->
+          <form class="auth-form" id="loginForm" novalidate>
+            
+            <!-- Email Input Group -->
+            <div class="form-group" id="emailGroup">
+              <label for="emailInput" class="form-label">
+                <span>Email Address</span>
+                <span class="sketch-pencil-indicator" id="emailPencil">✏️ sketching...</span>
+              </label>
+              
+              <div class="input-wrapper">
+                <div class="input-icon">
+                  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <rect x="2" y="4" width="20" height="16" rx="2" />
+                    <path d="M22 6L12 13 2 6" />
+                  </svg>
+                </div>
+                
+                <input 
+                  type="email" 
+                  id="emailInput" 
+                  name="email" 
+                  class="sketch-input" 
+                  placeholder="name@example.com" 
+                  autocomplete="email"
+                  required
+                >
+                
+                <div class="input-stroke-decor"></div>
+              </div>
+              <span class="field-error" id="emailError">Please enter a valid email address</span>
+            </div>
+
+            <!-- Password Input Group -->
+            <div class="form-group" id="passwordGroup">
+              <div class="label-row">
+                <label for="passwordInput" class="form-label">
+                  <span>Password</span>
+                  <span class="sketch-pencil-indicator" id="passwordPencil">🙈 Character covered eyes!</span>
+                </label>
+                <a href="#forgot" class="forgot-link" id="forgotPasswordLink">Forgot?</a>
+              </div>
+              
+              <div class="input-wrapper">
+                <div class="input-icon">
+                  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                  </svg>
+                </div>
+                
+                <input 
+                  type="password" 
+                  id="passwordInput" 
+                  name="password" 
+                  class="sketch-input" 
+                  placeholder="Enter your secret key" 
+                  autocomplete="current-password"
+                  required
+                >
+
+                <!-- Show/Hide Password Button -->
+                <button type="button" class="password-toggle" id="togglePasswordBtn" title="Toggle password visibility">
+                  <svg class="eye-open" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                  <svg class="eye-closed hidden" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                    <line x1="1" y1="1" x2="23" y2="23" />
+                  </svg>
+                </button>
+                
+                <div class="input-stroke-decor"></div>
+              </div>
+              
+              <!-- Sketch Password Strength Meter -->
+              <div class="password-meter" id="passwordMeter">
+                <div class="meter-track">
+                  <div class="meter-bar" id="meterBar"></div>
+                </div>
+                <div class="meter-label" id="meterLabel">Password strength: Empty</div>
+              </div>
+              <span class="field-error" id="passwordError">Password must be at least 6 characters</span>
+            </div>
+
+            <!-- Remember Me & Preferences -->
+            <div class="form-auxiliary">
+              <label class="sketch-checkbox-container" id="rememberMeContainer">
+                <input type="checkbox" id="rememberMeCheckbox" name="remember">
+                <span class="sketch-checkmark">
+                  <svg viewBox="0 0 16 16" width="14" height="14">
+                    <path class="check-path" d="M3,8 L6,12 L13,3" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+                <span class="checkbox-text">Keep me signed in</span>
+              </label>
+            </div>
+
+            <!-- Sign In Submit Button -->
+            <button type="submit" class="sketch-submit-btn" id="submitBtn">
+              <span class="btn-crosshatch"></span>
+              <span class="btn-content">
+                <span class="btn-label">Sign In to Canvas</span>
+                <svg class="btn-arrow" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                  <polyline points="12 5 19 12 12 19" />
+                </svg>
+              </span>
+              <span class="spinner-sketch hidden" id="submitSpinner">
+                <svg viewBox="0 0 24 24" width="22" height="22">
+                  <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="3" stroke-dasharray="35" stroke-dashoffset="10"/>
+                </svg>
+              </span>
+            </button>
+
+          </form>
+
+          <!-- Divider with hand-drawn pencil line -->
+          <div class="sketch-divider">
+            <span class="divider-line"></span>
+            <span class="divider-text handwritten">or continue with</span>
+            <span class="divider-line"></span>
+          </div>
+
+          <!-- Social Login Sketched Badges -->
+          <div class="social-auth-grid">
+            <button type="button" class="social-btn" title="Sign in with Google" onclick="handleSocialAuth('Google')">
+              <svg viewBox="0 0 24 24" width="18" height="18">
+                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/>
+                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/>
+              </svg>
+              <span>Google</span>
+            </button>
+
+            <button type="button" class="social-btn" title="Sign in with GitHub" onclick="handleSocialAuth('GitHub')">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+              </svg>
+              <span>GitHub</span>
+            </button>
+
+            <button type="button" class="social-btn" title="Sign in with Apple" onclick="handleSocialAuth('Apple')">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.87c.6-1.07 1-2.57.81-4.07-1.32.08-2.85.9-3.74 1.94-.59.69-1.12 2.22-.92 3.69 1.48.11 2.95-.77 3.85-1.56z"/>
+              </svg>
+              <span>Apple</span>
+            </button>
+          </div>
+
+          <!-- Card Footer (Registration prompt) -->
+          <div class="card-footer">
+            <span>Don't have a draft book?</span>
+            <a href="#signup" class="signup-link" id="signUpLink">Create an account</a>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Interactive Modal: Success Welcome Dialogue with Sketch Animation -->
+  <div class="sketch-modal-backdrop hidden" id="successModal">
+    <div class="sketch-modal">
+      <div class="modal-stamp">APPROVED</div>
+      <div class="modal-icon-circle">
+        <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="#1c1917" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+      </div>
+      <h2 class="modal-title handwritten">Authentication Successful!</h2>
+      <p class="modal-desc" id="modalUserMsg">Welcome back, artist! Your sketchbook workspace is loaded.</p>
+      <button type="button" class="modal-close-btn" id="modalCloseBtn">Continue to Dashboard</button>
+    </div>
+  </div>
+
+  <!-- Interactive Modal: Forgot Password -->
+  <div class="sketch-modal-backdrop hidden" id="forgotModal">
+    <div class="sketch-modal">
+      <h2 class="modal-title handwritten">Reset Your Key</h2>
+      <p class="modal-desc">Enter your email and we'll send a hand-sketched recovery link.</p>
+      <div class="modal-input-box">
+        <input type="email" id="forgotEmailInput" class="sketch-input" placeholder="artist@sketch.studio">
+      </div>
+      <div class="modal-btn-row">
+        <button type="button" class="modal-secondary-btn" id="forgotCancelBtn">Cancel</button>
+        <button type="button" class="modal-close-btn" id="forgotSubmitBtn">Send Link</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="sounds.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

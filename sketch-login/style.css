@@ -1,0 +1,1603 @@
+/* ==========================================================================
+   PENCIL SKETCH INTERACTIVE LOGIN EXPERIENCE
+   Artistic Handcrafted Aesthetic & Lighting Architecture
+   ========================================================================== */
+
+:root {
+  /* Dynamic Palette */
+  --bg-dark: #141416;
+  --bg-dark-grid: rgba(255, 255, 255, 0.04);
+  --bg-yellow-base: #FFDA44;
+  --bg-yellow-warm: #FFE478;
+  --bg-yellow-deep: #F0B800;
+  
+  --ink-primary: #18181B;
+  --ink-secondary: #52525B;
+  --ink-muted: #71717A;
+  --ink-light: #F4F4F5;
+  
+  --graphite-stroke: #1C1917;
+  --graphite-shadow: rgba(24, 24, 27, 0.16);
+  --graphite-shadow-lg: rgba(24, 24, 27, 0.22);
+  
+  --sketch-paper-white: #FFFFFF;
+  --sketch-paper-offwhite: #FAF8F5;
+  --sketch-card-dark: #18181C;
+  --sketch-card-dark-surface: #222228;
+  
+  --accent-amber: #D97706;
+  --accent-red: #DC2626;
+  --accent-green: #16A34A;
+  
+  --font-main: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-sketch: 'Caveat', cursive, sans-serif;
+  --font-mono: 'Space Mono', monospace;
+  
+  --transition-smooth: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-bounce: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Reset & Base Styles */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html, body {
+  width: 100%;
+  min-height: 100vh;
+  font-family: var(--font-main);
+  overflow-x: hidden;
+  position: relative;
+  color: var(--ink-primary);
+  user-select: none;
+}
+
+/* Hidden Utility */
+.hidden {
+  display: none !important;
+}
+
+.handwritten {
+  font-family: var(--font-sketch);
+}
+
+.svg-filters {
+  position: absolute;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   Background Canvas & Lighting Mechanics
+   ========================================================================== */
+
+.canvas-background {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  transition: background-color 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+}
+
+/* Lights OFF State (Dim Charcoal Sketch Paper) */
+body.light-off .canvas-background {
+  background-color: var(--bg-dark);
+}
+
+/* Lights ON State (Radiant Warm Artistic Yellow Studio) */
+body.light-on .canvas-background {
+  background-color: var(--bg-yellow-base);
+  background: radial-gradient(circle at 18% 18%, var(--bg-yellow-warm) 0%, var(--bg-yellow-base) 45%, var(--bg-yellow-deep) 100%);
+}
+
+/* Realistic Hand-Drawn Paper Texture Grain */
+.paper-texture {
+  position: absolute;
+  inset: 0;
+  opacity: 0.28;
+  pointer-events: none;
+  background-image: radial-gradient(#1c1917 0.75px, transparent 0.75px), radial-gradient(#1c1917 0.75px, transparent 0.75px);
+  background-size: 24px 24px;
+  background-position: 0 0, 12px 12px;
+  transition: opacity 0.6s ease;
+}
+
+body.light-off .paper-texture {
+  opacity: 0.15;
+  background-image: radial-gradient(#ffffff 0.75px, transparent 0.75px);
+}
+
+/* Draft Grid Overlay */
+.graphite-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-size: 40px 40px;
+  background-image: 
+    linear-gradient(to right, rgba(28, 25, 23, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(28, 25, 23, 0.05) 1px, transparent 1px);
+  opacity: 0.8;
+  transition: opacity 0.6s ease;
+}
+
+body.light-off .graphite-grid {
+  background-image: 
+    linear-gradient(to right, var(--bg-dark-grid) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--bg-dark-grid) 1px, transparent 1px);
+  opacity: 0.5;
+}
+
+/* Dark overlay for dim state */
+.dark-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 15, 18, 0.92);
+  opacity: 1;
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+
+body.light-on .dark-overlay {
+  opacity: 0;
+}
+
+/* Light Beam Explosion on Switch Flip */
+.light-beam {
+  position: absolute;
+  top: 100px;
+  left: 90px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.95) 0%, rgba(255, 228, 120, 0.6) 50%, transparent 80%);
+  transform: scale(0);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.light-beam.flash {
+  animation: lightBurst 0.9s cubic-bezier(0.1, 0.9, 0.2, 1) forwards;
+}
+
+@keyframes lightBurst {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(320);
+    opacity: 0;
+  }
+}
+
+/* ==========================================================================
+   Top Navigation & Controls
+   ========================================================================== */
+
+.top-nav {
+  position: relative;
+  z-index: 20;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 2.5rem;
+  transition: var(--transition-smooth);
+}
+
+.brand-sketch {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  transition: color 0.4s ease;
+}
+
+body.light-off .brand-sketch {
+  color: #E4E4E7;
+}
+
+body.light-on .brand-sketch {
+  color: var(--ink-primary);
+}
+
+.brand-title strong {
+  font-family: var(--font-sketch);
+  font-size: 1.6rem;
+  margin-left: 2px;
+  font-weight: 700;
+}
+
+.top-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+/* Card Style Mode Toggle (White Card vs Black Ink Card) */
+.card-theme-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(8px);
+  border: 1.5px solid var(--graphite-stroke);
+  border-radius: 30px;
+  padding: 0.25rem 0.5rem;
+  box-shadow: 2px 2px 0 var(--graphite-stroke);
+}
+
+body.light-off .card-theme-toggle {
+  background: rgba(30, 30, 36, 0.8);
+  border-color: #52525B;
+  box-shadow: 2px 2px 0 #3f3f46;
+}
+
+.toggle-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding-left: 0.35rem;
+  color: inherit;
+}
+
+body.light-off .toggle-label {
+  color: #A1A1AA;
+}
+
+.theme-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: transparent;
+  border: none;
+  padding: 0.3rem 0.65rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  border-radius: 20px;
+  cursor: pointer;
+  color: inherit;
+  transition: all 0.25s ease;
+}
+
+body.light-off .theme-btn {
+  color: #D4D4D8;
+}
+
+.theme-btn.active {
+  background: var(--ink-primary);
+  color: #FFFFFF;
+}
+
+body.light-off .theme-btn.active {
+  background: #FFFFFF;
+  color: #18181B;
+}
+
+.color-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1px solid currentColor;
+}
+
+.color-dot.white {
+  background-color: #FFFFFF;
+}
+
+.color-dot.black {
+  background-color: #18181B;
+}
+
+.icon-tool-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(8px);
+  border: 1.5px solid var(--graphite-stroke);
+  border-radius: 30px;
+  padding: 0.45rem 0.9rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 2px 2px 0 var(--graphite-stroke);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.3s ease;
+}
+
+body.light-off .icon-tool-btn {
+  background: rgba(30, 30, 36, 0.8);
+  border-color: #52525B;
+  color: #E4E4E7;
+  box-shadow: 2px 2px 0 #3f3f46;
+}
+
+.icon-tool-btn:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 var(--graphite-stroke);
+  background: rgba(255, 255, 255, 0.5);
+}
+
+body.light-off .icon-tool-btn:hover {
+  box-shadow: 3px 3px 0 #52525B;
+  background: rgba(45, 45, 55, 0.9);
+}
+
+.icon-tool-btn:active {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0 var(--graphite-stroke);
+}
+
+/* ==========================================================================
+   Wall Light Switch Station (Pencil Sketch Mechanical Switch)
+   ========================================================================== */
+
+.switch-station {
+  position: absolute;
+  top: 90px;
+  left: 55px;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.switch-plate {
+  position: relative;
+  width: 76px;
+  height: 120px;
+  background: #FAF8F2;
+  border: 3.5px solid #1C1917;
+  border-radius: 12px;
+  box-shadow: 5px 6px 0 rgba(28, 25, 23, 0.85);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.2s ease;
+  filter: url(#pencil-texture);
+}
+
+body.light-off .switch-plate {
+  background: #27272A;
+  border-color: #71717A;
+  box-shadow: 4px 6px 0 #09090B;
+}
+
+.switch-plate:hover {
+  transform: translate(-2px, -2px) scale(1.02);
+  box-shadow: 7px 8px 0 var(--graphite-stroke);
+}
+
+body.light-off .switch-plate:hover {
+  box-shadow: 6px 8px 0 #09090B;
+}
+
+/* Wall Screws */
+.plate-screw {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid #1C1917;
+  background: #E4E4E7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+body.light-off .plate-screw {
+  border-color: #71717A;
+  background: #3F3F46;
+}
+
+.screw-slot {
+  width: 8px;
+  height: 2px;
+  background: #1C1917;
+  transform: rotate(35deg);
+}
+
+body.light-off .screw-slot {
+  background: #A1A1AA;
+}
+
+.plate-screw.bottom .screw-slot {
+  transform: rotate(-50deg);
+}
+
+/* Toggle Frame & Rocker */
+.switch-toggle-frame {
+  width: 40px;
+  height: 62px;
+  background: #D4D4D8;
+  border: 2.5px solid #1C1917;
+  border-radius: 6px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+body.light-off .switch-toggle-frame {
+  background: #18181B;
+  border-color: #52525B;
+}
+
+.toggle-rocker {
+  position: absolute;
+  left: 2px;
+  right: 2px;
+  height: 32px;
+  background: #FFFFFF;
+  border: 2px solid #1C1917;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  transition: top 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease, background-color 0.2s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* OFF Position (Lever pulled DOWN) */
+body.light-off .toggle-rocker {
+  top: 24px;
+  background: #52525B;
+  border-color: #27272A;
+  box-shadow: 0 -3px 4px rgba(0, 0, 0, 0.4);
+}
+
+/* ON Position (Lever pushed UP) */
+body.light-on .toggle-rocker {
+  top: 2px;
+  background: #FEF08A;
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.25);
+}
+
+.rocker-label {
+  font-size: 0.62rem;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  line-height: 1;
+}
+
+body.light-off .rocker-label.on {
+  opacity: 0.2;
+}
+
+body.light-off .rocker-label.off {
+  color: #F87171;
+  opacity: 1;
+}
+
+body.light-on .rocker-label.on {
+  color: #16A34A;
+  opacity: 1;
+}
+
+body.light-on .rocker-label.off {
+  opacity: 0.2;
+}
+
+.rocker-ridge {
+  width: 14px;
+  height: 2px;
+  background: #71717A;
+  border-radius: 1px;
+}
+
+/* Switch Hand-drawn Annotation */
+.switch-label-sketch {
+  position: absolute;
+  left: 90px;
+  top: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  white-space: nowrap;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--ink-primary);
+  pointer-events: none;
+  transition: color 0.4s ease;
+}
+
+body.light-off .switch-label-sketch {
+  color: #E4E4E7;
+}
+
+.sketch-arrow {
+  margin-top: -6px;
+  margin-left: -2px;
+  transform: rotate(-15deg);
+}
+
+/* Switch Pulse Hint in Dark */
+.switch-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.85rem;
+  font-size: 0.85rem;
+  font-family: var(--font-sketch);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #FCD34D;
+  transition: opacity 0.4s ease;
+}
+
+body.light-on .switch-hint {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.pulse-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #FCD34D;
+  box-shadow: 0 0 10px #FCD34D;
+  animation: pulseDot 1.4s infinite ease-in-out;
+}
+
+@keyframes pulseDot {
+  0%, 100% {
+    transform: scale(0.9);
+    opacity: 0.4;
+  }
+  50% {
+    transform: scale(1.4);
+    opacity: 1;
+    box-shadow: 0 0 16px #FCD34D;
+  }
+}
+
+/* ==========================================================================
+   Main Stage Layout
+   ========================================================================== */
+
+.stage-container {
+  position: relative;
+  z-index: 10;
+  max-width: 1240px;
+  min-height: calc(100vh - 120px);
+  margin: 0 auto;
+  padding: 1rem 2rem 3rem;
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  align-items: center;
+  gap: 2.5rem;
+}
+
+/* ==========================================================================
+   The Hand-Drawn Pencil Character Arena & Animations
+   ========================================================================== */
+
+.character-arena {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.character-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Speech / Thought Bubble */
+.sketch-bubble {
+  position: absolute;
+  top: -45px;
+  left: 50%;
+  transform: translateX(-40%) scale(0.9);
+  background: #FFFFFF;
+  border: 2.5px solid #1C1917;
+  border-radius: 18px;
+  padding: 0.6rem 1.15rem;
+  box-shadow: 3px 4px 0 #1C1917;
+  z-index: 15;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  filter: url(#rough-edge);
+}
+
+body.light-off .sketch-bubble {
+  background: #27272A;
+  border-color: #E4E4E7;
+  box-shadow: 3px 4px 0 #09090B;
+}
+
+.bubble-content {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #1C1917;
+  white-space: nowrap;
+}
+
+body.light-off .bubble-content {
+  color: #F4F4F5;
+}
+
+.bubble-tail {
+  position: absolute;
+  bottom: -10px;
+  left: 35px;
+  width: 14px;
+  height: 14px;
+  background: #FFFFFF;
+  border-right: 2.5px solid #1C1917;
+  border-bottom: 2.5px solid #1C1917;
+  transform: rotate(45deg);
+}
+
+body.light-off .bubble-tail {
+  background: #27272A;
+  border-color: #E4E4E7;
+}
+
+/* SVG Character */
+.sketch-human-svg {
+  filter: url(#pencil-texture);
+  overflow: visible;
+  transition: transform 0.4s ease;
+}
+
+.character-group {
+  transform-origin: bottom center;
+}
+
+/* Idle Breathing Animation */
+body.light-on .char-head-group {
+  animation: breatheHead 3.5s ease-in-out infinite;
+}
+
+@keyframes breatheHead {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+/* Eye Blinking */
+#eyeL, #eyeR {
+  animation: eyeBlink 4.5s infinite ease-in-out;
+  transform-origin: center;
+}
+
+@keyframes eyeBlink {
+  0%, 46%, 50%, 100% {
+    transform: scaleY(1);
+  }
+  48% {
+    transform: scaleY(0.1);
+  }
+}
+
+/* Character Intro Walk-In Animation Sequence */
+.character-arena.walking-intro {
+  animation: characterWalkIn 2.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+@keyframes characterWalkIn {
+  0% {
+    transform: translate(-350px, 30px);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  55% {
+    transform: translate(-140px, -40px); /* Move close to the wall switch */
+  }
+  75% {
+    transform: translate(-140px, -40px);
+  }
+  100% {
+    transform: translate(0, 0); /* Settle comfortably on left stage */
+  }
+}
+
+/* Character Reaching for Switch Position */
+.character-arena.reaching-switch {
+  transform: translate(-140px, -50px) !important;
+}
+
+/* Floating Sparkle Doodles */
+.character-doodles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.doodle-star {
+  position: absolute;
+  font-size: 1.4rem;
+  color: #1C1917;
+  opacity: 0.6;
+  animation: floatStar 3s ease-in-out infinite alternate;
+}
+
+.doodle-star.s1 {
+  top: 15%;
+  right: 10%;
+  animation-delay: 0.2s;
+}
+
+.doodle-star.s2 {
+  top: 45%;
+  left: -5%;
+  animation-delay: 1.2s;
+}
+
+@keyframes floatStar {
+  0% {
+    transform: translateY(0) rotate(0deg) scale(0.85);
+  }
+  100% {
+    transform: translateY(-8px) rotate(20deg) scale(1.15);
+  }
+}
+
+/* ==========================================================================
+   The Login Card Architecture (Artisan Sketch Paper Style)
+   ========================================================================== */
+
+.login-arena {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-card-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 460px;
+  perspective: 1000px;
+}
+
+/* Washi Tape / Paper Pins at Corners */
+.card-tape {
+  position: absolute;
+  width: 60px;
+  height: 22px;
+  background: rgba(254, 240, 138, 0.7);
+  border: 1px dashed rgba(28, 25, 23, 0.4);
+  z-index: 12;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+  pointer-events: none;
+}
+
+.tape-top-left {
+  top: -10px;
+  left: 20px;
+  transform: rotate(-12deg);
+}
+
+.tape-top-right {
+  top: -10px;
+  right: 20px;
+  transform: rotate(14deg);
+}
+
+/* Master Card Container */
+.login-card {
+  position: relative;
+  width: 100%;
+  border-radius: 20px;
+  padding: 2.2rem 2.2rem 1.8rem;
+  transition: background-color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease;
+  filter: url(#rough-edge);
+}
+
+/* State when Light is OFF (Dim card) */
+body.light-off .login-card {
+  opacity: 0.25;
+  filter: blur(1px) grayscale(60%);
+  pointer-events: none;
+  transform: translateY(12px) scale(0.97);
+}
+
+/* State when Light is ON (Vibrant & crisp) */
+body.light-on .login-card {
+  opacity: 1;
+  filter: none;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
+}
+
+/* -------------------------------------------------------------
+   THEME 1: White Card (Handmade Paper with Charcoal Graphite)
+   ------------------------------------------------------------- */
+.login-card.theme-white {
+  background: var(--sketch-paper-white);
+  border: 3.5px solid var(--ink-primary);
+  box-shadow: 
+    8px 10px 0 var(--ink-primary),
+    0 20px 35px var(--graphite-shadow-lg);
+  color: var(--ink-primary);
+}
+
+/* -------------------------------------------------------------
+   THEME 2: Black Ink Card (Sumi Ink with Chalk/Pencil Accents)
+   ------------------------------------------------------------- */
+.login-card.theme-black {
+  background: var(--sketch-card-dark);
+  border: 3.5px solid #E4E4E7;
+  box-shadow: 
+    8px 10px 0 #09090B,
+    0 20px 40px rgba(0, 0, 0, 0.5);
+  color: #FAFAFA;
+}
+
+/* Card Header */
+.card-header {
+  margin-bottom: 1.35rem;
+}
+
+.header-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.25rem 0.65rem;
+  border-radius: 12px;
+  margin-bottom: 0.65rem;
+}
+
+.theme-white .header-badge {
+  background: #FEF3C7;
+  color: #92400E;
+  border: 1.5px solid #F59E0B;
+}
+
+.theme-black .header-badge {
+  background: #27272A;
+  color: #FDE68A;
+  border: 1.5px solid #71717A;
+}
+
+.card-title {
+  font-size: 2.1rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  margin-bottom: 0.35rem;
+}
+
+.card-subtitle {
+  font-size: 0.95rem;
+  color: var(--ink-secondary);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.theme-black .card-subtitle {
+  color: #A1A1AA;
+}
+
+.subtitle-flourish {
+  margin-top: 2px;
+  stroke: currentColor;
+  opacity: 0.7;
+}
+
+/* Quick Fill Demo Helper */
+.demo-quickfill {
+  margin-bottom: 1.25rem;
+}
+
+.demo-chip {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  background: rgba(254, 240, 138, 0.35);
+  border: 1.5px dashed var(--ink-primary);
+  border-radius: 10px;
+  padding: 0.45rem 0.8rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--ink-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.theme-black .demo-chip {
+  background: rgba(39, 39, 42, 0.7);
+  border-color: #71717A;
+  color: #E4E4E7;
+}
+
+.demo-chip:hover {
+  background: #FEF08A;
+  transform: translateY(-1px);
+}
+
+.theme-black .demo-chip:hover {
+  background: #3F3F46;
+}
+
+/* ==========================================================================
+   Form Fields & Handcrafted Inputs
+   ========================================================================== */
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.form-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.86rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sketch-pencil-indicator {
+  font-family: var(--font-sketch);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--accent-amber);
+  opacity: 0;
+  transform: translateY(3px);
+  transition: all 0.25s ease;
+}
+
+.form-group.focused .sketch-pencil-indicator {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.forgot-link {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-style: wavy;
+  text-decoration-thickness: 1.5px;
+  transition: color 0.2s ease;
+}
+
+.forgot-link:hover {
+  color: var(--accent-amber);
+}
+
+/* Input Box Styling */
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.input-icon {
+  position: absolute;
+  left: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-secondary);
+  pointer-events: none;
+  transition: color 0.2s ease;
+}
+
+.theme-black .input-icon {
+  color: #A1A1AA;
+}
+
+.sketch-input {
+  width: 100%;
+  padding: 0.75rem 1rem 0.75rem 2.85rem;
+  font-family: var(--font-main);
+  font-size: 0.95rem;
+  font-weight: 500;
+  border-radius: 12px;
+  outline: none;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* White theme inputs */
+.theme-white .sketch-input {
+  background: var(--sketch-paper-offwhite);
+  border: 2.5px solid var(--ink-primary);
+  color: var(--ink-primary);
+  box-shadow: 2px 3px 0 var(--graphite-shadow);
+}
+
+.theme-white .sketch-input:focus {
+  background: #FFFFFF;
+  border-color: var(--ink-primary);
+  box-shadow: 4px 5px 0 var(--ink-primary);
+  transform: translate(-1px, -1px);
+}
+
+/* Black theme inputs */
+.theme-black .sketch-input {
+  background: var(--sketch-card-dark-surface);
+  border: 2.5px solid #52525B;
+  color: #FFFFFF;
+  box-shadow: 2px 3px 0 #09090B;
+}
+
+.theme-black .sketch-input:focus {
+  background: #18181B;
+  border-color: #F4F4F5;
+  box-shadow: 4px 5px 0 #E4E4E7;
+  transform: translate(-1px, -1px);
+}
+
+.sketch-input::placeholder {
+  color: #A1A1AA;
+  font-weight: 400;
+}
+
+.theme-black .sketch-input::placeholder {
+  color: #71717A;
+}
+
+/* Password Toggle Eye Button */
+.password-toggle {
+  position: absolute;
+  right: 12px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-secondary);
+  padding: 4px;
+  border-radius: 6px;
+  transition: color 0.2s ease, transform 0.15s ease;
+}
+
+.theme-black .password-toggle {
+  color: #A1A1AA;
+}
+
+.password-toggle:hover {
+  color: var(--ink-primary);
+  transform: scale(1.1);
+}
+
+.theme-black .password-toggle:hover {
+  color: #FFFFFF;
+}
+
+/* Password Strength Meter */
+.password-meter {
+  display: none;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 0.35rem;
+}
+
+.password-meter.active {
+  display: flex;
+}
+
+.meter-track {
+  width: 100%;
+  height: 6px;
+  background: #E4E4E7;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid var(--ink-primary);
+}
+
+.theme-black .meter-track {
+  background: #27272A;
+  border-color: #71717A;
+}
+
+.meter-bar {
+  height: 100%;
+  width: 0%;
+  border-radius: 4px;
+  transition: width 0.3s ease, background-color 0.3s ease;
+}
+
+.meter-label {
+  font-size: 0.72rem;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--ink-muted);
+}
+
+/* Field Validation Errors */
+.field-error {
+  display: none;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--accent-red);
+  margin-top: 2px;
+}
+
+.form-group.has-error .field-error {
+  display: block;
+}
+
+.theme-white .form-group.has-error .sketch-input {
+  border-color: var(--accent-red);
+  background: #FEF2F2;
+}
+
+.theme-black .form-group.has-error .sketch-input {
+  border-color: #EF4444;
+  background: #2A1717;
+}
+
+/* Remember Me Checkbox */
+.form-auxiliary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 0.1rem;
+}
+
+.sketch-checkbox-container {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  cursor: pointer;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.sketch-checkbox-container input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.sketch-checkmark {
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.theme-white .sketch-checkmark {
+  background: #FAF8F5;
+  border: 2px solid var(--ink-primary);
+  box-shadow: 2px 2px 0 var(--graphite-shadow);
+}
+
+.theme-black .sketch-checkmark {
+  background: var(--sketch-card-dark-surface);
+  border: 2px solid #71717A;
+  box-shadow: 2px 2px 0 #09090B;
+}
+
+.check-path {
+  stroke-dasharray: 20;
+  stroke-dashoffset: 20;
+  transition: stroke-dashoffset 0.25s ease;
+}
+
+.sketch-checkbox-container input:checked ~ .sketch-checkmark {
+  background: #FEF08A;
+}
+
+.theme-black .sketch-checkbox-container input:checked ~ .sketch-checkmark {
+  background: #FDE047;
+  color: #18181B;
+  border-color: #FDE047;
+}
+
+.sketch-checkbox-container input:checked ~ .sketch-checkmark .check-path {
+  stroke-dashoffset: 0;
+}
+
+/* ==========================================================================
+   Submit Button with Hand-Hatched Texture
+   ========================================================================== */
+
+.sketch-submit-btn {
+  position: relative;
+  width: 100%;
+  padding: 0.9rem 1.5rem;
+  border-radius: 14px;
+  font-family: var(--font-main);
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.15s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+  margin-top: 0.4rem;
+}
+
+.theme-white .sketch-submit-btn {
+  background: var(--ink-primary);
+  color: #FFFFFF;
+  border: 2.5px solid var(--ink-primary);
+  box-shadow: 4px 5px 0 #000000;
+}
+
+.theme-black .sketch-submit-btn {
+  background: #FDE047;
+  color: #18181B;
+  border: 2.5px solid #FDE047;
+  box-shadow: 4px 5px 0 #CA8A04;
+}
+
+.sketch-submit-btn:hover {
+  transform: translate(-2px, -2px);
+}
+
+.theme-white .sketch-submit-btn:hover {
+  box-shadow: 6px 7px 0 #000000;
+  background: #27272A;
+}
+
+.theme-black .sketch-submit-btn:hover {
+  box-shadow: 6px 7px 0 #CA8A04;
+  background: #FEF08A;
+}
+
+.sketch-submit-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 currentColor;
+}
+
+.btn-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+}
+
+.btn-arrow {
+  transition: transform 0.2s ease;
+}
+
+.sketch-submit-btn:hover .btn-arrow {
+  transform: translateX(4px);
+}
+
+/* Spinner */
+.spinner-sketch {
+  animation: spin 0.8s linear infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* ==========================================================================
+   Divider & Social Authentication Grid
+   ========================================================================== */
+
+.sketch-divider {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 1.15rem 0 0.95rem;
+}
+
+.divider-line {
+  flex: 1;
+  height: 2px;
+  background: #E4E4E7;
+}
+
+.theme-white .divider-line {
+  background: #E4E4E7;
+}
+
+.theme-black .divider-line {
+  background: #3F3F46;
+}
+
+.divider-text {
+  font-size: 1.25rem;
+  color: var(--ink-secondary);
+  white-space: nowrap;
+}
+
+.theme-black .divider-text {
+  color: #A1A1AA;
+}
+
+.social-auth-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.65rem;
+}
+
+.social-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.65rem 0.5rem;
+  border-radius: 12px;
+  font-family: var(--font-main);
+  font-size: 0.84rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.theme-white .social-btn {
+  background: #FAF8F5;
+  border: 2px solid var(--ink-primary);
+  color: var(--ink-primary);
+  box-shadow: 2px 3px 0 var(--graphite-shadow);
+}
+
+.theme-white .social-btn:hover {
+  background: #FFFFFF;
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 4px 0 var(--ink-primary);
+}
+
+.theme-black .social-btn {
+  background: var(--sketch-card-dark-surface);
+  border: 2px solid #52525B;
+  color: #FAFAFA;
+  box-shadow: 2px 3px 0 #09090B;
+}
+
+.theme-black .social-btn:hover {
+  background: #27272A;
+  border-color: #E4E4E7;
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 4px 0 #E4E4E7;
+}
+
+/* Card Footer */
+.card-footer {
+  margin-top: 1.25rem;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--ink-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+}
+
+.theme-black .card-footer {
+  color: #A1A1AA;
+}
+
+.signup-link {
+  font-weight: 700;
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-style: wavy;
+}
+
+/* ==========================================================================
+   Modals & Popups
+   ========================================================================== */
+
+.sketch-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.sketch-modal {
+  position: relative;
+  max-width: 420px;
+  width: 100%;
+  background: #FFFFFF;
+  border: 3.5px solid #1C1917;
+  border-radius: 20px;
+  padding: 2.2rem;
+  box-shadow: 8px 10px 0 #1C1917;
+  text-align: center;
+  filter: url(#rough-edge);
+  animation: popModal 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes popModal {
+  0% { transform: scale(0.85) translateY(20px); opacity: 0; }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+.modal-stamp {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  border: 2px dashed #16A34A;
+  color: #16A34A;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transform: rotate(8deg);
+}
+
+.modal-icon-circle {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 1.25rem;
+  background: #FEF08A;
+  border: 2.5px solid #1C1917;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.modal-desc {
+  font-size: 0.92rem;
+  color: var(--ink-secondary);
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+.modal-input-box {
+  margin-bottom: 1.25rem;
+}
+
+.modal-btn-row {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.modal-close-btn {
+  flex: 1;
+  padding: 0.8rem 1.25rem;
+  background: #1C1917;
+  color: #FFFFFF;
+  border: 2px solid #1C1917;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 3px 4px 0 #71717A;
+  transition: all 0.2s ease;
+}
+
+.modal-close-btn:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 5px 0 #71717A;
+}
+
+.modal-secondary-btn {
+  flex: 1;
+  padding: 0.8rem 1.25rem;
+  background: #FAF8F5;
+  color: #1C1917;
+  border: 2px solid #1C1917;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* ==========================================================================
+   Responsive Adaptations
+   ========================================================================== */
+
+@media (max-width: 980px) {
+  .stage-container {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    padding-top: 4rem;
+  }
+  
+  .switch-station {
+    top: 75px;
+    left: 20px;
+    transform: scale(0.85);
+    transform-origin: top left;
+  }
+  
+  .character-arena {
+    order: 2;
+    height: 280px;
+  }
+
+  .character-wrapper {
+    transform: scale(0.8);
+  }
+
+  .login-arena {
+    order: 1;
+  }
+  
+  .top-nav {
+    padding: 1rem 1.5rem;
+  }
+
+  .card-theme-toggle {
+    display: none;
+  }
+}
+
+@media (max-width: 540px) {
+  .login-card {
+    padding: 1.6rem 1.4rem;
+  }
+  
+  .card-title {
+    font-size: 1.75rem;
+  }
+
+  .social-auth-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .top-nav {
+    padding: 0.75rem 1rem;
+  }
+
+  .btn-text {
+    display: none;
+  }
+}
