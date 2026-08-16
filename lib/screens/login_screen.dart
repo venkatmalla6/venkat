@@ -34,7 +34,6 @@ class _LoginScreenState extends State<LoginScreen>
   // Animation Controllers
   late AnimationController _introController;
   late Animation<double> _walkAnimation;
-  late Animation<double> _lightBurstAnimation;
   late AnimationController _breatheController;
   late AnimationController _blinkController;
   late AnimationController _cardEnterController;
@@ -53,13 +52,6 @@ class _LoginScreenState extends State<LoginScreen>
       CurvedAnimation(
         parent: _introController,
         curve: const Interval(0.0, 0.45, curve: Curves.easeOutCubic),
-      ),
-    );
-
-    _lightBurstAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _introController,
-        curve: const Interval(0.55, 0.85, curve: Curves.easeOutQuad),
       ),
     );
 
@@ -409,7 +401,7 @@ class _LoginScreenState extends State<LoginScreen>
                                 ? const Color(0xFF1C1917)
                                 : Colors.white,
                             elevation: 0,
-                            side: Border.all(
+                            side: BorderSide(
                               color: _isLightOn
                                   ? const Color(0xFF1C1917)
                                   : const Color(0xFF52525B),
