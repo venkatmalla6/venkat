@@ -12,14 +12,19 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen>
     with TickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
+  final _nameCtrl = TextEditingController();
   final _emailCtrl = TextEditingController();
   final _passCtrl = TextEditingController();
+  final _confirmPassCtrl = TextEditingController();
+  final _nameFocusNode = FocusNode();
   final _emailFocusNode = FocusNode();
   final _passFocusNode = FocusNode();
+  final _confirmPassFocusNode = FocusNode();
 
   bool _isLogin = true;
   bool _loading = false;
   bool _obscure = true;
+  bool _obscureConfirm = true;
   String? _errorMsg;
   bool _cardIsWhite = true; // White Card vs Black Ink Card
   bool _rememberMe = true;
@@ -73,17 +78,41 @@ class _LoginScreenState extends State<LoginScreen>
     )..repeat();
 
     // Focus listeners for character reactions
+    _nameFocusNode.addListener(() {
+      if (_nameFocusNode.hasFocus && !_isCoveringEyes) {
+        setState(() {
+          _characterSpeech = "What's your name or artist handle? 🎨";
+        });
+      }
+    });
+
     _passFocusNode.addListener(() {
       if (_passFocusNode.hasFocus) {
         setState(() {
           _isCoveringEyes = true;
           _characterSpeech = "I'm looking away! Your password is safe 🙈";
         });
-      } else {
+      } else if (!_confirmPassFocusNode.hasFocus) {
         setState(() {
           _isCoveringEyes = false;
           if (_isLightOn && !_isThumbsUp) {
             _characterSpeech = "I won't tell anyone! 😉";
+          }
+        });
+      }
+    });
+
+    _confirmPassFocusNode.addListener(() {
+      if (_confirmPassFocusNode.hasFocus) {
+        setState(() {
+          _isCoveringEyes = true;
+          _characterSpeech = "Confirming your secret code! 🙈";
+        });
+      } else if (!_passFocusNode.hasFocus) {
+        setState(() {
+          _isCoveringEyes = false;
+          if (_isLightOn && !_isThumbsUp) {
+            _characterSpeech = "Passwords looking great! ✨";
           }
         });
       }
@@ -158,10 +187,14 @@ class _LoginScreenState extends State<LoginScreen>
 
   @override
   void dispose() {
+    _nameCtrl.dispose();
     _emailCtrl.dispose();
     _passCtrl.dispose();
+    _confirmPassCtrl.dispose();
+    _nameFocusNode.dispose();
     _emailFocusNode.dispose();
     _passFocusNode.dispose();
+    _confirmPassFocusNode.dispose();
     _introController.dispose();
     _breatheController.dispose();
     _blinkController.dispose();
@@ -184,7 +217,9 @@ class _LoginScreenState extends State<LoginScreen>
     setState(() {
       _loading = true;
       _errorMsg = null;
-      _characterSpeech = "Checking your sketch credentials... ⏳";
+      _characterSpeech = _isLogin
+          ? "Checking your sketch credentials... ⏳"
+          : "Creating your new sketchbook account... ⏳";
     });
 
     try {
@@ -194,15 +229,21 @@ class _LoginScreenState extends State<LoginScreen>
           password: _passCtrl.text,
         );
       } else {
-        await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        final credential =
+            await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: _emailCtrl.text.trim(),
           password: _passCtrl.text,
         );
+        if (_nameCtrl.text.trim().isNotEmpty) {
+          await credential.user?.updateDisplayName(_nameCtrl.text.trim());
+        }
       }
 
       setState(() {
         _isThumbsUp = true;
-        _characterSpeech = "You're in! Loading your timetable! 🎉";
+        _characterSpeech = _isLogin
+            ? "You're in! Loading your timetable! 🎉"
+            : "Account created! Loading your timetable! 🎉";
       });
 
       await Future.delayed(const Duration(milliseconds: 800));
@@ -259,13 +300,18 @@ class _LoginScreenState extends State<LoginScreen>
       case 'user-not-found':
         return 'No sketch account found with this email.';
       case 'wrong-password':
-        return 'Incorrect password. Please try again.';
+      case 'invalid-credential':
+        return 'Incorrect password or email credentials.';
       case 'email-already-in-use':
         return 'An account already exists with this email.';
       case 'weak-password':
         return 'Password must be at least 6 characters.';
       case 'invalid-email':
         return 'Please enter a valid email address.';
+      case 'operation-not-allowed':
+        return 'Email/password sign-in is not enabled in Firebase Console.';
+      case 'too-many-requests':
+        return 'Too many attempts. Please try again later.';
       default:
         return 'Authentication failed ($code)';
     }
@@ -775,55 +821,79 @@ class _LoginScreenState extends State<LoginScreen>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    // Mode Switcher Tabs (Sign In / Register)
+                    _buildAuthModeTabs(),
+                    const SizedBox(height: 14),
+
                     // Header
                     _buildCardHeader(),
                     const SizedBox(height: 16),
 
-                    // Quick Demo Fill Chip
-                    GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _emailCtrl.text = 'artist@sketch.studio';
-                          _passCtrl.text = 'Palette#2026Master';
-                          _characterSpeech = "Demo draft credentials loaded! 🚀";
-                        });
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: _cardIsWhite
-                              ? const Color(0xFFFEF08A).withValues(alpha: 0.5)
-                              : const Color(0xFF27272A),
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
+                    // Quick Demo Fill Chip (Shown in Login Mode)
+                    if (_isLogin) ...[
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _emailCtrl.text = 'artist@sketch.studio';
+                            _passCtrl.text = 'Palette#2026Master';
+                            _characterSpeech = "Demo draft credentials loaded! 🚀";
+                          });
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
                             color: _cardIsWhite
-                                ? const Color(0xFF1C1917)
-                                : const Color(0xFF71717A),
-                            style: BorderStyle.solid,
+                                ? const Color(0xFFFEF08A).withValues(alpha: 0.5)
+                                : const Color(0xFF27272A),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: _cardIsWhite
+                                  ? const Color(0xFF1C1917)
+                                  : const Color(0xFF71717A),
+                              style: BorderStyle.solid,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Text('✏️ '),
+                              Text(
+                                'Try Demo: artist@sketch.studio',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                  color: _cardIsWhite
+                                      ? const Color(0xFF1C1917)
+                                      : const Color(0xFFE4E4E7),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Text('✏️ '),
-                            Text(
-                              'Try Demo: artist@sketch.studio',
-                              style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w700,
-                                color: _cardIsWhite
-                                    ? const Color(0xFF1C1917)
-                                    : const Color(0xFFE4E4E7),
-                              ),
-                            ),
-                          ],
-                        ),
                       ),
-                    ),
-                    const SizedBox(height: 16),
+                      const SizedBox(height: 14),
+                    ],
+
+                    // Full Name Field (Registration Mode Only)
+                    if (!_isLogin) ...[
+                      _buildSketchTextField(
+                        controller: _nameCtrl,
+                        focusNode: _nameFocusNode,
+                        label: 'Full Name',
+                        hint: 'e.g. Leonardo da Vinci',
+                        icon: Icons.person_outline_rounded,
+                        validator: (v) {
+                          if (v == null || v.trim().isEmpty) {
+                            return 'Please enter your name';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 14),
+                    ],
 
                     // Email Field
                     _buildSketchTextField(
@@ -846,7 +916,7 @@ class _LoginScreenState extends State<LoginScreen>
                       controller: _passCtrl,
                       focusNode: _passFocusNode,
                       label: 'Password',
-                      hint: 'Enter secret key',
+                      hint: _isLogin ? 'Enter secret key' : 'Min 6 characters',
                       icon: Icons.lock_outline_rounded,
                       obscureText: _obscure,
                       suffixIcon: IconButton(
@@ -867,75 +937,140 @@ class _LoginScreenState extends State<LoginScreen>
                         return null;
                       },
                     ),
+
+                    // Confirm Password Field (Registration Mode Only)
+                    if (!_isLogin) ...[
+                      const SizedBox(height: 14),
+                      _buildSketchTextField(
+                        controller: _confirmPassCtrl,
+                        focusNode: _confirmPassFocusNode,
+                        label: 'Confirm Password',
+                        hint: 'Re-enter your secret key',
+                        icon: Icons.lock_reset_rounded,
+                        obscureText: _obscureConfirm,
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _obscureConfirm
+                                ? Icons.visibility_off_outlined
+                                : Icons.visibility_outlined,
+                            color: _cardIsWhite
+                                ? const Color(0xFF52525B)
+                                : const Color(0xFFA1A1AA),
+                            size: 18,
+                          ),
+                          onPressed: () =>
+                              setState(() => _obscureConfirm = !_obscureConfirm),
+                        ),
+                        validator: (v) {
+                          if (v == null || v.isEmpty) {
+                            return 'Please confirm your password';
+                          }
+                          if (v != _passCtrl.text) {
+                            return 'Passwords do not match';
+                          }
+                          return null;
+                        },
+                      ),
+                    ],
+
                     const SizedBox(height: 8),
 
-                    // Remember Me & Forgot Password
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: Checkbox(
-                                value: _rememberMe,
-                                activeColor: const Color(0xFF1C1917),
-                                checkColor: const Color(0xFFFEF08A),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(4),
+                    // Remember Me & Forgot Password (Login Mode) or Cloud Sync Info (Register Mode)
+                    if (_isLogin)
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: Checkbox(
+                                  value: _rememberMe,
+                                  activeColor: const Color(0xFF1C1917),
+                                  checkColor: const Color(0xFFFEF08A),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  side: BorderSide(
+                                    color: _cardIsWhite
+                                        ? const Color(0xFF1C1917)
+                                        : const Color(0xFFE4E4E7),
+                                    width: 1.5,
+                                  ),
+                                  onChanged: (v) =>
+                                      setState(() => _rememberMe = v ?? true),
                                 ),
-                                side: BorderSide(
-                                  color: _cardIsWhite
-                                      ? const Color(0xFF1C1917)
-                                      : const Color(0xFFE4E4E7),
-                                  width: 1.5,
-                                ),
-                                onChanged: (v) =>
-                                    setState(() => _rememberMe = v ?? true),
                               ),
+                              const SizedBox(width: 8),
+                              Text(
+                                'Keep signed in',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: _cardIsWhite
+                                      ? const Color(0xFF52525B)
+                                      : const Color(0xFFA1A1AA),
+                                ),
+                              ),
+                            ],
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Recovery sketch link sent! 📬'),
+                                  backgroundColor: Color(0xFF16A34A),
+                                ),
+                              );
+                            },
+                            style: TextButton.styleFrom(
+                              padding: EdgeInsets.zero,
+                              minimumSize: Size.zero,
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                             ),
-                            const SizedBox(width: 8),
-                            Text(
-                              'Keep signed in',
+                            child: Text(
+                              'Forgot?',
                               style: TextStyle(
                                 fontSize: 12,
-                                fontWeight: FontWeight.w600,
+                                fontWeight: FontWeight.w700,
+                                decoration: TextDecoration.underline,
                                 color: _cardIsWhite
-                                    ? const Color(0xFF52525B)
-                                    : const Color(0xFFA1A1AA),
+                                    ? const Color(0xFF1C1917)
+                                    : const Color(0xFFFEF08A),
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    else
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 2),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.cloud_done_outlined,
+                              size: 15,
+                              color: _cardIsWhite
+                                  ? const Color(0xFF16A34A)
+                                  : const Color(0xFF4ADE80),
+                            ),
+                            const SizedBox(width: 6),
+                            Expanded(
+                              child: Text(
+                                'Syncs your timetable and custom tasks securely to cloud',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                  color: _cardIsWhite
+                                      ? const Color(0xFF71717A)
+                                      : const Color(0xFFA1A1AA),
+                                ),
                               ),
                             ),
                           ],
                         ),
-                        TextButton(
-                          onPressed: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Recovery sketch link sent! 📬'),
-                                backgroundColor: Color(0xFF16A34A),
-                              ),
-                            );
-                          },
-                          style: TextButton.styleFrom(
-                            padding: EdgeInsets.zero,
-                            minimumSize: Size.zero,
-                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                          ),
-                          child: Text(
-                            'Forgot?',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700,
-                              decoration: TextDecoration.underline,
-                              color: _cardIsWhite
-                                  ? const Color(0xFF1C1917)
-                                  : const Color(0xFFFEF08A),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
 
                     // Error Message
                     if (_errorMsg != null) ...[
@@ -997,7 +1132,7 @@ class _LoginScreenState extends State<LoginScreen>
                                 Text(
                                   _isLogin
                                       ? 'Sign In to Workspace'
-                                      : 'Create Account',
+                                      : 'Create Account & Start',
                                   style: const TextStyle(
                                     fontSize: 15,
                                     fontWeight: FontWeight.w800,
@@ -1005,7 +1140,12 @@ class _LoginScreenState extends State<LoginScreen>
                                   ),
                                 ),
                                 const SizedBox(width: 6),
-                                const Icon(Icons.arrow_forward_rounded, size: 18),
+                                Icon(
+                                  _isLogin
+                                      ? Icons.arrow_forward_rounded
+                                      : Icons.check_circle_outline_rounded,
+                                  size: 18,
+                                ),
                               ],
                             ),
                     ),
@@ -1037,7 +1177,9 @@ class _LoginScreenState extends State<LoginScreen>
                             : Colors.white,
                       ),
                       label: Text(
-                        'Continue with Google',
+                        _isLogin
+                            ? 'Continue with Google'
+                            : 'Sign up with Google',
                         style: TextStyle(
                           color: _cardIsWhite
                               ? const Color(0xFF1C1917)
@@ -1049,7 +1191,7 @@ class _LoginScreenState extends State<LoginScreen>
                     ),
                     const SizedBox(height: 14),
 
-                    // Register Switch
+                    // Register / Login Switch Link
                     Center(
                       child: GestureDetector(
                         onTap: () {
@@ -1063,8 +1205,8 @@ class _LoginScreenState extends State<LoginScreen>
                         },
                         child: Text(
                           _isLogin
-                              ? "Don't have an account? Create one"
-                              : "Already have a sketch book? Sign In",
+                              ? "Don't have an account? Register now"
+                              : "Already have an account? Sign In",
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w700,
@@ -1086,6 +1228,115 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
+  // ── Mode Switcher Tab Bar (Sign In / Register) ─────────────────────────────
+  Widget _buildAuthModeTabs() {
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: _cardIsWhite
+            ? const Color(0xFFF4F4F5)
+            : const Color(0xFF27272A),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: _cardIsWhite
+              ? const Color(0xFFE4E4E7)
+              : const Color(0xFF3F3F46),
+          width: 1.5,
+        ),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: _buildAuthTabItem(
+              label: 'Sign In',
+              icon: Icons.login_rounded,
+              isActive: _isLogin,
+              onTap: () {
+                if (!_isLogin) {
+                  setState(() {
+                    _isLogin = true;
+                    _errorMsg = null;
+                    _characterSpeech = "Welcome back! Ready to sketch? ✏️";
+                  });
+                }
+              },
+            ),
+          ),
+          const SizedBox(width: 4),
+          Expanded(
+            child: _buildAuthTabItem(
+              label: 'Register',
+              icon: Icons.person_add_alt_1_rounded,
+              isActive: !_isLogin,
+              onTap: () {
+                if (_isLogin) {
+                  setState(() {
+                    _isLogin = false;
+                    _errorMsg = null;
+                    _characterSpeech = "Let's create a new sketchbook account! 🎨";
+                  });
+                }
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAuthTabItem({
+    required String label,
+    required IconData icon,
+    required bool isActive,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        decoration: BoxDecoration(
+          color: isActive
+              ? (_cardIsWhite ? const Color(0xFF1C1917) : const Color(0xFFFEF08A))
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(8),
+          boxShadow: isActive
+              ? [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.1),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ]
+              : null,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              size: 15,
+              color: isActive
+                  ? (_cardIsWhite ? Colors.white : const Color(0xFF18181B))
+                  : (_cardIsWhite ? const Color(0xFF71717A) : const Color(0xFFA1A1AA)),
+            ),
+            const SizedBox(width: 6),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w800,
+                color: isActive
+                    ? (_cardIsWhite ? Colors.white : const Color(0xFF18181B))
+                    : (_cardIsWhite ? const Color(0xFF71717A) : const Color(0xFFA1A1AA)),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildCardHeader() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1104,7 +1355,7 @@ class _LoginScreenState extends State<LoginScreen>
             ),
           ),
           child: Text(
-            'HANDCRAFTED ATELIER',
+            _isLogin ? 'HANDCRAFTED ATELIER' : 'JOIN THE WORKSPACE',
             style: TextStyle(
               fontSize: 9,
               fontWeight: FontWeight.w900,
@@ -1126,7 +1377,9 @@ class _LoginScreenState extends State<LoginScreen>
           ),
         ),
         Text(
-          'Sign in to your creative study timetable',
+          _isLogin
+              ? 'Sign in to your creative study timetable'
+              : 'Register your account to sync tasks and progress',
           style: TextStyle(
             fontSize: 12,
             color: _cardIsWhite

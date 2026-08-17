@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 // ─── Data Models & Content for all 3 Timetables ───────────────────────────
 
 class ScheduleRow {
